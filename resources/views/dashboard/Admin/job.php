@@ -10,9 +10,7 @@
 
 <body class="bg-blue-50 text-gray-900">
   <!-- Header/Navbar -->
-  <?php
-  include('../navbar_admin.php')
-  ?>
+   <?php include('template/navbar_admin.php'); ?>
   <div class="max-w-7xl mx-auto px-6 py-12">
 
     <!-- Header Section -->

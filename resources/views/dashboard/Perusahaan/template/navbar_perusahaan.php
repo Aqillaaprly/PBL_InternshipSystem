@@ -1,4 +1,14 @@
-<?php include 'inc/lang.php'; ?>
+
+<?php
+// session_start();
+
+// // Cek apakah sudah login
+// if (!isset($_SESSION['user'])) {
+//     header('Location: /index.php');
+//     exit;
+// }
+
+?><?php include 'inc/lang.php'; ?>
 <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
@@ -13,18 +23,17 @@
                     </svg>
                 </button>
 
-                <a href="index.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
+                <a href="dashboard.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
                     SIMMAGANG
                 </a>
             </div>
 
             <!-- Center: Navigation Menu -->
-            <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-                <a href="mahasiswa.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['data_mahasiswa']; ?></a>
-                <a href="pembimbing.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['pembimbing']; ?></a>
-                <a href="laporan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['laporan']; ?></a>
-                <a href="pengaturan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['pengaturan']; ?></a>
-            </nav>
+           <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
+        <a href="lowongan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Lowongan</a>
+        <a href="pendaftar.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pendaftar</a>
+        
+      </nav>  
 
             <!-- Right: Google Translate + Profile -->
             <div class="flex items-center space-x-4">
@@ -49,10 +58,10 @@
                     </button>
 
                     <div id="profileDropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
-                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md"><?= $lang['profil']; ?></a>
+                        <a href="adminProfile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md"><?= $lang['profil']; ?></a>
                         <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><?= $lang['pengaturan']; ?></a>
                         <div class="border-t border-gray-200"></div>
-                        <a href="#" class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-b-md"><?= $lang['keluar']; ?></a>
+                        <a href="/login.php" class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-b-md"><?= $lang['keluar']; ?></a>
                     </div>
                 </div>
             </div>
