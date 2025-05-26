@@ -16,10 +16,9 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'username',
         'password',
-        'role', // Tambahan kolom untuk role
+        'role_id', // Tambahan kolom untuk role
     ];
 
     /**
@@ -45,12 +44,17 @@ class User extends Authenticatable
         ];
     }
 
+    public function role()
+    {
+       return $this->belongsTo(Role::class);
+    }
+
     /**
      * Helper methods for role-based access.
      */
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === '1';
     }
 
     public function isMahasiswa(): bool

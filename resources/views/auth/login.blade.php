@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login Simagang</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -23,7 +24,8 @@
             <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4 text-sm"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-       <form class="space-y-4 md:space-y-5" method="POST" action="{{ url('/login') }}">
+       <form class="space-y-4 md:space-y-5" method="POST" action="{{ route('log-in') }}">
+            @csrf
             <div>
                         <label class="block text-gray-600 mb-1">Username</label>
                         <input type="text" name="username" id="username" value="{{ old('username') }}" required
