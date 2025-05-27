@@ -16,12 +16,12 @@
     <div class="bg-white p-6 rounded-xl shadow mb-8 flex flex-col lg:flex-row justify-between items-center space-y-6 lg:space-y-0">
         <div class="max-w-xl">
             <h1 class="text-xl font-semibold text-blue-900 mb-2">
-                Lorem ipsum dolor sit amet consectetur. Augue aliquam quis sodales tempor donec.
+                Pantau dan Kelola Aktivitas Bimbingan Mahasiswa dengan Mudah dan Efisien
             </h1>
             <p class="text-md text-blue-700 font-semibold">
-                Nulla malesuada dui fermentum rhoncus feugiat ac aliquam.
+                Dashboard ini dirancang khusus untuk pembimbing dalam memantau progres, absensi, dan catatan bimbingan mahasiswa
             </p>
-            <p class="text-sm text-gray-500 mt-2">Lorem ipsum dolor sit amet consectetur.</p>
+            <p class="text-sm text-gray-500 mt-2">Lihat daftar mahasiswa bimbingan, jadwal pertemuan, serta aktivitas terbaru secara real-time.</p>
             <div class="mt-4 flex flex-col sm:flex-row gap-4">
                 <select class="p-2 border border-gray-300 rounded w-full sm:w-48">
                     <option>Regional</option>

@@ -14,8 +14,8 @@
 <div class="bg-blue-100 py-12 px-6 md:px-20">
     <div class="grid md:grid-cols-2 gap-10 items-center">
         <div>
-            <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-4">Lorem ipsum dolor sit amet consectetur. Augue aliquam quis sodales tempor donec.</h1>
-            <p class="text-gray-700 mb-6">Nulla malesuada dui fermentum rhoncus feugiat ac aliquam.</p>
+            <h1 class="text-3xl md:text-4xl font-bold leading-tight mb-4">Temukan dan Daftar Program Magang Sesuai Minat dan Keahlian Anda!</h1>
+            <p class="text-gray-700 mb-6">SIMMAGANG memudahkan mahasiswa dalam menjelajahi peluang magang dari berbagai perusahaan dan sektor. Dapatkan pengalaman kerja yang relevan dan tingkatkan kompetensi Anda sebelum lulus.</p>
             <div class="flex flex-col sm:flex-row gap-4 items-center">
                 <select class="px-4 py-2 rounded-md border border-gray-300 w-full sm:w-auto">
                     <option>Regional</option>
