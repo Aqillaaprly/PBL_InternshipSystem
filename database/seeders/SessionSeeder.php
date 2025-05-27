@@ -27,19 +27,15 @@ class SessionSeeder extends Seeder
 
         if ($userExists) {
             DB::table('sessions')->insert([
-                'id' => Str::random(40), // ID sesi acak khas Laravel
-                'user_id' => $userId, // Kaitkan dengan user_id yang ada
+                'id' => Str::random(40), 
+                'user_id' => $userId, 
                 'ip_address' => '127.0.0.1',
                 'user_agent' => 'Contoh Seeder User Agent/1.0',
-                // 'payload' biasanya berisi data sesi yang ter-serialize dan ter-encode.
-                // Membuat payload yang valid secara manual itu rumit.
-                // Untuk contoh ini, kita akan gunakan string kosong atau data dummy sederhana yang di-encode.
-                // Payload yang sebenarnya dibuat oleh Laravel saat session disimpan.
-                'payload' => base64_encode(serialize(['_token' => Str::random(40)])), // Contoh payload minimal
-                'last_activity' => time(), // Waktu aktivitas terakhir (timestamp Unix)
+                'payload' => base64_encode(serialize(['_token' => Str::random(40)])), 
+                'last_activity' => time(), 
             ]);
 
-            // Anda bisa menambahkan lebih banyak data sesi jika perlu
+           
             // DB::table('sessions')->insert([
             //     'id' => Str::random(40),
             //     'user_id' => null, // Sesi untuk guest (pengguna belum login)
@@ -50,8 +46,7 @@ class SessionSeeder extends Seeder
             // ]);
 
         } else {
-            // Berikan output jika user_id tidak ditemukan, agar seeder tidak gagal diam-diam
-            // atau lempar exception jika ini adalah kondisi kritis.
+            
             if (app()->runningInConsole()) {
                 $this->command->warn("User dengan ID {$userId} tidak ditemukan. Session seeder untuk pengguna ini dilewati.");
             }
