@@ -10,7 +10,7 @@
 
 <body class="bg-blue-50 text-gray-800">
     <!-- Header/Navbar -->
-    <?php include('template/navbar_admin.php'); ?>
+    @include('admin.template.navbar')
 
     <!-- Main Content -->
     <div class="flex flex-col min-h-screen">
@@ -46,19 +46,19 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
                 <a href="perusahaan.php" class="cursor-pointer block">
                     <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                        <p class="text-2xl font-bold text-blue-600"><?= $jumlahPerusahaan ?></p>
+                        {{-- <p class="text-2xl font-bold text-blue-600"><?= $jumlahPerusahaan ?></p> --}}
                         <p class="text-sm text-gray-700 mt-1">Perusahaan</p>
                     </div>
                 </a>
                 <a href="lowongan.php" class="cursor-pointer block">
                     <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                        <p class="text-2xl font-bold text-blue-600"><?= $jumlahLowongan ?></p>
+                        {{-- <p class="text-2xl font-bold text-blue-600"><?= $jumlahLowongan ?></p> --}}
                         <p class="text-sm text-gray-700 mt-1">Lowongan</p>
                     </div>
                 </a>
                 <a href="pendaftar.php" class="cursor-pointer block">
                     <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                        <p class="text-2xl font-bold text-blue-600"><?= $jumlahPendaftar ?></p>
+                        {{-- <p class="text-2xl font-bold text-blue-600"><?= $jumlahPendaftar ?></p> --}}
                         <p class="text-sm text-gray-700 mt-1">Pendaftar</p>
                     </div>
                 </a>
