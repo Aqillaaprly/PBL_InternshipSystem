@@ -12,7 +12,7 @@ class UserController extends Controller
     public function view()
     {
         $users = User::with('role')->get();
-        return view('admin.UserData', compact('users')); // kirim variabel $users ke view
+        return view('admin.dashboard', compact('users')); // kirim variabel $users ke view
     }
 
     public function create()
@@ -40,40 +40,39 @@ class UserController extends Controller
     }
 
     public function edit($id)
-{
-    $user = User::findOrFail($id);
-    $roles = Role::all(); // Jika kamu punya relasi role
-    return view('admin.edit', compact('user', 'roles'));
-}
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'username' => 'required|string|max:255',
-        'role_id' => 'required|exists:roles,id',
-        'password' => 'nullable|min:6', // hanya divalidasi jika diisi
-    ]);
+    {
+        $user = User::findOrFail($id);
+        $roles = Role::all(); // Jika kamu punya relasi role
+        return view('admin.edit', compact('user', 'roles'));
+    }
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'role_id' => 'required|exists:roles,id',
+            'password' => 'nullable|min:6', // hanya divalidasi jika diisi
+        ]);
 
-    $user = User::findOrFail($id);
-    $user->username = $request->username;
-    $user->role_id = $request->role_id;
+        $user = User::findOrFail($id);
+        $user->username = $request->username;
+        $user->role_id = $request->role_id;
 
-    // Jika password diisi, hash dan simpan
-    if ($request->filled('password')) {
-        $user->password = Hash::make($request->password);
+        // Jika password diisi, hash dan simpan
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->route('userdata.index')->with('success', 'User berhasil diperbarui.');
     }
 
-    $user->save();
 
-    return redirect()->route('userdata.index')->with('success', 'User berhasil diperbarui.');
-}
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
 
-
-public function destroy($id)
-{
-    $user = User::findOrFail($id);
-    $user->delete();
-
-    return redirect()->route('userdata.index')->with('success', 'User berhasil dihapus.');
-}
-
+        return redirect()->route('userdata.index')->with('success', 'User berhasil dihapus.');
+    }
 }
