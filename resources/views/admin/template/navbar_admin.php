@@ -23,7 +23,7 @@
                     </svg>
                 </button>
 
-                <a href="index.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
+                <a href="dashboard.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
                     SIMMAGANG
                 </a>
             </div>
@@ -34,7 +34,7 @@
         <a href="data_pembimbing.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pembimbing</a>
         <a href="laporan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Laporan</a>
         <a href="pengaturan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pengaturan</a>
-      </nav>  
+      </nav>
 
             <!-- Right: Google Translate + Profile -->
             <div class="flex items-center space-x-4">

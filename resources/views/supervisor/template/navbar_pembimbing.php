@@ -13,17 +13,16 @@
                     </svg>
                 </button>
 
-                <a href="index.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
+                <a href="dashboard.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
                     SIMMAGANG
                 </a>
             </div>
 
             <!-- Center: Navigation Menu -->
             <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-                <a href="mahasiswa.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['data_mahasiswa']; ?></a>
-                <a href="pembimbing.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['pembimbing']; ?></a>
+                <a href="bimbingan-list.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['data_mahasiswa']; ?></a>
+                <a href="data_pembimbing.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['pembimbing']; ?></a>
                 <a href="laporan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['laporan']; ?></a>
-                <a href="pengaturan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['pengaturan']; ?></a>
             </nav>
 
             <!-- Right: Google Translate + Profile -->

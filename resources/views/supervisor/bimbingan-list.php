@@ -20,7 +20,7 @@
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
-<?php include '../navbar.php'; ?>
+<?php include 'template/navbar_pembimbing.php'; ?>
 
 <main class="pt-24 px-6 max-w-7xl mx-auto">
     <div class="bg-white rounded-xl shadow p-6">

@@ -8,7 +8,7 @@
 </head>
 <body class="bg-blue-50 text-gray-800">
 
-<?php include '../navbar_pembimbing.php'; ?>
+<?php include 'template/navbar_pembimbing.php'; ?>
 
 <main class="pt-28 px-6 max-w-6xl mx-auto w-full">
 
@@ -103,7 +103,7 @@
 
 </main>
 
-<?php include '../footer.php'; ?>
+<?php include 'template/footer.php'; ?>
 
 </body>
 </html>
