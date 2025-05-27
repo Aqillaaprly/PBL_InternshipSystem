@@ -8,7 +8,7 @@
 </head>
 <body class="bg-[#f0f6ff]">
     <?php
-    include('../navbar_admin.php')
+    include('template/navbar_admin.php')
     ?>
 <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6">
     <div class="bg-white p-8 rounded-xl shadow">

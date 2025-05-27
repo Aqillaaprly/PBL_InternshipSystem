@@ -12,7 +12,7 @@
 <body class="bg-blue-50 text-gray-800">
 
     <!-- Header/Navbar -->
-    <?php include('template/navbar_admin.php') ?>
+    <?php include('template/navbar_pembimbing.php') ?>
 
     <!-- Main Content -->
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6 space-y-10">
@@ -102,7 +102,7 @@
     </main>
 
     <!-- Footer -->
-    <?php include('template/footer.php') ?>
+    <?php include('../footer.php') ?>
 
     <!-- Dropdown JS -->
     <script>
