@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            $table->string('id')->primary(); // ID sesi sebagai primary key
+            $table->foreignId('user_id')->nullable()->index(); // user_id yang terkait dengan sesi, bisa null (untuk guest)
+            $table->string('ip_address', 45)->nullable(); // Alamat IP
+            $table->text('user_agent')->nullable(); // User agent browser
+            $table->longText('payload'); // Data sesi yang di-serialize
+            $table->integer('last_activity')->index(); // Timestamp aktivitas terakhir
         });
     }
 

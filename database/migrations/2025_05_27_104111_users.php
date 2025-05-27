@@ -10,9 +10,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->id(); // Kolom ID auto-increment sebagai primary key
-            $table->string('name')->unique(); // Kolom nama role, harus unik
+            $table->string('username')->unique(); // Kolom username, harus unik
+            $table->string('password'); // Kolom untuk menyimpan hash password
+            $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('set null');
+            $table->rememberToken(); // Kolom untuk fitur "remember me"
             $table->timestamps(); // Kolom created_at dan updated_at
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('users');
     }
 };
