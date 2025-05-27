@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 pt-20 relative">
 
-<?php include('../navbar_mahasiswa.php'); ?>
+<?php include('template/navbar_mahasiswa.php'); ?>
 
 <div class="max-w-7xl mx-auto p-4">
     <div class="bg-white rounded-xl shadow-md p-6 relative">

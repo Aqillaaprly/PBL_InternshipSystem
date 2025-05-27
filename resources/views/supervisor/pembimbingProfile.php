@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f0f6ff]">
-<?php include '../navbar_pembimbing.php'; ?>
+<?php include 'template/navbar_pembimbing.php'; ?>
 
 <main class="max-w-xl mx-auto px-6 py-10">
     <div class="bg-white p-8 rounded-xl shadow">

@@ -12,18 +12,18 @@
 
     <!-- Header/Navbar -->
     <?php
-    include('../navbar_admin.php')
+    include('template/navbar_admin.php')
     ?>
 
     <!-- Main Content -->
     <div class="flex flex-col min-h-screen">
         <main class="p-6 max-w-7xl mx-auto w-full">
           <div class="w-full">
-               <img src="https://www.pixelstalk.net/wp-content/uploads/2016/05/Images-New-York-City-Backgrounds.jpg" 
-           alt="Foto" 
+               <img src="https://www.pixelstalk.net/wp-content/uploads/2016/05/Images-New-York-City-Backgrounds.jpg"
+           alt="Foto"
            class="w-full h-48 object-cover rounded-b-lg shadow" />
-           </div> 
-            
+           </div>
+
             <!-- Heading Section -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div class="my-3 col-span-3 text-center">
@@ -80,7 +80,7 @@
             </div>
 
             <?php include('jobcard.php') ?>
-        
+
 
             <!-- Recent Absence Table -->
             <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition cursor-pointer">
@@ -193,7 +193,7 @@
         </main>
 
         <!-- Footer -->
-        <?php include('../footer.php') ?>
+        <?php include('template/footer.php') ?>
     </div>
 
     <!-- Dropdown JS -->

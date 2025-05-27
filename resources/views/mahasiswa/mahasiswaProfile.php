@@ -8,7 +8,7 @@
 </head>
 <body class="bg-[#f0f6ff]">
     <?php
-    include('../navbar_mahasiswa.php')
+    include('template/navbar_mahasiswa.php')
     ?>
 
 <main class="max-w-xl mx-auto px-6 py-10">

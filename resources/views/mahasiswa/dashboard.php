@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<?php include('../navbar_mahasiswa.php')?>
+<?php include('template/navbar_mahasiswa.php')?>
 <body class="bg-blue-50 text-gray-800 pt-20">
 
 <!-- Hero Section -->
@@ -49,7 +49,7 @@
     </div>
 </div>
 
-<?php include '../footer.php'; ?>
+<?php include 'template/footer.php'; ?>
 </body>
 </html>
 

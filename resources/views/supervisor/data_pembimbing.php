@@ -12,7 +12,7 @@
 
     <!-- Header/Navbar -->
     <?php
-    include('template/navbar_admin.php')
+    include('template/navbar_pembimbing.php')
     ?>
 
     <!-- Main Content -->
@@ -74,7 +74,7 @@
     </main>
 
     <!-- Footer -->
-   <?php include('template/footer.php') ?>
+   <?php include('../footer.php') ?>
 
     <!-- Dropdown JS -->
     <script>
