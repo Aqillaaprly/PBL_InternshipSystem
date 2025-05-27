@@ -30,7 +30,7 @@
 
             <!-- Center: Navigation Menu -->
            <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-        <a href="data_mahasiswa.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Mahasiswa</a>
+        <a href="bimbingan-list.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Mahasiswa</a>
         <a href="data_pembimbing.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pembimbing</a>
         <a href="laporan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Laporan</a>
         <a href="pengaturan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pengaturan</a>
