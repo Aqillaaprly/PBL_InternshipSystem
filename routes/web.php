@@ -1,12 +1,20 @@
 <?php
 
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\UserController; // Untuk manajemen user data
+use App\Http\Controllers\Admin\AdminDashboardController; // Controller baru untuk dashboard admin
 use App\Http\Controllers\Admin\CompanyController;
 use App\Http\Controllers\Admin\LowonganController;
 use App\Http\Controllers\Admin\PendaftarController;
+use App\Http\Controllers\Admin\MahasiswaController as AdminMahasiswaController; // Untuk data mahasiswa oleh admin
+use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController; // Untuk data pembimbing oleh admin
+use App\Http\Controllers\Admin\LaporanController as AdminLaporanController; // Untuk laporan oleh admin
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController; // Untuk profil admin
 
+
+// Mengarahkan halaman utama ('/') ke halaman login
+Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
 
 // LOGIN dan LOGOUT Routes
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
