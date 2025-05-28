@@ -15,16 +15,15 @@ include resource_path('views/admin/inc/lang.php');
                     </svg>
                 </button>
 
-                <a href="index.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
+                <a href="{{ route('admin.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
                     SIMMAGANG
                 </a>
             </div>
 
-            <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-                
-                <a href="route('admin.datamahasiswa')" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Mahasiswa</a>
-                <a href="route('admin.data_pembimbing')" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pembimbing</a>
-                <a href="route('admin.laporan')" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Laporan</a>
+             <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
+                <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Mahasiswa</a>
+                <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pembimbing</a>
+                <a href="{{ route('admin.laporan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Laporan</a>
             </nav>
 
             <div class="flex items-center space-x-4">
@@ -37,15 +36,16 @@ include resource_path('views/admin/inc/lang.php');
                     <div id="google_translate_element" class="ml-1"></div>
                 </div>
 
+                <!-- Profile admin -->
+            
                 <div class="relative">
                     <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full" aria-haspopup="true" aria-expanded="false">
                         <img src="https://i.pravatar.cc/40" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300" />
                         <span class="hidden sm:block font-medium text-gray-700">Admin TI</span>
                     </button>
-
                     <div id="profileDropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
                         {{-- Ganti href ke route Laravel jika ini file Blade --}}
-                        <a href="{{-- route('admin.profile') --}}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md"><?= $lang['profil']; ?></a>
+                        <a href="route('admin.profile')" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md"><?= $lang['profil']; ?></a>
                         <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"><?= $lang['pengaturan']; ?></a>
                         <div class="border-t border-gray-200"></div>
                         <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-b-md">
@@ -60,3 +60,69 @@ include resource_path('views/admin/inc/lang.php');
         </div>
     </div>
 </header>
+
+<!-- Custom Styles for Google Translate -->
+<style>
+    /* Hilangkan logo G Translate */
+    .goog-logo-link {
+        display: none !important;
+    }
+
+    .goog-te-gadget span {
+        display: none !important;
+    }
+
+    .goog-te-gadget {
+        color: transparent !important;
+        font-size: 0 !important;
+    }
+
+    /* Atur select agar tetap tampil rapi */
+    #google_translate_element select {
+        background-color: white;
+        color: #4B5563;
+        border: 1px solid #D1D5DB;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        padding: 0.25rem 0.5rem;
+    }
+</style>
+
+<!-- Script for Google Translate and Dropdowns -->
+<script type="text/javascript">
+    function hideGoogleLogo() {
+        const interval = setInterval(() => {
+            const logo = document.querySelector('.goog-logo-link');
+            if (logo) {
+                logo.style.display = 'none';
+                const spans = document.querySelectorAll('.goog-te-gadget span');
+                spans.forEach(span => span.style.display = 'none');
+                clearInterval(interval);
+            }
+        }, 100);
+    }
+    function googleTranslateElementInit() {
+        new google.translate.TranslateElement({
+            pageLanguage: 'id',
+            includedLanguages: 'id,en',
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+        }, 'google_translate_element');
+    }
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    profileBtn.addEventListener('click', () => {
+        const isHidden = profileDropdown.classList.toggle('hidden');
+        profileBtn.setAttribute('aria-expanded', !isHidden);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+            profileDropdown.classList.add('hidden');
+            profileBtn.setAttribute('aria-expanded', false);
+        }
+    });
+</script>
+<!-- Google Translate API -->
+<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
