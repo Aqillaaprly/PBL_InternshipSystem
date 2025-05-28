@@ -59,13 +59,11 @@ class Pendaftar extends Model
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
 
-    /**
-     * Get the documents for the pendaftar.
-     * Anda bisa membuat model dan relasi terpisah untuk dokumen jika lebih kompleks.
-     * Contoh sederhana jika path dokumen disimpan langsung di tabel pendaftars:
-     */
-    // public function dokumenPendaftars()
-    // {
-    // return $this->hasMany(DokumenPendaftar::class); // Jika ada model DokumenPendaftar terpisah
-    // }
+     public function dokumenPendaftars()
+    {
+        // Pastikan Anda memiliki model DokumenPendaftar dan tabel yang sesuai
+        // return $this->hasMany(DokumenPendaftar::class); 
+        // Jika belum ada model DokumenPendaftar, ini akan error. 
+        // Untuk sementara, Anda bisa mengomentari pemanggilan 'dokumenPendaftars' di controller jika fitur ini belum siap.
+    }
 }

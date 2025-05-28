@@ -9,6 +9,8 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log; // Added for logging errors
 
 class CompanyController extends Controller
 {
@@ -17,8 +19,7 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $companies = Company::with('user')->latest()->paginate(10); // Ambil data perusahaan dengan relasi user
-        // Variabel $jumlahPerusahaan untuk dashboard bisa dihitung di sini atau di UserController
+        $companies = Company::with('user')->latest()->paginate(10);
         $jumlahPerusahaan = Company::count();
         return view('admin.perusahaan', compact('companies', 'jumlahPerusahaan'));
     }
@@ -28,8 +29,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        // Anda mungkin perlu mengirimkan data lain ke view create jika diperlukan
-        return view('admin.company.create'); // Buat view ini: resources/views/admin/company/create.blade.php
+        return view('admin.company.create'); // Ensure this view exists
     }
 
     /**
@@ -45,11 +45,10 @@ class CompanyController extends Controller
             'kode_pos' => 'nullable|string|max:10',
             'telepon' => 'nullable|string|max:20|unique:companies,telepon',
             'email_perusahaan' => 'required|string|email|max:255|unique:companies,email_perusahaan',
-            'website' => 'nullable|url|max:255',
+            'website' => 'required|url|max:255',
             'deskripsi' => 'nullable|string',
-            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Contoh validasi logo
+            'logo_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Logo is required
             'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
-            // Validasi untuk membuat user baru untuk perusahaan
             'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:6|confirmed',
         ]);
@@ -60,25 +59,33 @@ class CompanyController extends Controller
                         ->withInput();
         }
 
-        // Dapatkan role 'perusahaan'
-        $perusahaanRole = Role::where('name', 'perusahaan')->first();
-        if (!$perusahaanRole) {
-            return redirect()->route('admin.perusahaan.create')->with('error', 'Role "perusahaan" tidak ditemukan.');
+        // Handle file upload for logo
+        $logoPath = null;
+        if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
+            $logoPath = $request->file('logo_path')->store('logos', 'public');
+        } else {
+            // This condition should ideally not be met if 'required' validation works
+            // and form has enctype="multipart/form-data"
+            return redirect()->route('admin.perusahaan.create')
+                             ->with('error', 'Logo perusahaan wajib diunggah dan harus merupakan file gambar yang valid.')
+                             ->withInput();
         }
 
-        // Buat user baru untuk perusahaan
+        $perusahaanRole = Role::where('name', 'perusahaan')->first();
+        if (!$perusahaanRole) {
+            Log::error("Role 'perusahaan' tidak ditemukan saat membuat perusahaan baru.");
+            return redirect()->route('admin.perusahaan.create')
+                             ->with('error', 'Terjadi kesalahan konfigurasi sistem. Silakan hubungi administrator.')
+                             ->withInput();
+        }
+
         $user = User::create([
-            'name' => $request->nama_perusahaan, // Menggunakan nama perusahaan sebagai nama user
-            'email' => $request->email_perusahaan, // Menggunakan email perusahaan sebagai email user
+            'name' => $request->nama_perusahaan,
+            'email' => $request->email_perusahaan,
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'role_id' => $perusahaanRole->id,
         ]);
-
-        $path = null;
-        if ($request->hasFile('logo_path')) {
-            $path = $request->file('logo_path')->store('logos', 'public'); // Simpan di storage/app/public/logos
-        }
 
         Company::create([
             'user_id' => $user->id,
@@ -91,7 +98,7 @@ class CompanyController extends Controller
             'email_perusahaan' => $request->email_perusahaan,
             'website' => $request->website,
             'deskripsi' => $request->deskripsi,
-            'logo_path' => $path,
+            'logo_path' => $logoPath, // Use the stored path
             'status_kerjasama' => $request->status_kerjasama,
         ]);
 
@@ -101,9 +108,9 @@ class CompanyController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Company $company) // Menggunakan Route Model Binding
+    public function show(Company $company)
     {
-        return view('admin.company.show', compact('company')); // Buat view ini: resources/views/admin/company/show.blade.php
+        return view('admin.company.show', compact('company')); // Ensure this view exists
     }
 
     /**
@@ -111,7 +118,7 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        return view('admin.company.edit', compact('company')); // Buat view ini: resources/views/admin/company/edit.blade.php
+        return view('admin.company.edit', compact('company')); // Ensure this view exists
     }
 
     /**
@@ -127,12 +134,11 @@ class CompanyController extends Controller
             'kode_pos' => 'nullable|string|max:10',
             'telepon' => 'nullable|string|max:20|unique:companies,telepon,' . $company->id,
             'email_perusahaan' => 'required|string|email|max:255|unique:companies,email_perusahaan,' . $company->id,
-            'website' => 'nullable|url|max:255',
+            'website' => 'required|url|max:255',
             'deskripsi' => 'nullable|string',
-            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Logo is optional on update
             'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
-            // Validasi untuk update user terkait (jika diperlukan)
-            'username' => 'sometimes|required|string|max:255|unique:users,username,' . $company->user_id,
+            'username' => 'sometimes|required|string|max:255|unique:users,username,' . ($company->user_id ?? 'NULL') . ',id',
             'password' => 'nullable|string|min:6|confirmed',
         ]);
 
@@ -142,19 +148,22 @@ class CompanyController extends Controller
                         ->withInput();
         }
 
-        $data = $request->except(['logo_path', 'username', 'password', 'password_confirmation']); // Ambil semua kecuali logo, username, password
+        $data = $request->except(['_token', '_method', 'logo_path', 'username', 'password', 'password_confirmation']);
 
-        if ($request->hasFile('logo_path')) {
-            // Hapus logo lama jika ada
-            if ($company->logo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_path)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($company->logo_path);
+        if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
+            // Delete old logo if it exists
+            if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
+                Storage::disk('public')->delete($company->logo_path);
             }
             $data['logo_path'] = $request->file('logo_path')->store('logos', 'public');
         }
+        // If no new logo is uploaded, $data['logo_path'] will not be set,
+        // so the existing $company->logo_path will be preserved during the update,
+        // which is correct because the database field is NOT NULL.
 
         $company->update($data);
 
-        // Update user terkait jika ada input username atau password
+        // Update user related details if company has a user
         if ($company->user) {
             $userData = [];
             if ($request->filled('username')) {
@@ -163,7 +172,7 @@ class CompanyController extends Controller
             if ($request->filled('password')) {
                 $userData['password'] = Hash::make($request->password);
             }
-            // Update email dan nama user juga jika email_perusahaan atau nama_perusahaan berubah
+            // Always update name and email of user if company name/email changes
             $userData['name'] = $request->nama_perusahaan;
             $userData['email'] = $request->email_perusahaan;
 
@@ -171,7 +180,6 @@ class CompanyController extends Controller
                 $company->user->update($userData);
             }
         }
-
 
         return redirect()->route('admin.perusahaan.index')->with('success', 'Data perusahaan berhasil diperbarui.');
     }
@@ -181,12 +189,13 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
-        // Hapus logo dari storage jika ada
-        if ($company->logo_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($company->logo_path)) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($company->logo_path);
+        // Delete logo from storage if it exists
+        if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
+            Storage::disk('public')->delete($company->logo_path);
         }
 
-        // Hapus user terkait jika ada dan jika diperlukan
+        // Optionally delete the associated user if the business logic requires it
+        // Be cautious with this, as the user might be linked elsewhere or have other roles.
         // if ($company->user) {
         //     $company->user->delete();
         // }

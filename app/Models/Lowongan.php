@@ -8,12 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Lowongan extends Model
 {
     use HasFactory;
-
-    // Definisikan fillable attributes jika diperlukan
-    // protected $fillable = ['company_id', 'judul', 'deskripsi', ...];
-
+    protected $fillable = [
+        'company_id',
+        'judul',
+        'deskripsi',
+        'kualifikasi',
+        'tipe',
+        'lokasi',
+        'gaji_min',
+        'gaji_max',
+        'tanggal_buka',
+        'tanggal_tutup',
+        'status'
+    ];
     public function company()
     {
+
         return $this->belongsTo(Company::class);
     }
 }

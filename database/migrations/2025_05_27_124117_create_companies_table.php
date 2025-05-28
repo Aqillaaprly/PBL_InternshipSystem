@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Jika perusahaan punya akun login sendiri
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->string('nama_perusahaan');
             $table->text('alamat')->nullable();
             $table->string('kota')->nullable();
@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('kode_pos', 10)->nullable();
             $table->string('telepon', 20)->nullable()->unique();
             $table->string('email_perusahaan')->nullable()->unique();
-            $table->string('website')->nullable();
+            $table->string('website'); 
             $table->text('deskripsi')->nullable();
-            $table->string('logo_path')->nullable();
+            $table->string('logo_path'); 
             $table->enum('status_kerjasama', ['Aktif', 'Non-Aktif', 'Review'])->default('Review');
             $table->timestamps();
         });

@@ -19,10 +19,6 @@ class ProfileController extends Controller
     public function show()
     {
         $admin = Auth::user();
-        // Pastikan view 'admin.profile.show' atau 'admin.adminProfile' ada
-        // Anda memiliki file 'adminProfile.php' di 'company/template' dan 'mahasiswa',
-        // namun belum ada untuk admin secara spesifik.
-        // Asumsi Anda akan membuat 'admin.profile.blade.php' atau 'admin.adminProfile.blade.php'
         return view('admin.adminProfile', compact('admin')); // Ganti 'admin.adminProfile' dengan nama view yang benar
     }
 
@@ -41,7 +37,7 @@ class ProfileController extends Controller
     /**
      * Update the admin's profile.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)
@@ -64,7 +60,7 @@ class ProfileController extends Controller
             $admin->password = Hash::make($request->new_password);
         }
 
-        $admin->save();
+        // $admin->save();
 
         return redirect()->route('admin.profile')->with('success', 'Profil berhasil diperbarui.');
     }

@@ -7,9 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f0f6ff]">
-    <?php
-    include('template/navbar_admin.php')
-    ?>
+    @include('admin.template.navbar')
+    
 <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6">
     <div class="bg-white p-8 rounded-xl shadow">
         <div class="flex justify-between items-center mb-6">
@@ -32,18 +31,38 @@
                 </tr>
                 </thead>
                 <tbody>
-                <?php for ($i = 1; $i <= 10; $i++): ?>
+                @forelse($companies as $index => $company)
                     <tr class="border-b">
-                        <td class="px-5 py-3"><?= $i ?></td>
-                        <td class="px-5 py-3">Perusahaan <?= $i ?></td>
-                        <td class="px-5 py-3">Posisi <?= $i ?></td>
-                        <td class="px-5 py-3">Kuota <?= rand(1, 10) ?></td>
-                        <td class="px-5 py-3">...</td>
+                        <td class="px-5 py-3">{{ $companies->firstItem() + $index }}</td>
+                        <td class="px-5 py-3">{{ $company->nama_perusahaan }}</td>
+                        <td class="px-5 py-3">{{ $company->email_perusahaan }}</td>
+                        <td class="px-5 py-3">{{ $company->telepon }}</td>
+                        <td class="px-5 py-3">
+                            <span class="text-xs font-medium px-2 py-1 rounded-full
+                                @if($company->status_kerjasama == 'Aktif') bg-green-100 text-green-600 @elseif($company->status_kerjasama == 'Non-Aktif') bg-red-100 text-red-500 @else bg-yellow-100 text-yellow-600 @endif">
+                                {{ $company->status_kerjasama }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-3 space-x-1">
+                            {{-- Ganti link ke route yang sesuai --}}
+                            <a href="{{-- route('admin.perusahaan.show', $company->id) --}}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                            <a href="{{-- route('admin.perusahaan.edit', $company->id) --}}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
+                            <form action="{{-- route('admin.perusahaan.destroy', $company->id) --}}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus?');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">Delete</button>
+                            </form>
+                        </td>
                     </tr>
-                <?php endfor; ?>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-5 py-3 text-center text-gray-500">Tidak ada data perusahaan.</td>
+                    </tr>
+                @endforelse
                 </tbody>
             </table>
         </div>
+        
         <div class="flex justify-between items-center mt-6">
             <p class="text-sm text-gray-500">Page</p>
             <div class="space-x-2">

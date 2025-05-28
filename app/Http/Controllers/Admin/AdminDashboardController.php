@@ -27,12 +27,14 @@ class AdminDashboardController extends Controller
         // Contoh menghitung jumlah mahasiswa (user dengan role_id tertentu)
         $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
         $jumlahMahasiswa = $mahasiswaRole ? User::where('role_id', $mahasiswaRole->id)->count() : 0;
+         $companies = Company::latest()->get();
 
         return view('admin.dashboard', compact(
             'jumlahPerusahaan',
             'jumlahLowongan',
-            'jumlahPendaftar'
-            'jumlahMahasiswa' // Jika Anda menambahkannya
+            'jumlahPendaftar',
+            'jumlahMahasiswa',
+            'companies' // Ensure this string matches the variable name EXACTLY: 'companies' (lowercase 'c')
         ));
     }
 }

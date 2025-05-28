@@ -19,8 +19,9 @@
         .status-tidak-aktif { background-color: #ffcccc; color: #c62828; }
     </style>
 </head>
+
 <body class="bg-blue-50 text-gray-800">
-<?php include 'template/navbar_admin.php'; ?>
+@include('admin.template.navbar')
 
 <main class="pt-24 px-6 max-w-7xl mx-auto">
     <div class="bg-white rounded-xl shadow p-6">
