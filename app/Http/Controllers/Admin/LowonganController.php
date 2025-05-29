@@ -15,10 +15,9 @@ class LowonganController extends Controller
      */
     public function index()
     {
-        $lowongans = Lowongan::with('company')->latest()->paginate(10); // Asumsi ada relasi 'company' di model Lowongan
-        // Variabel $jumlahLowongan untuk dashboard
+        $lowongans = Lowongan::with('company')->latest()->paginate(10);
         $jumlahLowongan = Lowongan::count();
-        return view('admin.lowongan', compact('lowongans', 'jumlahLowongan')); // resources/views/admin/lowongan.blade.php
+        return view('admin.lowongan', compact('lowongans', 'jumlahLowongan')); // Mencoba memuat resources/views/admin/lowongan.blade.php
     }
 
     /**
@@ -51,8 +50,8 @@ class LowonganController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.lowongan.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         Lowongan::create($request->all());
@@ -98,8 +97,8 @@ class LowonganController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.lowongan.edit', $lowongan->id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $lowongan->update($request->all());

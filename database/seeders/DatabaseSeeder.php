@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,      // Pastikan ini sudah ada
             CompanySeeder::class,
+            LowonganSeeder::class,
             // Seeder lain jika ada
         ]);
     }

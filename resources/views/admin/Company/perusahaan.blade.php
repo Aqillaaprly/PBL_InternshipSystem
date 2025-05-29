@@ -8,7 +8,7 @@
 </head>
 <body class="bg-[#f0f6ff]">
     @include('admin.template.navbar')
-    
+
 <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6">
     <div class="bg-white p-8 rounded-xl shadow">
         <div class="flex justify-between items-center mb-6">
@@ -16,7 +16,8 @@
             <div class="flex space-x-3">
                 <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
                 <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
-                <button class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah</button>
+                {{-- Menggunakan route name yang benar untuk tombol Tambah --}}
+                <a href="{{ route('admin.perusahaan.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah</a>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -25,9 +26,10 @@
                 <tr>
                     <th class="px-5 py-3">No</th>
                     <th class="px-5 py-3">Nama Perusahaan</th>
-                    <th class="px-5 py-3">Posisi</th>
-                    <th class="px-5 py-3">Kuota Tersedia</th>
-                    <th class="px-5 py-3">Action</th>
+                    <th class="px-5 py-3">Email Perusahaan</th>
+                    <th class="px-5 py-3">Telepon</th>
+                    <th class="px-5 py-3">Status Kerjasama</th>
+                    <th class="px-5 py-3 text-center">Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -43,15 +45,16 @@
                                 {{ $company->status_kerjasama }}
                             </span>
                         </td>
-                        <td class="px-5 py-3 space-x-1">
-                            {{-- Ganti link ke route yang sesuai --}}
-                            <a href="{{-- route('admin.perusahaan.show', $company->id) --}}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
-                            <a href="{{-- route('admin.perusahaan.edit', $company->id) --}}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
-                            <form action="{{-- route('admin.perusahaan.destroy', $company->id) --}}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">Delete</button>
-                            </form>
+                        <td class="px-5 py-3">
+                            <div class="flex space-x-1 justify-center">
+                                <a href="{{ route('admin.perusahaan.show', $company->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                                <a href="{{ route('admin.perusahaan.edit', $company->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
+                                <form action="{{ route('admin.perusahaan.destroy', $company->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus perusahaan ini?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
@@ -62,18 +65,14 @@
                 </tbody>
             </table>
         </div>
-        
-        <div class="flex justify-between items-center mt-6">
-            <p class="text-sm text-gray-500">Page</p>
-            <div class="space-x-2">
-                <button class="px-3 py-1 border rounded">1</button>
-                <button class="px-3 py-1 border rounded">2</button>
-                <button class="px-3 py-1 border rounded">3</button>
-            </div>
-            <p class="text-sm text-gray-500">Result</p>
+
+        @if($companies->hasPages())
+        <div class="mt-6">
+            {{ $companies->links() }}
         </div>
+        @endif
     </div>
 </main>
-
+@include('admin.template.footer')
 </body>
 </html>

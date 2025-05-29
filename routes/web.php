@@ -25,6 +25,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
     
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+     Route::get('/perusahaan', [CompanyController::class, 'index'])->name('perusahaan.index'); // Hanya ini untuk CompanyController
 
     // Manajemen User Data (jika berbeda dari dashboard utama)
     Route::get('/userdata', [UserController::class, 'view'])->name('userdata.index');

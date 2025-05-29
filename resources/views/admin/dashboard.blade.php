@@ -53,12 +53,12 @@
                     </div>
                 </a>
                 {{-- Asumsi ada route bernama 'admin.vacancies.index' atau sesuaikan --}}
-                <a href="{{ route('admin.lowongan.index') }}" class="cursor-pointer block">
-                    <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                        <p class="text-2xl font-bold text-blue-600">{{ $jumlahLowongan ?? 0 }}</p>
-                        <p class="text-sm text-gray-700 mt-1">Lowongan</p>
-                    </div>
-                </a>
+                    <a href="{{ route('admin.lowongan.index') }}" class="cursor-pointer block">
+                        <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
+                            <p class="text-2xl font-bold text-blue-600">{{ $jumlahLowongan ?? 0 }}</p>
+                            <p class="text-sm text-gray-700 mt-1">Lowongan</p>
+                        </div>
+                    </a>
                 {{-- Asumsi ada route bernama 'admin.applicants.index' atau sesuaikan --}}
                 <a href="{{ route('admin.pendaftar.index') }}" class="cursor-pointer block">
                     <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
@@ -112,8 +112,10 @@
         </main>
 
         {{-- Pastikan path ini benar: resources/views/admin/template/footer.blade.php --}}
-        @include('admin.template.footer')
     </div>
+</body>
+@include('admin.template.footer')
+</html>
 
     {{-- JavaScript untuk dropdown profile, idealnya ini bagian dari navbar atau layout utama --}}
     {{-- Jika sudah ada di navbar, tidak perlu diulang di sini --}}
@@ -133,5 +135,3 @@
         });
     </script>
     @endif
-</body>
-</html>
