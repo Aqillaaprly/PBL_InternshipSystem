@@ -9,61 +9,41 @@ class Pendaftar extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'pendaftars'; // Sesuaikan dengan nama tabel pendaftar Anda jika berbeda
+    protected $table = 'pendaftars';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
-        'user_id', // ID mahasiswa yang mendaftar
-        'lowongan_id', // ID lowongan yang dilamar
+        'user_id',
+        'lowongan_id',
         'tanggal_daftar',
-        'status_lamaran', // Contoh: Pending, Ditinjau, Diterima, Ditolak, Wawancara
-        'surat_lamaran_path', // Path ke file surat lamaran jika ada
-        'cv_path', // Path ke file CV jika ada
-        'portofolio_path', // Path ke file portofolio jika ada
-        'catatan_pendaftar', // Catatan dari pendaftar
-        'catatan_admin', // Catatan dari admin atau perusahaan
-        // Tambahkan kolom lain yang relevan dengan tabel pendaftar Anda
+        'status_lamaran',
+        'surat_lamaran_path',
+        'cv_path',
+        'portofolio_path',
+        'catatan_pendaftar',
+        'catatan_admin',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'tanggal_daftar' => 'date',
     ];
 
-    /**
-     * Get the user (mahasiswa) that owns the pendaftaran.
-     */
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    /**
-     * Get the lowongan that the pendaftaran belongs to.
-     */
     public function lowongan()
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
 
-     public function dokumenPendaftars()
+    /**
+     * Get all of the dokumen for the Pendaftar
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function dokumenPendaftars() // Pastikan nama method konsisten
     {
-        // Pastikan Anda memiliki model DokumenPendaftar dan tabel yang sesuai
-        // return $this->hasMany(DokumenPendaftar::class); 
-        // Jika belum ada model DokumenPendaftar, ini akan error. 
-        // Untuk sementara, Anda bisa mengomentari pemanggilan 'dokumenPendaftars' di controller jika fitur ini belum siap.
+        return $this->hasMany(DokumenPendaftar::class, 'pendaftar_id');
     }
 }

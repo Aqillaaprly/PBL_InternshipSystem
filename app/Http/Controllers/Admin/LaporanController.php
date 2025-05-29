@@ -16,7 +16,7 @@ class LaporanController extends Controller
      */
     public function index()
     {
-        return view('admin.laporan'); // compact('laporans') jika ada data
+        return view('admin.Mahasiswa.laporan'); // compact('laporans') jika ada data
     }
 
 }

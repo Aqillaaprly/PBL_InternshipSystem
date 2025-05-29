@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\DetailPembimbing;
 
 class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquent
 {
@@ -34,6 +35,14 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
 
     public function role()
     {
-       return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class);
+    }
+    public function detailMahasiswa()
+    {
+        return $this->hasOne(Mahasiswa::class, 'user_id', 'id');
+    }
+    public function detailPembimbing()
+    {
+        return $this->hasOne(DetailPembimbing::class, 'user_id');
     }
 }

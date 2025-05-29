@@ -1,94 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Data Mahasiswa - SIMMAGANG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Pembimbing - Admin SIMMAGANG</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- <link rel="stylesheet" href="{{ asset('css/admin_style.css') }}"> --}}
 </head>
 
 <body class="bg-blue-50 text-gray-800">
 
-    <!-- Header/Navbar -->
     @include('admin.template.navbar')
 
-    <!-- Main Content -->
-    <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6">
+    <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
-            <div class="flex justify-between items-center pb-4">
-                <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Pembimbing</h1>
-                <div class="flex space-x-3">
-                    <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
-                    <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
-                    <button class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah</button>
+            <div class="flex flex-col sm:flex-row justify-between items-center pb-6">
+                <h1 class="text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Data Dosen Pembimbing</h1>
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3 w-full sm:w-auto">
+                    <form method="GET" action="{{ route('admin.data_pembimbing') }}" class="flex flex-1 sm:flex-none">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIP..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-full">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r text-sm">Cari</button>
+                    </form>
+                    {{-- Tombol Tambah Pembimbing (Nonaktifkan jika belum ada fungsionalitasnya) --}}
+                    {{-- <a href="{{-- route('admin.pembimbing.create') --}}" class="bg-green-600 text-white px-5 py-2 rounded text-sm hover:bg-green-700 text-center whitespace-nowrap">+ Tambah Pembimbing</a> --}}
                 </div>
             </div>
+
+            @if (session('success'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Berhasil!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+            @if (session('error'))
+                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Gagal!</strong>
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            @endif
+
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-center">
-                    <thead class="bg-gray-100">
+                <table class="min-w-full text-sm">
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs text-left">
                         <tr>
                             <th class="px-5 py-3">No</th>
                             <th class="px-5 py-3">NIP</th>
-                            <th class="px-5 py-3">Nama</th>
+                            <th class="px-5 py-3">Nama Pembimbing</th>
                             <th class="px-5 py-3">Email</th>
-                            <th class="px-5 py-3">Action</th>
+                            {{-- Tambahkan kolom lain jika relevan dari model Pembimbing atau User --}}
+                            {{-- <th class="px-5 py-3">Jabatan Fungsional</th> --}}
+                            {{-- <th class="px-5 py-3">Program Studi</th> --}}
+                            <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php for ($i = 1; $i <= 10; $i++): ?>
-                            <tr class="border-b">
-                                <td class="px-5 py-3"><?= $i ?></td>
-                                <td class="px-5 py-3">1123123123</td>
-                                <td class="px-5 py-3">Nama <?= $i ?></td>
-                                <td class="px-5 py-3">Dosen@gmail.com</td>
-                                <td class="px-5 py-3 space-x-1">
-                                    <button class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
-                                        Show
-                                    </button>
-                                    <button class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
-                                        Edit
-                                    </button>
-                                    <button class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">
-                                        Delete
-                                    </button>
+                    <tbody class="text-gray-600 text-left">
+                        @forelse ($pembimbings as $index => $pembimbing)
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="px-5 py-4 text-center">{{ $pembimbings->firstItem() + $index }}</td>
+                                <td class="px-5 py-4">{{ $pembimbing->username ?? '-' }}</td> {{-- Asumsi NIP ada di username --}}
+                                <td class="px-5 py-4">{{ $pembimbing->name ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $pembimbing->email ?? '-' }}</td>
+                                {{-- Contoh jika ada relasi ke detail pembimbing: --}}
+                                <td class="px-5 py-4">{{ $pembimbing->detailPembimbing->jabatan_fungsional ?? 'N/A' }}</td>
+                                <td class="px-5 py-4">{{ $pembimbing->detailPembimbing->program_studi_homebase ?? 'N/A' }}</td>
+                                <td class="px-5 py-4 text-center">
+                                    <div class="flex item-center justify-center space-x-2">
+                                        {{-- Tombol Edit User (jika data utama di tabel users) --}}
+                                        <a href="{{ route('admin.users.edit', $pembimbing->id) }}" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md shadow-sm">Edit</a>
+                                        {{-- Tombol Edit Detail Pembimbing (jika ada form edit khusus untuk tabel pembimbings/detail_pembimbings) --}}
+                                        {{-- <a href="{{ route('admin.pembimbing.details.edit', $pembimbing->detailPembimbing->id)" class="text-xs bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-md shadow-sm">Edit Detail</a> --}}
+                                    </div>
                                 </td>
-
                             </tr>
-                        <?php endfor; ?>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-5 py-4 text-center text-gray-500">
+                                     @if(request('search'))
+                                        Tidak ada pembimbing ditemukan untuk pencarian "{{ request('search') }}".
+                                    @else
+                                        Belum ada data pembimbing.
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-between items-center mt-6">
-                <p class="text-sm text-gray-500">Page</p>
-                <div class="space-x-2">
-                    <button class="px-3 py-1 border rounded">1</button>
-                    <button class="px-3 py-1 border rounded">2</button>
-                    <button class="px-3 py-1 border rounded">3</button>
+
+            @if ($pembimbings->hasPages())
+                <div class="mt-6 px-2">
+                  {{-- Struktur paginasi meniru gambar image_f44e5b.png --}}
+                  <div class="flex justify-between items-center">
+                      <p class="text-sm text-gray-500 hidden sm:block">
+                          Page
+                      </p>
+                      <div>
+                          {{ $pembimbings->appends(request()->query())->links('vendor.pagination.tailwind') }} {{-- Memastikan view paginasi tailwind default digunakan atau yang sudah dikustomisasi --}}
+                      </div>
+                      <p class="text-sm text-gray-500 hidden sm:block">
+                          Result
+                      </p>
+                  </div>
                 </div>
-                <p class="text-sm text-gray-500">Result</p>
-            </div>
+            @endif
         </div>
     </main>
 
-    <!-- Footer -->
-   @include('admin.template.footer')
+    @include('admin.template.footer')
 
-    <!-- Dropdown JS -->
-    <script>
-        const profileBtn = document.getElementById('profileBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
-
-        profileBtn?.addEventListener('click', () => {
-            profileDropdown.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                profileDropdown.classList.add('hidden');
-            }
-        });
-    </script>
 </body>
-
 </html>

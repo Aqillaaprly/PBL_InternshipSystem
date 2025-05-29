@@ -1,96 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Data Mahasiswa - SIMMAGANG</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Data Mahasiswa - Admin SIMMAGANG</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- <link rel="stylesheet" href="{{ asset('css/admin_style.css') }}"> --}}
 </head>
 
 <body class="bg-blue-50 text-gray-800">
 
-    <!-- Header/Navbar -->
-    
     @include('admin.template.navbar')
 
-    <!-- Main Content -->
-    <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6">
+    <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
+            {{-- Header Halaman dan Tombol Aksi --}}
             <div class="flex justify-between items-center pb-4">
                 <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Mahasiswa</h1>
                 <div class="flex space-x-3">
-                    <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
-                    <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
-                    <button class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah</button>
+                    <form method="GET" action="{{ route('admin.datamahasiswa') }}" class="flex">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
+                    </form>
+                    <button class="border border-gray-300 px-4 py-2 rounded text-sm">Filter</button>
+                    <a href="route('admin.mahasiswa.create')" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>
                 </div>
             </div>
+
+            @if (session('success'))
+                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Berhasil!</strong>
+                    <span class="block sm:inline">{{ session('success') }}</span>
+                </div>
+            @endif
+            @if (session('error'))
+                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                    <strong class="font-bold">Gagal!</strong>
+                    <span class="block sm:inline">{{ session('error') }}</span>
+                </div>
+            @endif
+
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-center">
-                    <thead class="bg-gray-100">
+                <table class="min-w-full text-sm text-center"> {{-- text-center untuk data sel --}}
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
                             <th class="px-5 py-3">No</th>
                             <th class="px-5 py-3">NIM</th>
-                            <th class="px-5 py-3">Nama</th>
+                            <th class="px-5 py-3">Nama Mahasiswa</th>
                             <th class="px-5 py-3">Email</th>
+                            <th class="px-5 py-3">Program Studi</th>
                             <th class="px-5 py-3">Kelas</th>
-                            <th class="px-5 py-3">Action</th>
+                            <th class="px-5 py-3">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php for ($i = 1; $i <= 10; $i++): ?>
-                            <tr class="border-b">
-                                <td class="px-5 py-3"><?= $i ?></td>
-                                <td class="px-5 py-3">2341123123</td>
-                                <td class="px-5 py-3">Nama <?= $i ?></td>
-                                <td class="px-5 py-3">Mahasiswa@gmail.com</td>
-                                <td class="px-5 py-3">TI 2L</td>
-                                <td class="px-5 py-3 space-x-1">
-                                    <button class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
-                                        Show
-                                    </button>
-                                    <button class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
-                                        Edit
-                                    </button>
-                                    <button class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">
-                                        Delete
-                                    </button>
+                    <tbody class="text-gray-600">
+                        @forelse ($mahasiswas as $index => $mahasiswa)
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="px-5 py-4">{{ $mahasiswas->firstItem() + $index }}</td>
+                                <td class="px-5 py-4">{{ $mahasiswa->username ?? ($mahasiswa->detailMahasiswa->nim ?? '-') }}</td>
+                                <td class="px-5 py-4 text-left">{{ $mahasiswa->name ?? ($mahasiswa->detailMahasiswa->nama ?? '-') }}</td> {{-- text-left untuk nama --}}
+                                <td class="px-5 py-4 text-left">{{ $mahasiswa->email ?? ($mahasiswa->detailMahasiswa->email ?? '-') }}</td> {{-- text-left untuk email --}}
+                                <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->kelas ?? '-' }}</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex item-center justify-center space-x-1">
+                                        {{-- Tombol Show (Contoh) --}}
+                                        <a href="{{--{{ route('admin.mahasiswa.show', $mahasiswa->id) }}--}}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                            Show
+                                        </a>
+                                        <a href="{{ route('admin.users.edit', $mahasiswa->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.users.destroy', $mahasiswa->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mahasiswa ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
-
                             </tr>
-                        <?php endfor; ?>
+                        @empty
+                            <tr>
+                                <td colspan="7" class="px-5 py-4 text-center text-gray-500">
+                                     @if(request('search'))
+                                        Tidak ada mahasiswa ditemukan untuk pencarian "{{ request('search') }}".
+                                    @else
+                                        Belum ada data mahasiswa.
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-between items-center mt-6">
-                <p class="text-sm text-gray-500">Page</p>
-                <div class="space-x-2">
-                    <button class="px-3 py-1 border rounded">1</button>
-                    <button class="px-3 py-1 border rounded">2</button>
-                    <button class="px-3 py-1 border rounded">3</button>
+
+            {{-- Paginasi Dinamis dari Laravel --}}
+            @if ($mahasiswas->hasPages())
+                <div class="mt-6"> {{-- Anda bisa mengganti class ini agar sesuai, misal 'flex justify-between items-center mt-6' --}}
+                    {{ $mahasiswas->appends(request()->query())->links() }}
                 </div>
-                <p class="text-sm text-gray-500">Result</p>
-            </div>
+            @endif
         </div>
     </main>
 
-    <!-- Footer -->
- @include('admin.template.footer')
-    <!-- Dropdown JS -->
-    <script>
-        const profileBtn = document.getElementById('profileBtn');
-        const profileDropdown = document.getElementById('profileDropdown');
+    @include('admin.template.footer')
 
-        profileBtn?.addEventListener('click', () => {
-            profileDropdown.classList.toggle('hidden');
-        });
+    {{-- Script dropdown profile dari navbar Anda mungkin sudah ada di admin.template.navbar --}}
+    {{-- Jika belum, Anda bisa menambahkannya di sini atau di layout utama --}}
 
-        document.addEventListener('click', (e) => {
-            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                profileDropdown.classList.add('hidden');
-            }
-        });
-    </script>
 </body>
-
 </html>

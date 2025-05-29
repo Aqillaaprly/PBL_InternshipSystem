@@ -15,24 +15,30 @@ class PembimbingController extends Controller
      *
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request) // Tambahkan Request $request
     {
-        // Ambil role dosen (asumsi pembimbing adalah dosen)
         $dosenRole = Role::where('name', 'dosen')->first();
 
         if (!$dosenRole) {
             return redirect()->route('admin.dashboard')->with('error', 'Role dosen tidak ditemukan.');
         }
 
-        $pembimbings = User::where('role_id', $dosenRole->id)
-                            ->orderBy('name')
-                            ->paginate(15);
+        $query = User::where('role_id', $dosenRole->id);
 
-        // Pastikan view 'admin.pembimbing.index' atau 'admin.data_pembimbing' ada
-        // Jika view Anda bernama 'admin.data_pembimbing.blade.php', maka gunakan 'admin.data_pembimbing'
-        // Anda memiliki file 'admin.datapembimbing.blade.php' dan 'admin.data_pembimbing.blade.php', pastikan konsisten.
-        // Saya akan menggunakan 'admin.data_pembimbing' sesuai nama route.
-        return view('admin.data_pembimbing', compact('pembimbings'));
+        // Logika Pencarian
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('username', 'like', "%{$searchTerm}%") // username (NIP)
+                  ->orWhere('email', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $pembimbings = $query->orderBy('name')->paginate(10)->withQueryString();
+
+
+        return view('admin.Pembimbing.data_pembimbing', compact('pembimbings'));
     }
 
     // Tambahkan method CRUD lainnya jika diperlukan

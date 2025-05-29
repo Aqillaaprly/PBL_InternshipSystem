@@ -3,46 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User; // Asumsi mahasiswa adalah User
+use Illuminate\Http\Request; // Tambahkan ini
+use App\Models\User;
 use App\Models\Role;
 
 class MahasiswaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * Ini akan menangani route('admin.datamahasiswa')
-     *
-     * @return \Illuminate\View\View
-     */
-    public function index()
+    public function index(Request $request)
     {
-        // Ambil role mahasiswa
         $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
 
         if (!$mahasiswaRole) {
-            // Handle jika role mahasiswa tidak ditemukan, mungkin redirect atau tampilkan error
             return redirect()->route('admin.dashboard')->with('error', 'Role mahasiswa tidak ditemukan.');
         }
 
-        $mahasiswas = User::where('role_id', $mahasiswaRole->id)
-                            ->orderBy('name') // Urutkan berdasarkan nama
-                            ->paginate(15); // Gunakan paginasi
+         $query = User::with('detailMahasiswa')->where('role_id', $mahasiswaRole->id);
 
-        // Pastikan view 'admin.mahasiswa.index' atau 'admin.datamahasiswa' ada
-        // Jika view Anda bernama 'admin.datamahasiswa.blade.php', maka gunakan 'admin.datamahasiswa'
-        return view('admin.Mahasiswa.datamahasiswa', compact('mahasiswas'));
+        // Logika Pencarian (mencari di kolom username yang sekarang dianggap NIM)
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('username', 'like', "%{$searchTerm}%") // username (NIM)
+                  ->orWhere('email', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $mahasiswas = $query->orderBy('name')->paginate(15)->withQueryString();
+
+         return view('admin.Mahasiswa.datamahasiswa', compact('mahasiswas'));
     }
-
-    // Anda bisa menambahkan method lain seperti create, store, edit, update, destroy
-    // jika admin memiliki hak untuk mengelola data mahasiswa secara penuh.
-    // Contoh:
-    // public function show(User $mahasiswa)
-    // {
-    //     // Pastikan user yang diambil adalah mahasiswa
-    //     if ($mahasiswa->role->name !== 'mahasiswa') {
-    //         abort(404);
-    //     }
-    //     return view('admin.mahasiswa.show', compact('mahasiswa'));
-    // }
 }
