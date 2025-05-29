@@ -17,7 +17,7 @@ class LowonganController extends Controller
     {
         $lowongans = Lowongan::with('company')->latest()->paginate(10);
         $jumlahLowongan = Lowongan::count();
-        return view('admin.lowongan', compact('lowongans', 'jumlahLowongan')); // Mencoba memuat resources/views/admin/lowongan.blade.php
+        return view('admin.Company.lowongan', compact('lowongans', 'jumlahLowongan')); // Corrected view path
     }
 
     /**

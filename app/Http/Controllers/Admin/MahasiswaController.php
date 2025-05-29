@@ -31,7 +31,7 @@ class MahasiswaController extends Controller
 
         // Pastikan view 'admin.mahasiswa.index' atau 'admin.datamahasiswa' ada
         // Jika view Anda bernama 'admin.datamahasiswa.blade.php', maka gunakan 'admin.datamahasiswa'
-        return view('admin.datamahasiswa', compact('mahasiswas')); 
+        return view('admin.Mahasiswa.datamahasiswa', compact('mahasiswas'));
     }
 
     // Anda bisa menambahkan method lain seperti create, store, edit, update, destroy

@@ -18,42 +18,34 @@ Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home')
 
 // LOGIN dan LOGOUT Routes
 Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('log-in'); 
+Route::post('/login', [AuthenticatedSessionController::class, 'store'])->name('log-in');
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 // ADMIN GROUP
 Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
-    
+
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-     Route::get('/perusahaan', [CompanyController::class, 'index'])->name('perusahaan.index'); // Hanya ini untuk CompanyController
 
     // Manajemen User Data (jika berbeda dari dashboard utama)
-    Route::get('/userdata', [UserController::class, 'view'])->name('userdata.index');
-    Route::get('/userdata/create', [UserController::class, 'create'])->name('userdata.create');
-    Route::post('/userdata', [UserController::class, 'store'])->name('userdata.store');
-    Route::get('/userdata/{user}/edit', [UserController::class, 'edit'])->name('userdata.edit'); // Menggunakan {user} untuk route model binding
-    Route::put('/userdata/{user}', [UserController::class, 'update'])->name('userdata.update');
-    Route::delete('/userdata/{user}', [UserController::class, 'destroy'])->name('userdata.destroy');
+    Route::resource('userdata', UserController::class); // Use resource for UserController too if it handles CRUD
 
-    // Manajemen Perusahaan
-    Route::get('/perusahaan', [CompanyController::class, 'index'])->name('perusahaan.index');
+    // Manajemen Perusahaan using Route::resource
+    // This single line replaces individual GET/POST/PUT/DELETE routes for standard CRUD operations
+    Route::resource('perusahaan', CompanyController::class);
 
-    // Manajemen Lowongan
-    Route::get('/lowongan', [LowonganController::class, 'index'])->name('lowongan.index');
-   
+    // Manajemen Lowongan using Route::resource if it handles CRUD
+    Route::resource('lowongan', LowonganController::class);
 
-    // Manajemen Pendaftar
-    Route::get('/pendaftar', [PendaftarController::class, 'index'])->name('pendaftar.index');
+    // Manajemen Pendaftar using Route::resource if it handles CRUD
+    Route::resource('pendaftar', PendaftarController::class);
 
-
-    // Routes untuk link navbar admin yang belum ada
+    // Routes untuk link navbar admin yang sudah ada
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
     Route::get('/data-pembimbing', [AdminPembimbingController::class, 'index'])->name('data_pembimbing');
     Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan');
     Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
-    // Route::get('/pengaturan', [AdminPengaturanController::class, 'index'])->name('pengaturan'); // Jika ada halaman pengaturan
-
 });
+
 
 // DOSEN GROUP
 Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')->group(function () {

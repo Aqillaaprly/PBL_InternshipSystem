@@ -9,44 +9,13 @@
 </head>
 
 <body class="bg-blue-50 text-gray-900">
-  {{-- This should be the correct include for your admin navbar --}}
-  {{-- Assuming it's located at resources/views/admin/template/navbar.blade.php --}}
-  @include('admin.template.navbar') 
 
   <div class="max-w-7xl mx-auto px-6 py-12 mt-16"> {{-- Added mt-16 for fixed navbar --}}
 
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-12">
-      <div class="md:w-1/2">
         <h1 class="text-2xl md:text-3xl font-extrabold leading-tight mb-4 text-blue-900">
           Rekomendasi Lowongan Magang
         </h1>
-
-        {{-- This form would ideally submit to a controller method that filters companies --}}
-        <form method="GET" action="{{ route('admin.perusahaan.index') }}"> {{-- Or your specific route for this page --}}
-          <div class="flex flex-wrap gap-3 items-center">
-            <select name="regional" class="border border-blue-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Regional">
-              <option value="">Semua Regional</option>
-              <option value="jakarta">Jakarta</option>
-              <option value="bandung">Bandung</option>
-              <option value="surabaya">Surabaya</option>
-              {{-- Add more regions as needed --}}
-            </select>
-            <input
-              name="sektor"
-              type="text"
-              placeholder="Sektor bidang"
-              class="border border-gray-300 rounded-md px-3 py-2 text-sm w-64 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              aria-label="Job sector" />
-            <button
-              type="submit"
-              class="bg-blue-900 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-blue-800 transition">
-              Tampilkan
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
+        
     @if(isset($companies) && $companies->count() > 0)
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     @foreach($companies as $company)

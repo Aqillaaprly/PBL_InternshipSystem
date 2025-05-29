@@ -19,8 +19,8 @@
              <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
                 <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Mahasiswa</a>
                 <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Pembimbing</a>
-                <a href="{{ route('admin.Company.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Perusahaan</a>
-                <a href="{{ route('admin.Company.lowongan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Perusahaan</a>
+                <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Perusahaan</a>
+                <a href="{{ route('admin.lowongan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Data Lowongan</a>
                 <a href="{{ route('admin.laporan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition">Laporan</a>
             </nav>
 

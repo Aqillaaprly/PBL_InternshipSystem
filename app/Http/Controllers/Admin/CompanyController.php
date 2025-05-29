@@ -22,7 +22,7 @@ class CompanyController extends Controller
         $companies = Company::with('user')->latest()->paginate(10);
         // $jumlahPerusahaan = Company::count(); // Ini mungkin lebih cocok di DashboardController
         // return view('admin.perusahaan', compact('companies', 'jumlahPerusahaan'));
-        return view('admin.perusahaan', compact('companies'));
+        return view('admin.Company.perusahaan', compact('companies')); // Corrected view path
     }
 
     /**

@@ -49,11 +49,11 @@
                                 {{ $lowongan->status }}
                             </span>
                         </td>
-                        <td class="px-5 py-3 space-x-1">
-                            {{-- Sesuaikan route ke admin.lowongan.show, admin.lowongan.edit, admin.lowongan.destroy --}}
-                            <a href="{{-- route('admin.lowongan.show', $lowongan->id) --}}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
-                            <a href="{{-- route('admin.lowongan.edit', $lowongan->id) --}}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
-                            <form action="{{-- route('admin.lowongan.destroy', $lowongan->id) --}}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
+                       <td class="px-5 py-3">
+                         <div class="flex space-x-1">
+                            <a href="route('admin.lowongan.show')" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                            <a href="route('admin.lowongan.edit')" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
+                            <form action="route('admin.lowongan.destroy')" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">Delete</button>

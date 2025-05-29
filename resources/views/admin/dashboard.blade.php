@@ -67,9 +67,8 @@
                     </div>
                 </a>
             </div>
-
-          
             @include('admin.job')
+          
 
             <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
                 <h2 class="font-semibold text-gray-700 mb-4">Absensi Terkini (Contoh)</h2>
