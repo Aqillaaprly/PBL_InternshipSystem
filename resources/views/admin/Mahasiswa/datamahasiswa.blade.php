@@ -18,7 +18,6 @@
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
                     </form>
-                    <button class="border border-gray-300 px-4 py-2 rounded text-sm">Filter</button>
                     <a href="{{ route('admin.mahasiswa.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>
                 </div>
             </div>

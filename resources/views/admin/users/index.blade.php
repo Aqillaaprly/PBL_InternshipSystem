@@ -70,7 +70,7 @@
                                 <td class="px-5 py-4 text-center">
                                     <div class="flex item-center justify-center space-x-1">
                                         {{-- Tombol Show bisa ditambahkan jika diperlukan --}}
-                                        {{-- <a href="{{ route('admin.users.show', $user->id) }}" class="bg-sky-100 text-sky-600 text-xs font-medium px-3 py-1 rounded hover:bg-sky-200">Show</a> --}}
+                                        <a href="{{-- {{ route('admin.users.show', $user->id) }}--}}" class="bg-sky-100 text-sky-600 text-xs font-medium px-3 py-1 rounded hover:bg-sky-200">Show</a>
                                         <a href="{{ route('admin.users.edit', $user->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
                                             Edit
                                         </a>
