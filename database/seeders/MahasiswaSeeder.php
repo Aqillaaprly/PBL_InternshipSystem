@@ -42,8 +42,8 @@ class MahasiswaSeeder extends Seeder
                     'nim' => $user->username, // NIM dari username User
                     'nama' => $user->name,
                     'email' => $user->email,
-                    'kelas' => $faker->randomElement(['TI-2A', 'TI-2B', 'TI-2C', 'TI-2D', 'MI-2A', 'MI-2B', 'SI-2A']),
-                    'program_studi' => $faker->randomElement(['Teknik Informatika', 'Manajemen Informatika', 'Sistem Informasi', 'Teknik Komputer']),
+                    'kelas' => $faker->randomElement(['TI-2A', 'TI-2B', 'TI-2C', 'TI-2D', 'SIB-2A', 'SIB-2B', 'SIB-3A']),
+                    'program_studi' => $faker->randomElement(['Teknik Informatika','Sistem Informasi']),
                     'nomor_hp' => $faker->unique()->e164PhoneNumber(), // Format nomor HP internasional
                     'alamat' => $faker->address(),
                 ]

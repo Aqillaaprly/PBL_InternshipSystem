@@ -41,8 +41,8 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
     {
         return $this->hasOne(Mahasiswa::class, 'user_id', 'id');
     }
-    public function detailPembimbing()
+    public function pembimbingDetail() // atau nama lain yang Anda inginkan
     {
-        return $this->hasOne(DetailPembimbing::class, 'user_id');
+        return $this->hasOne(Pembimbing::class, 'user_id');
     }
 }

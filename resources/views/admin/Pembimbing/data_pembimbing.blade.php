@@ -23,7 +23,7 @@
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r text-sm">Cari</button>
                     </form>
                     {{-- Tombol Tambah Pembimbing (Nonaktifkan jika belum ada fungsionalitasnya) --}}
-                    {{-- <a href="{{-- route('admin.pembimbing.create') --}}" class="bg-green-600 text-white px-5 py-2 rounded text-sm hover:bg-green-700 text-center whitespace-nowrap">+ Tambah Pembimbing</a> --}}
+                    <a href="route('admin.pembimbing.create')" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>
                 </div>
             </div>
 
@@ -49,30 +49,37 @@
                             <th class="px-5 py-3">Nama Pembimbing</th>
                             <th class="px-5 py-3">Email</th>
                             {{-- Tambahkan kolom lain jika relevan dari model Pembimbing atau User --}}
-                            {{-- <th class="px-5 py-3">Jabatan Fungsional</th> --}}
-                            {{-- <th class="px-5 py-3">Program Studi</th> --}}
+                            <th class="px-5 py-3">Jabatan Fungsional</th>
+                            <th class="px-5 py-3">Program Studi</th>
                             <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="text-gray-600 text-left">
+                        {{-- $pembimbings adalah Paginator instance dari model Pembimbing --}}
                         @forelse ($pembimbings as $index => $pembimbing)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
                                 <td class="px-5 py-4 text-center">{{ $pembimbings->firstItem() + $index }}</td>
-                                <td class="px-5 py-4">{{ $pembimbing->username ?? '-' }}</td> {{-- Asumsi NIP ada di username --}}
-                                <td class="px-5 py-4">{{ $pembimbing->name ?? '-' }}</td>
-                                <td class="px-5 py-4">{{ $pembimbing->email ?? '-' }}</td>
-                                {{-- Contoh jika ada relasi ke detail pembimbing: --}}
-                                <td class="px-5 py-4">{{ $pembimbing->detailPembimbing->jabatan_fungsional ?? 'N/A' }}</td>
-                                <td class="px-5 py-4">{{ $pembimbing->detailPembimbing->program_studi_homebase ?? 'N/A' }}</td>
+                                <td class="px-5 py-4">{{ $pembimbing->nip ?? ($pembimbing->user->username ?? '-') }}</td> {{-- NIP dari tabel pembimbings, fallback ke username user --}}
+                                <td class="px-5 py-4">{{ $pembimbing->nama_lengkap ?? ($pembimbing->user->name ?? '-') }}</td> {{-- Nama dari tabel pembimbings, fallback ke nama user --}}
+                                <td class="px-5 py-4">{{ $pembimbing->email_institusi ?? ($pembimbing->user->email ?? '-') }}</td> {{-- Email institusi dari pembimbings, fallback ke email user --}}
+                                <td class="px-5 py-4">{{ $pembimbing->jabatan_fungsional ?? 'N/A' }}</td>
+                                <td class="px-5 py-4">{{ $pembimbing->program_studi_homebase ?? 'N/A' }}</td>
                                 <td class="px-5 py-4 text-center">
-                                    <div class="flex item-center justify-center space-x-2">
-                                        {{-- Tombol Edit User (jika data utama di tabel users) --}}
-                                        <a href="{{ route('admin.users.edit', $pembimbing->id) }}" class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-md shadow-sm">Edit</a>
-                                        {{-- Tombol Edit Detail Pembimbing (jika ada form edit khusus untuk tabel pembimbings/detail_pembimbings) --}}
-                                        {{-- <a href="{{ route('admin.pembimbing.details.edit', $pembimbing->detailPembimbing->id)" class="text-xs bg-sky-500 hover:bg-sky-600 text-white px-3 py-1.5 rounded-md shadow-sm">Edit Detail</a> --}}
+                            <div class="flex item-center justify-center space-x-1">
+                                <a href="{{--{{ route('admin.mahasiswa.show', $mahasiswa->id) }}--}}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                                <a href="{{ route('admin.users.edit', $pembimbing->user->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
+                                    Edit
+                                </a>
+                                <form action="{{ route('admin.users.destroy', $pembimbing->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mahasiswa ini?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">
+                                                Delete
+                                            </button>
+                                        </form>
                                     </div>
                                 </td>
-                            </tr>
+                                                            </tr>
                         @empty
                             <tr>
                                 <td colspan="6" class="px-5 py-4 text-center text-gray-500">
@@ -87,21 +94,10 @@
                     </tbody>
                 </table>
             </div>
-
+             {{-- Paginasi Dinamis dari Laravel --}}
             @if ($pembimbings->hasPages())
-                <div class="mt-6 px-2">
-                  {{-- Struktur paginasi meniru gambar image_f44e5b.png --}}
-                  <div class="flex justify-between items-center">
-                      <p class="text-sm text-gray-500 hidden sm:block">
-                          Page
-                      </p>
-                      <div>
-                          {{ $pembimbings->appends(request()->query())->links('vendor.pagination.tailwind') }} {{-- Memastikan view paginasi tailwind default digunakan atau yang sudah dikustomisasi --}}
-                      </div>
-                      <p class="text-sm text-gray-500 hidden sm:block">
-                          Result
-                      </p>
-                  </div>
+                <div class="mt-6"> {{-- Anda bisa mengganti class ini agar sesuai, misal 'flex justify-between items-center mt-6' --}}
+                    {{ $pembimbings->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>

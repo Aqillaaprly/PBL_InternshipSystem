@@ -23,11 +23,11 @@ class UserSeeder extends Seeder
         // Membuat Admin
         if ($adminRole) {
             User::firstOrCreate(
-                ['username' => 'admin'], // Cari berdasarkan username
+                ['username' => 'rey'], // Cari berdasarkan username
                 [ // Jika tidak ditemukan, buat dengan atribut ini
                     'name' => 'Administrator Sistem',
                     'email' => 'admin@simmagang.test', // Pastikan email unik jika tidak nullable
-                    'password' => Hash::make('password'), // Ganti dengan password yang aman
+                    'password' => Hash::make('123456'), // Ganti dengan password yang aman
                     'role_id' => $adminRole->id,
                     'email_verified_at' => now(),
                 ]

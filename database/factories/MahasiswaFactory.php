@@ -43,8 +43,8 @@ class MahasiswaFactory extends Factory
         'nim' => $user->username,
         'nama' => $user->name,
         'email' => $user->email,
-        'kelas' => $faker->randomElement(['TI-3A', 'TI-3B', 'TI-3C', 'MI-3A', 'SI-3B']),
-        'program_studi' => $faker->randomElement(['Teknik Informatika', 'Manajemen Informatika', 'Sistem Informasi']),
+        'kelas' => $faker->randomElement(['TI-3A', 'TI-3B', 'TI-3C', 'SIB-3A', 'SI-3B']),
+        'program_studi' => $faker->randomElement(['Teknik Informatika', 'Sistem Informasi Bisnis']),
         'nomor_hp' => $faker->unique()->e164PhoneNumber(),
         'alamat' => $faker->address(),
     ];

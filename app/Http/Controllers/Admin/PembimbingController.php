@@ -4,42 +4,34 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User; // Asumsi pembimbing (dosen) adalah User
-use App\Models\Role;
+use App\Models\Pembimbing; // Ganti User dengan Pembimbing
+// Role mungkin tidak lagi dibutuhkan di sini jika semua dosen ada di tabel pembimbings
+// use App\Models\Role; 
 
 class PembimbingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     * Ini akan menangani route('admin.data_pembimbing')
-     *
-     * @return \Illuminate\View\View
-     */
-    public function index(Request $request) // Tambahkan Request $request
+    public function index(Request $request)
     {
-        $dosenRole = Role::where('name', 'dosen')->first();
+        // Query ke model Pembimbing dan eager load data user terkait
+        $query = Pembimbing::with('user');
 
-        if (!$dosenRole) {
-            return redirect()->route('admin.dashboard')->with('error', 'Role dosen tidak ditemukan.');
-        }
-
-        $query = User::where('role_id', $dosenRole->id);
-
-        // Logika Pencarian
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('username', 'like', "%{$searchTerm}%") // username (NIP)
-                  ->orWhere('email', 'like', "%{$searchTerm}%");
+                $q->where('nip', 'like', "%{$searchTerm}%") // Cari NIP di tabel pembimbings
+                  ->orWhere('nama_lengkap', 'like', "%{$searchTerm}%") // Cari nama_lengkap di tabel pembimbings
+                  ->orWhere('jabatan_fungsional', 'like', "%{$searchTerm}%")
+                  ->orWhere('program_studi_homebase', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('user', function($userQuery) use ($searchTerm) { // Cari di tabel users melalui relasi
+                      $userQuery->where('username', 'like', "%{$searchTerm}%") // Username login
+                                ->orWhere('email', 'like', "%{$searchTerm}%");   // Email login
+                  });
             });
         }
 
-        $pembimbings = $query->orderBy('name')->paginate(10)->withQueryString();
-
+        // $pembimbings adalah koleksi dari model Pembimbing
+        $pembimbings = $query->orderBy('nama_lengkap')->paginate(10)->withQueryString(); 
 
         return view('admin.Pembimbing.data_pembimbing', compact('pembimbings'));
     }
-
-    // Tambahkan method CRUD lainnya jika diperlukan
 }
