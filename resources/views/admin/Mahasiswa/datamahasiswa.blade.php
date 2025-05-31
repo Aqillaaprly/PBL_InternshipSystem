@@ -1,21 +1,16 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Data Mahasiswa - Admin SIMMAGANG</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    {{-- <link rel="stylesheet" href="{{ asset('css/admin_style.css') }}"> --}}
 </head>
-
 <body class="bg-blue-50 text-gray-800">
-
     @include('admin.template.navbar')
 
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
-            {{-- Header Halaman dan Tombol Aksi --}}
             <div class="flex justify-between items-center pb-4">
                 <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Mahasiswa</h1>
                 <div class="flex space-x-3">
@@ -24,7 +19,7 @@
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
                     </form>
                     <button class="border border-gray-300 px-4 py-2 rounded text-sm">Filter</button>
-                    <a href="route('admin.mahasiswa.create')" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>
+                    <a href="{{ route('admin.mahasiswa.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>
                 </div>
             </div>
 
@@ -42,7 +37,7 @@
             @endif
 
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm text-center"> {{-- text-center untuk data sel --}}
+                <table class="min-w-full text-sm text-center">
                     <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
                             <th class="px-5 py-3">No</th>
@@ -59,20 +54,21 @@
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
                                 <td class="px-5 py-4">{{ $mahasiswas->firstItem() + $index }}</td>
                                 <td class="px-5 py-4">{{ $mahasiswa->username ?? ($mahasiswa->detailMahasiswa->nim ?? '-') }}</td>
-                                <td class="px-5 py-4 text-left">{{ $mahasiswa->name ?? ($mahasiswa->detailMahasiswa->nama ?? '-') }}</td> {{-- text-left untuk nama --}}
-                                <td class="px-5 py-4 text-left">{{ $mahasiswa->email ?? ($mahasiswa->detailMahasiswa->email ?? '-') }}</td> {{-- text-left untuk email --}}
+                                <td class="px-5 py-4 text-left">{{ $mahasiswa->name ?? ($mahasiswa->detailMahasiswa->nama ?? '-') }}</td>
+                                <td class="px-5 py-4 text-left">{{ $mahasiswa->email ?? ($mahasiswa->detailMahasiswa->email ?? '-') }}</td>
                                 <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
                                 <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->kelas ?? '-' }}</td>
                                 <td class="px-5 py-4">
                                     <div class="flex item-center justify-center space-x-1">
-                                        {{-- Tombol Show (Contoh) --}}
-                                        <a href="{{--{{ route('admin.mahasiswa.show', $mahasiswa->id) }}--}}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                        <a href="{{ route('admin.mahasiswa.show', $mahasiswa->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
                                             Show
                                         </a>
-                                        <a href="{{ route('admin.users.edit', $mahasiswa->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
+                                        {{-- Mengarah ke AdminMahasiswaController@edit --}}
+                                        <a href="{{ route('admin.mahasiswa.edit', $mahasiswa->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">
                                             Edit
                                         </a>
-                                        <form action="{{ route('admin.users.destroy', $mahasiswa->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mahasiswa ini?');">
+                                        {{-- Mengarah ke AdminMahasiswaController@destroy --}}
+                                        <form action="{{ route('admin.mahasiswa.destroy', $mahasiswa->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus mahasiswa ini? Menghapus user mahasiswa juga akan menghapus detail mahasiswa terkait.');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">
@@ -97,19 +93,13 @@
                 </table>
             </div>
 
-            {{-- Paginasi Dinamis dari Laravel --}}
             @if ($mahasiswas->hasPages())
-                <div class="mt-6"> {{-- Anda bisa mengganti class ini agar sesuai, misal 'flex justify-between items-center mt-6' --}}
+                <div class="mt-6">
                     {{ $mahasiswas->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>
     </main>
-
     @include('admin.template.footer')
-
-    {{-- Script dropdown profile dari navbar Anda mungkin sudah ada di admin.template.navbar --}}
-    {{-- Jika belum, Anda bisa menambahkannya di sini atau di layout utama --}}
-
 </body>
 </html>

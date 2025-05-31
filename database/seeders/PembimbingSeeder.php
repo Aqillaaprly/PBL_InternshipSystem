@@ -17,15 +17,15 @@ class PembimbingSeeder extends Seeder
         if (!$dosenRole) {
             $this->command->error("Role 'dosen' tidak ditemukan. PembimbingSeeder tidak dapat membuat data pembimbing terkait user.");
             // Alternatif: buat pembimbing tanpa user_id jika skema memperbolehkan
-            // Pembimbing::factory()->count(5)->create(['user_id' => null]);
-            // $this->command->info("5 data pembimbing (tanpa user terkait) telah di-seed menggunakan factory.");
+            // Pembimbing::factory()->count(15)->create(['user_id' => null]); // Diubah ke 15 jika tanpa user
+            // $this->command->info("15 data pembimbing (tanpa user terkait) telah di-seed menggunakan factory.");
             return;
         }
 
         // Ambil user dengan role dosen yang sudah dibuat oleh UserSeeder
         $usersDosen = User::where('role_id', $dosenRole->id)->get();
         $jumlahPembimbingDibuat = 0;
-        $targetPembimbing = 5; // Jumlah pembimbing yang ingin dibuat
+        $targetPembimbing = 15; // Jumlah pembimbing yang ingin dibuat diubah menjadi 15
 
         foreach ($usersDosen as $user) {
             if ($jumlahPembimbingDibuat >= $targetPembimbing) break;
@@ -37,7 +37,8 @@ class PembimbingSeeder extends Seeder
                     'nip' => $user->username, // Asumsi username user dosen adalah NIP
                     'nama_lengkap' => $user->name,
                     'email_institusi' => $user->email,
-                    // Factory akan mengisi sisa field dengan data dummy
+                    // Factory akan mengisi sisa field dengan data dummy,
+                    // termasuk program_studi_homebase sesuai update di factory
                 ]);
                 $jumlahPembimbingDibuat++;
             }
@@ -49,7 +50,7 @@ class PembimbingSeeder extends Seeder
         if ($sisaDibutuhkan > 0) {
             $this->command->info("Membuat {$sisaDibutuhkan} data pembimbing tambahan (dan user terkait jika factory diatur) menggunakan factory...");
             try {
-                Pembimbing::factory()->count($sisaDibutuhkan)->create();
+                Pembimbing::factory()->count($sisaDibutuhkan)->create(); // Ini akan menggunakan factory yang sudah diupdate
                 $jumlahPembimbingDibuat += $sisaDibutuhkan;
             } catch (\Exception $e) {
                 $this->command->error("Gagal membuat pembimbing menggunakan factory: " . $e->getMessage());
@@ -59,7 +60,7 @@ class PembimbingSeeder extends Seeder
         if ($jumlahPembimbingDibuat > 0) {
              $this->command->info("Total {$jumlahPembimbingDibuat} data pembimbing telah di-seed.");
         } else {
-             $this->command->warn('Tidak ada data pembimbing baru yang di-seed (mungkin sudah ada atau tidak ada user dosen).');
+             $this->command->warn('Tidak ada data pembimbing baru yang di-seed (mungkin sudah ada atau tidak ada user dosen yang cukup).');
         }
     }
 }

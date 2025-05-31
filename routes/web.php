@@ -50,7 +50,19 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
 
     // Data Mahasiswa (dikelola Admin)
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
-    // CRUD untuk mahasiswa oleh admin bisa ditambahkan di sini jika diperlukan
+    Route::get('/data-mahasiswa/create', [AdminMahasiswaController::class, 'create'])->name('mahasiswa.create');
+    Route::post('/data-mahasiswa', [AdminMahasiswaController::class, 'store'])->name('mahasiswa.store');
+    Route::get('/data-mahasiswa/{mahasiswa}/show', [AdminMahasiswaController::class, 'show'])->name('mahasiswa.show'); // show (User $mahasiswa)
+    Route::get('/data-mahasiswa/{mahasiswa}/edit', [AdminMahasiswaController::class, 'edit'])->name('mahasiswa.edit'); // edit (User $mahasiswa)
+    Route::put('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'update'])->name('mahasiswa.update'); // update (User $mahasiswa)
+    Route::delete('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'destroy'])->name('mahasiswa.destroy'); // destroy (User $mahasiswa)
+
+
+    Route::get('/data-pembimbing', [AdminPembimbingController::class, 'index'])->name('data_pembimbing');
+    Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan');
+    Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
     // Data Pembimbing (dikelola Admin)
     Route::get('/data-pembimbing', [AdminPembimbingController::class, 'index'])->name('data_pembimbing');

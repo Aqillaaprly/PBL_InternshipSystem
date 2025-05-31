@@ -37,7 +37,7 @@ class PembimbingFactory extends Factory
             'email_institusi' => $emailInstitusi,
             'nomor_telepon' => $this->faker->e164PhoneNumber,
             'jabatan_fungsional' => $this->faker->randomElement(['Asisten Ahli', 'Lektor', 'Lektor Kepala', 'Profesor']),
-            'program_studi_homebase' => $this->faker->randomElement(['Teknik Informatika', 'Sistem Informasi', 'Manajemen Informatika', 'Teknik Elektro']),
+            'program_studi_homebase' => $this->faker->randomElement(['Teknik Informatika', 'Sistem Informasi Bisnis']), // Diubah di sini
             'bidang_keahlian_utama' => $this->faker->sentence(3),
             'kuota_bimbingan_aktif' => $this->faker->numberBetween(0, 5),
             'maks_kuota_bimbingan' => $this->faker->randomElement([8, 10, 12]),
