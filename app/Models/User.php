@@ -18,6 +18,7 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
         'username',
         'password',
         'role_id',
+        'profile_picture',
     ];
 
     protected $hidden = [
