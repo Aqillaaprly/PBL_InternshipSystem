@@ -22,7 +22,7 @@
           List Perusahaan Penerima Magang
         </h1>
 
-        <!-- Filters -->
+        <!-- Filters
         <form class="flex flex-wrap gap-3 items-center">
           <select class="border border-blue-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Regional">
             <option value="">Regional</option>
@@ -40,7 +40,7 @@
             class="bg-blue-900 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-blue-800 transition">
             Show Jobs
           </button>
-        </form>
+        </form> -->
       </div>
 
     </div>
@@ -237,8 +237,6 @@
 
   </div>
 
-  <!-- Footer -->
-  <?php include('../footer.php') ?>
 </body>
 
 </html>
