@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
+use App\Http\Controllers\Mahasiswa\MahasiswaController;
+use App\Models\Company;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -66,26 +68,38 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
 });
 
 
-
 // MAHASISWA GROUP
 Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('mahasiswa.dashboard');
-    })->name('dashboard');
+    // Dashboard
+    Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
 
+    // Melihat pembimbing
+    Route::get('/pembimbing', [MahasiswaController::class, 'lihatPembimbing'])->name('pembimbing');
+
+    // Absensi
     Route::get('/absensi', function () {
         return view('mahasiswa.absensi');
     })->name('absensi');
+
+    // Job
     Route::get('/job', function () {
         return view('mahasiswa.job');
     })->name('job');
+
     Route::get('/profile', function () {
         return view('mahasiswa.mahasiswaProfile');
     })->name('profile');
+
+    // Perusahaan (with data)
     Route::get('/perusahaan', function () {
-        return view('mahasiswa.perusahaan');
+        $companies = \App\Models\Company::with('lowongans')->get();
+        return view('mahasiswa.perusahaan', compact('companies'));
     })->name('perusahaan');
-    // Tambahkan route mahasiswa lainnya di sini
+
+    // Laporan
+    Route::get('/laporan', function () {
+        return view('mahasiswa.laporan');
+    })->name('laporan');
 });
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
