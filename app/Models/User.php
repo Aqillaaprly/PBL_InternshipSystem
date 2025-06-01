@@ -46,4 +46,8 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
     {
         return $this->hasOne(Pembimbing::class, 'user_id');
     }
+    public function company()
+{
+    return $this->hasOne(\App\Models\Company::class, 'user_id');
+}
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\MahasiswaController as AdminMahasiswaController;
 use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Company\CompanyController;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -95,16 +96,11 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 
 // PERUSAHAAN GROUP
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('perusahaan.dashboard'); // Pastikan view ini ada: resources/views/company/dashboard.blade.php
-    })->name('dashboard');
+    Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/lowongan', function () { return view('company.lowongan'); })->name('lowongan');
-    Route::get('/pendaftar', function () { return view('company.pendaftar'); })->name('pendaftar');
-    Route::get('/tambah-lowongan', function () { return view('company.tambah_lowongan'); })->name('tambah_lowongan');
-    // Proses tambah lowongan dan pendaftar sebaiknya menggunakan Controller
-    // Contoh:
-    // Route::post('/lowongan', [App\Http\Controllers\Company\LowonganController::class, 'store'])->name('lowongan.store');
-    // Route::post('/pendaftar/update-status', [App\Http\Controllers\Company\PendaftarController::class, 'updateStatus'])->name('pendaftar.update_status');
+    Route::get('/lowongan', [CompanyController::class, 'lowongan'])->name('lowongan');
+    Route::get('/lowongan/tambah', [CompanyController::class, 'createLowongan'])->name('tambah_lowongan');
+    Route::post('/lowongan', [CompanyController::class, 'storeLowongan'])->name('lowongan.store');
+
+    Route::get('/pendaftar', [CompanyController::class, 'pendaftar'])->name('pendaftar'); 
 });
-
