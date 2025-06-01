@@ -8,12 +8,12 @@
 </head>
 
 @include('mahasiswa.template.navbar')
-<body class="bg-blue-50 text-gray-800 pt-20">
 
+<body class="bg-blue-50 text-gray-800 pt-20">
 
 <!-- Hero Section -->
 <div class="flex flex-col min-h-screen">
-    <main class="p-6 max-w-7xl mx-auto w-full mt-4">
+    <main class="max-w-[1300px] mx-auto w-full px-6 md:px-10 mt-4">
         <div class="w-full mb-6">
             <img src="https://www.pixelstalk.net/wp-content/uploads/2016/05/Images-New-York-City-Backgrounds.jpg"
                  alt="Header"
@@ -24,6 +24,7 @@
             <p class="text-sm text-gray-600">Dashboard Sistem Informasi Manajemen Magang Mahasiswa</p>
         </div>
 
+        <!-- Descriptions -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
             <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
                 <h2 class="text-xl font-bold text-blue-800 mb-3">Magang Pusat</h2>
@@ -38,23 +39,23 @@
         </div>
 
         <!-- Statistics Section -->
-        <div class="grid grid-cols-3 gap-4 text-center my-12 px-6 md:px-20">
-            <div class="bg-white rounded-xl py-6 shadow">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center my-12">
+            <div class="bg-white rounded-xl shadow flex flex-col items-center justify-center py-8 h-40">
                 <p class="text-3xl font-bold text-blue-600">10</p>
                 <p class="text-sm">Perusahaan</p>
             </div>
-            <div class="bg-white rounded-xl py-6 shadow">
+            <div class="bg-white rounded-xl shadow flex flex-col items-center justify-center py-8 h-40">
                 <p class="text-3xl font-bold text-blue-600">15</p>
                 <p class="text-sm">Lowongan</p>
             </div>
-            <div class="bg-white rounded-xl py-6 shadow">
+            <div class="bg-white rounded-xl shadow flex flex-col items-center justify-center py-8 h-40">
                 <p class="text-3xl font-bold text-blue-600">10</p>
                 <p class="text-sm">Pendaftar</p>
             </div>
         </div>
 
         <!-- Job Cards Section -->
-        <div class="px-6 md:px-20">
+        <div>
             @include('mahasiswa.job')
         </div>
     </main>

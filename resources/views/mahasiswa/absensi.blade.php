@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 pt-20 relative">
 
-<?php include('template/navbar_mahasiswa.php'); ?>
+@include('mahasiswa.template.navbar')
 
 <div class="max-w-7xl mx-auto p-4">
     <div class="bg-white rounded-xl shadow-md p-6 relative">
@@ -78,7 +78,7 @@
     </div>
 </div>
 
-<?php include('../footer.php'); ?>
+@include('mahasiswa.template.footer')
 
 <!-- Modal Script -->
 <script>

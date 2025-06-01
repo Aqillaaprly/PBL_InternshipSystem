@@ -92,6 +92,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/job', function () { return view('mahasiswa.job'); })->name('job');
     Route::get('/profile', function () { return view('mahasiswa.mahasiswaProfile'); })->name('profile');
     Route::get('/perusahaan', function () { return view('mahasiswa.perusahaan'); })->name('perusahaan');
+    Route::get('/laporan', function () { return view('mahasiswa.laporan'); })->name('laporan');
     // Tambahkan route lain untuk mahasiswa di sini
 });
 

@@ -17,95 +17,90 @@
                     </svg>
                 </button>
 
-                <a href="dashboard.php" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
+                <a href="{{ route('mahasiswa.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
                     SIMMAGANG
                 </a>
             </div>
-
             <!-- Center: Navigation Menu -->
             <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-<<<<<<<< HEAD:resources/views/mahasiswa/template/navbar.blade.php
                 <a href="{{ route('mahasiswa.perusahaan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('mahasiswa.perusahaan') ? 'border-blue-600 text-blue-600' : '' }}">Perusahaan</a>
                 <a href="{{ route('mahasiswa.absensi') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('mahasiswa.absensi') ? 'border-blue-600 text-blue-600' : '' }}">Absensi</a>
-                <class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition ">Report</a>
-========
-                <a href="perusahaan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['perusahaan']; ?></a>
-                <a href="absensi.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['absensi']; ?></a>
->>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/mahasiswa/template/navbar_mahasiswa.php
+                <a href="{{ route('mahasiswa.laporan') }}"class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition ">Report</a>
             </nav>
 
-            <!-- Right: Google Translate + Profile -->
             <div class="flex items-center space-x-4">
-                <!-- Google Translate with Globe Icon -->
-                <div class="flex items-center space-x-2 mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 4v1m0 14v1m8-8h1M3 12H2m16.95-4.95l.707.707M5.343 5.343l-.707.707M16.95 16.95l.707-.707M5.343 18.657l-.707-.707M12 6a6 6 0 100 12a6 6 0 000-12z"/>
+                {{-- Google Translate dengan Ikon Globe --}}
+                <div class="flex items-center space-x-1">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 9a9 9 0 016.364 2.636M12 12V3m-3.364 9.364A9 9 0 0112 3m0 18v-9m-3.364-6.364A9 9 0 005.636 7.364M12 12h9m-9 0H3"/>
                     </svg>
-                    <div id="google_translate_element" class="ml-1"></div>
+                    <div id="google_translate_element"></div>
+
                 </div>
 
-                <!-- Profile Dropdown -->
                 <div class="relative">
                     <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full" aria-haspopup="true" aria-expanded="false">
-                        <img src="https://i.pravatar.cc/40" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300" />
-                        <span class="hidden sm:block font-medium text-gray-700">Mahasiswa TI</span>
+                        @if (Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture))
+                        <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
+                        @else
+                        {{-- Fallback ke UI Avatars jika tidak ada foto --}}
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? Auth::user()->username) }}&background=random&color=fff&size=40" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
+                        @endif
+                        <span class="hidden sm:block font-medium text-gray-700">{{ Auth::user()->username ?? 'Admin' }}</span>
                     </button>
-
                     <div id="profileDropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
-                        <a href="mahasiswaProfile.php" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md"></a>
-                        <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-100"></a>
+                        <a href="{{ route('mahasiswa.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md">Profil</a>
                         <div class="border-t border-gray-200"></div>
-                        <a href="#" class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-b-md"></a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                        <a href="{{ route('logout') }}"
+                           onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                           class="block px-4 py-2 text-red-600 hover:bg-red-100 rounded-b-md">
+                            Keluar
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </header>
-
-<!-- Custom Styles for Google Translate -->
 <style>
-    .goog-logo-link, .goog-te-gadget span {
+    /* Sembunyikan elemen branding Google Translate dan banner */
+    .goog-logo-link,
+    .goog-te-gadget span, /* Ini akan menyembunyikan teks "Powered by Google Translate" */
+    iframe.goog-te-banner-frame {
         display: none !important;
     }
 
     .goog-te-gadget {
-        color: transparent !important;
-        font-size: 0 !important;
+        color: transparent !important; /* Membuat teks default transparan */
+        font-size: 0 !important; /* Membuat font size 0 agar tidak memakan tempat */
+        line-height: normal !important;
+        display: inline-block; /* Agar widget tidak terlalu lebar */
+        vertical-align: middle; /* Menjaga kesejajaran vertikal dengan ikon globe */
     }
 
-    #google_translate_element select {
+    /* Mencegah Google menambahkan margin/padding ke body saat banner muncul */
+    body {
+        top: 0px !important;
+    }
+
+    /* Styling untuk dropdown bahasa dari Google Translate */
+    #google_translate_element select.goog-te-combo {
         background-color: white;
-        color: #4B5563;
-        border: 1px solid #D1D5DB;
-        border-radius: 4px;
-        font-size: 0.875rem;
-        padding: 0.25rem 0.5rem;
-    }
-
-    .goog-tooltip,
-    .goog-tooltip:hover,
-    .goog-te-balloon-frame {
-        display: none !important;
-    }
-
-    .goog-text-highlight {
-        background: none !important;
-        box-shadow: none !important;
-    }
-
-    iframe.goog-te-banner-frame {
-        position: absolute !important;
-        top: 0 !important;
-        z-index: 9999 !important;
-        width: 100% !important;
-        height: 40px !important;
-    }
-
-    #google-translate-banner-spacer {
-        height: 0px;
-        transition: height 0.3s ease;
+        color: #4B5563; /* text-gray-700 */
+        border: 1px solid #D1D5DB; /* border-gray-300 */
+        border-radius: 0.375rem; /* rounded-md */
+        padding: 0.25rem 0.5rem; /* py-1 px-2 */
+        font-size: 0.875rem; /* text-sm */
+        line-height: 1.25rem; /* leading-tight */
+        height: 2rem; /* Sesuaikan tinggi jika perlu, misal h-8 */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+        margin-left: 0.25rem; /* ml-1 */
+        min-width: auto; /* Biarkan lebarnya menyesuaikan konten atau atur sesuai kebutuhan */
     }
 </style>
 
@@ -113,60 +108,57 @@
     function googleTranslateElementInit() {
         new google.translate.TranslateElement({
             pageLanguage: 'id',
-            includedLanguages: 'id,en',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+            includedLanguages: 'id,en,es,fr,de,ja,ko,ar', // Sesuaikan daftar bahasa
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+            autoDisplay: false
         }, 'google_translate_element');
+
+        // Fungsi untuk mencoba menyembunyikan elemen yang tidak diinginkan
+        // dan memastikan body tidak bergeser
+        function styleGoogleTranslateWidget() {
+            var bannerFrame = document.querySelector('iframe.goog-te-banner-frame');
+            if (bannerFrame) {
+                bannerFrame.style.display = 'none';
+            }
+            // Paksa body kembali ke posisi atas jika Google Translate mengubahnya
+            document.body.style.top = '0px';
+
+            var gtElement = document.getElementById('google_translate_element');
+            if (gtElement) {
+                var spans = gtElement.querySelectorAll('.goog-te-gadget > span');
+                spans.forEach(function(span) {
+                    if (!span.querySelector('select')) { // Jangan sembunyikan span yang berisi select
+                        span.style.display = 'none';
+                    }
+                });
+                var logoLink = gtElement.querySelector('.goog-logo-link');
+                if (logoLink) logoLink.style.display = 'none';
+            }
+        }
+
+        // Panggil fungsi styling beberapa kali setelah jeda untuk menangani pemuatan dinamis widget
+        setTimeout(styleGoogleTranslateWidget, 500);
+        setTimeout(styleGoogleTranslateWidget, 1500);
+        // Anda bisa juga menggunakan MutationObserver jika ingin solusi yang lebih robus
+        // untuk mendeteksi perubahan DOM oleh widget Google.
     }
 
-    // Handle profile dropdown toggle
+    // JavaScript untuk Profile Dropdown (tetap sama)
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');
 
-    profileBtn.addEventListener('click', () => {
-        const isHidden = profileDropdown.classList.toggle('hidden');
-        profileBtn.setAttribute('aria-expanded', !isHidden);
-    });
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', () => {
+            const isHidden = profileDropdown.classList.toggle('hidden');
+            profileBtn.setAttribute('aria-expanded', !isHidden);
+        });
 
-    document.addEventListener('click', function(e) {
-        if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-            profileDropdown.classList.add('hidden');
-            profileBtn.setAttribute('aria-expanded', false);
-        }
-    });
-
-    // Observe for Google Translate banner and adjust layout
-    function repositionTranslateBanner() {
-        const iframe = document.querySelector("iframe.goog-te-banner-frame");
-        const spacer = document.getElementById("google-translate-banner-spacer");
-
-        if (iframe && spacer) {
-            spacer.style.height = "40px";
-        }
-    }
-
-    const observer = new MutationObserver(() => {
-        repositionTranslateBanner();
-    });
-
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-</script>
-
-<!-- Google Translate API -->
-<script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
-
-
-<!-- Google Translate Element Positioned at Bottom -->
-<div id="google_translate_element" style="position: fixed !important; bottom: 0 !important; left: 0 !important; z-index: 9999 !important; background: white; padding: 5px;"></div>
-
-<script type="text/javascript">
-    function googleTranslateElementInit() {
-        new google.translate.TranslateElement(
-            {pageLanguage: 'id', layout: google.translate.TranslateElement.InlineLayout.SIMPLE},
-            'google_translate_element'
-        );
+        document.addEventListener('click', function(e) {
+            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+                profileDropdown.classList.add('hidden');
+                profileBtn.setAttribute('aria-expanded', false);
+            }
+        });
     }
 </script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
