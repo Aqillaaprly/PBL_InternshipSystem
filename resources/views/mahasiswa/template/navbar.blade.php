@@ -24,9 +24,14 @@
 
             <!-- Center: Navigation Menu -->
             <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
+<<<<<<<< HEAD:resources/views/mahasiswa/template/navbar.blade.php
                 <a href="{{ route('mahasiswa.perusahaan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('mahasiswa.perusahaan') ? 'border-blue-600 text-blue-600' : '' }}">Perusahaan</a>
                 <a href="{{ route('mahasiswa.absensi') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('mahasiswa.absensi') ? 'border-blue-600 text-blue-600' : '' }}">Absensi</a>
                 <class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition ">Report</a>
+========
+                <a href="perusahaan.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['perusahaan']; ?></a>
+                <a href="absensi.php" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition"><?= $lang['absensi']; ?></a>
+>>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/mahasiswa/template/navbar_mahasiswa.php
             </nav>
 
             <!-- Right: Google Translate + Profile -->

@@ -12,7 +12,11 @@
 
     <!-- Header/Navbar -->
     <?php
+<<<<<<<< HEAD:resources/views/supervisor/data_pembimbing.blade.php
     include('template/navbar_pembimbing.php')
+========
+    include('template/navbar_admin.php')
+>>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/admin/datamahasiswa.php
     ?>
 
     <!-- Main Content -->
@@ -74,7 +78,11 @@
     </main>
 
     <!-- Footer -->
+<<<<<<<< HEAD:resources/views/supervisor/data_pembimbing.blade.php
    <?php include('../footer.php') ?>
+========
+    <?php include('template/footer.php') ?>
+>>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/admin/datamahasiswa.php
 
     <!-- Dropdown JS -->
     <script>

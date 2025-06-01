@@ -12,12 +12,8 @@
 <body class="bg-blue-50 text-gray-800">
 
     <!-- Header/Navbar -->
-<<<<<<<< HEAD:resources/views/dosen/laporan.blade.php
-    @include('admin.template.navbar')
-========
-    <?php include('template/navbar_admin.php') ?>
+    <?php include('template/navbar_pembimbing.php') ?>
 
->>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/admin/laporan.php
     <!-- Main Content -->
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6 space-y-10">
 
@@ -106,11 +102,7 @@
     </main>
 
     <!-- Footer -->
-<<<<<<<< HEAD:resources/views/dosen/laporan.blade.php
-   @include('admin.template.footer')
-========
-    <?php include('template/footer.php') ?>
->>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/admin/laporan.php
+    <?php include('../footer.php') ?>
 
     <!-- Dropdown JS -->
     <script>

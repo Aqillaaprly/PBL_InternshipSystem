@@ -12,11 +12,7 @@
 
     <!-- Header/Navbar -->
     <?php
-<<<<<<<< HEAD:resources/views/dosen/data_pembimbing.blade.php
     include('template/navbar_pembimbing.php')
-========
-    include('template/navbar_admin.php')
->>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/admin/data_pembimbing.php
     ?>
 
     <!-- Main Content -->
@@ -78,7 +74,7 @@
     </main>
 
     <!-- Footer -->
-   <?php include('template/footer.php') ?>
+   <?php include('../footer.php') ?>
 
     <!-- Dropdown JS -->
     <script>

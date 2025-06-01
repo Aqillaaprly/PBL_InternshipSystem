@@ -7,8 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-[#f0f6ff]">
+<<<<<<<< HEAD:resources/views/perusahaan/lowongan.blade.php
     @include('admin.template.navbar')
 
+========
+    <?php
+    include('template/navbar_admin.php')
+    ?>
+>>>>>>>> origin/Branch-fix-frontend-Krisna:resources/views/admin/perusahaan.php
 <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6">
     <div class="bg-white p-8 rounded-xl shadow">
         <div class="flex justify-between items-center mb-6">
