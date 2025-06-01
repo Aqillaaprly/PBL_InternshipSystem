@@ -58,6 +58,12 @@ class Pembimbing extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+       // Seorang pembimbing bisa membimbing banyak mahasiswa (melalui tabel BimbinganMagang)
+    public function bimbinganMagangs()
+    {
+        return $this->hasMany(BimbinganMagang::class, 'pembimbing_id');
+    }
+
     /**
      * Contoh relasi: Seorang pembimbing bisa memiliki banyak mahasiswa bimbingan.
      * Ini memerlukan tabel 'mahasiswas' memiliki kolom 'pembimbing_id'.

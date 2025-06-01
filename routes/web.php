@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Company\CompanyController;
+use App\Http\Controllers\Admin\PenugasanPembimbingController;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -62,6 +63,13 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+
+    Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // ... (route admin lainnya) ...
+
+    // Manajemen Penugasan Pembimbing
+    Route::resource('penugasan-pembimbing', PenugasanPembimbingController::class);
+});
 });
 
 // DOSEN GROUP
@@ -69,7 +77,10 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/dashboard', function () {
         return view('dosen.dashboard'); // Pastikan view ini ada: resources/views/dosen/dashboard.blade.php
     })->name('dashboard');
+Route::get('/mahasiswa-bimbingan', [App\Http\Controllers\Dosen\DosenController::class, 'mahasiswaBimbingan'])->name('mahasiswa.bimbingan');
 });
+
+
 
 // MAHASISWA GROUP
 Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
@@ -82,6 +93,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/job', function () { return view('mahasiswa.job'); })->name('job');
     Route::get('/profile', function () { return view('mahasiswa.mahasiswaProfile'); })->name('profile');
     Route::get('/perusahaan', function () { return view('mahasiswa.perusahaan'); })->name('perusahaan');
+    Route::get('/dosen-pembimbing', [App\Http\Controllers\Mahasiswa\MahasiswaController::class, 'lihatPembimbing'])->name('lihat.pembimbing');
 });
 
 // PERUSAHAAN GROUP
