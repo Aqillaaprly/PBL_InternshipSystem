@@ -49,53 +49,75 @@
                 </div>
             </div>
 
-        {{-- <!-- Statistik -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                <p class="text-2xl font-bold text-blue-600"><?= $jumlahUserMahasiswaYangAda ?></p>
-                <p class="text-sm text-gray-700 mt-1">Total Mahasiswa </p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-xl shadow hover:bg-blue-50 transition">
+                    <h2 class="font-semibold text-gray-700 mb-4">Statistik Program Studi</h2>
+                    {{-- Konten statistik prodi --}}
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow hover:bg-blue-50 transition">
+                    <h2 class="font-semibold text-gray-700 mb-4">Laporan Mahasiwa Terakhir</h2>
+                    {{-- Konten pengguna aktif --}}
+                </div>
             </div>
-            <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                <p class="text-2xl font-bold text-blue-600"><?= $jumlahPendaftar ?></p>
-                <p class="text-sm text-gray-700 mt-1">Total Pendaftar</p>
+            @include('dosen.Job')
+
+{{--Tabel mahasiswa bimbingan--}}
+      <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
+                <h2 class="font-semibold text-gray-700 mb-4">Mahasiswa</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-500 uppercase border-b">
+                            <tr>
+                                <th class="px-4 py-2">No</th>
+                                <th class="px-4 py-2">Nama</th>
+                                <th class="px-4 py-2">Perusahaan</th>
+                                <th class="px-4 py-2">Posisi</th>
+                                <th class="px-4 py-2">Tanggal Masuk Magang</th>
+                                <th class="px-4 py-2">Tanggal Selesai Magang</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="px-4 py-2">1</td>
+                                <td class="px-4 py-2">Andi Pratama</td>
+                                <td class="px-4 py-2">Astra</td>
+                                <td class="px-4 py-2">Web Dev</td>
+                                <td class="px-4 py-2">12 Mei 2025</td>
+                                <td class="px-4 py-2">12 November 2025</td>
+                            </tr>
+                            {{-- Data lainnya --}}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- Tombol Aksi -->
-        <div class="flex justify-end mb-4">
-            <a href="tambah_lowongan.php" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Tambah Lowongan</a>
-        </div>
-
-        <!-- Tabel Lowongan -->
-        <div class="bg-white p-6 rounded shadow mb-6">
-            <h2 class="font-semibold text-gray-700 mb-4">Lowongan Anda</h2>
-            <table class="w-full text-sm text-left text-gray-600">
-                <thead class="text-xs text-gray-500 uppercase border-b">
-                    <tr>
-                        <th class="px-4 py-2">Judul</th>
-                        <th class="px-4 py-2">Deadline</th>
-                        <th class="px-4 py-2">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $query = mysqli_query($conn, "SELECT * FROM lowongan WHERE perusahaan_id = 1");
-                    while ($row = mysqli_fetch_assoc($query)) {
-                        echo "<tr class='border-b'>
-                            <td class='px-4 py-2'>{$row['judul']}</td>
-                            <td class='px-4 py-2'>{$row['batas_akhir']}</td>
-                            <td class='px-4 py-2'>
-                                <a href='pendaftar.php?id={$row['id']}' class='text-blue-600 hover:underline'>Lihat Pendaftar</a>
-                            </td>
-                        </tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-    </main> --}} 
-
-    {{-- <?php include('template/footer.php'); ?> --}}
-
-</body>
+{{--Tabel Absensi mahasiswa bimbingan--}}
+      <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
+                <h2 class="font-semibold text-gray-700 mb-4">Absensi Mahasiswa</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-600">
+                        <thead class="text-xs text-gray-500 uppercase border-b">
+                            <tr>
+                                <th class="px-4 py-2">No</th>
+                                <th class="px-4 py-2">Nama</th>
+                                <th class="px-4 py-2">Perusahaan</th>
+                                <th class="px-4 py-2">Jam Masuk</th>
+                                <th class="px-4 py-2">Keterangan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="px-4 py-2">1</td>
+                                <td class="px-4 py-2">Andi Pratama</td>
+                                <td class="px-4 py-2">Astra</td>
+                                <td class="px-4 py-2">08.55</td>
+                                <td class="px-4 py-2">Hadir</td>
+                            </tr>
+                            {{-- Data lainnya --}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </body>
+        @include('dosen.template.footer')
 </html>
