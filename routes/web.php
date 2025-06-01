@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\MahasiswaController as AdminMahasiswaController;
 use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
 
 // Mengarahkan halaman utama ('/') ke halaman login
@@ -51,12 +52,9 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
-    Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // ... (route admin lainnya) ...
 
     // Manajemen Penugasan Pembimbing
     Route::resource('penugasan-pembimbing', PenugasanPembimbingController::class);
-});
 });
 
 // DOSEN GROUP
