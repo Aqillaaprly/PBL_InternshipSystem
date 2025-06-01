@@ -23,6 +23,19 @@
             <p class="text-sm text-gray-600">Dashboard Sistem Informasi Manajemen Magang Mahasiswa</p>
         </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+                <h2 class="text-xl font-bold text-blue-800 mb-3">Magang Pusat</h2>
+                <p class="text-gray-700 mb-3">Magang Pusat adalah proses untuk menerapkan keilmuan atau kompetensi yang didapat selama menjalani masa pendidikan, di dunia kerja secara langsung. Pemagang jadi bisa memahami sistem kerja yang profesional di industri sebenarnya.</p>
+                <p class="text-gray-700">Perusahaan-perusahaan yang akan di jadikan tempat magang sudah terorganisir oleh kampus</p>
+            </div>
+            <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition">
+                <h2 class="text-xl font-bold text-blue-800 mb-3">Magang Mandiri</h2>
+                <p class="text-gray-700 mb-3">Magang Mandiri adalah proses untuk menerapkan keilmuan atau kompetensi yang didapat selama menjalani masa pendidikan, di dunia kerja secara langsung. Pemagang jadi bisa memahami sistem kerja yang profesional di industri sebenarnya.</p>
+                <p class="text-gray-700">Mahasiswa mencari sendiri perusahaan-perusahan yang akan dijadikan untuk penerapan keilmuan atau kompetensi.</p>
+            </div>
+        </div>
+
         <!-- Statistics Section -->
         <div class="grid grid-cols-3 gap-4 text-center my-12 px-6 md:px-20">
             <div class="bg-white rounded-xl py-6 shadow">
