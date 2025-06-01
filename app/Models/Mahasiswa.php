@@ -40,6 +40,14 @@ class Mahasiswa extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
+     // Mahasiswa (detail) memiliki satu atau lebih entri bimbingan magang
+    // melalui user_id yang terkait
+    public function bimbinganMagangs()
+    {
+        return $this->hasMany(BimbinganMagang::class, 'mahasiswa_user_id', 'user_id');
+    }
+
+
     // Anda bisa menambahkan relasi lain di sini jika mahasiswa
     // memiliki hubungan dengan tabel lain secara langsung
     // Misalnya, jika pendaftar langsung dari Mahasiswa model:
