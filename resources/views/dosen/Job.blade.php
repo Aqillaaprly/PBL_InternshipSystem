@@ -12,42 +12,6 @@
 
     <!-- Header Section -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-12">
-      
-      <!-- Text Content -->
-      <div class="md:w-1/2">
-        <h1 class="text-2xl md:text-3xl font-extrabold leading-tight mb-4 text-blue-900">
-          Lorem ipsum dolor sit amet consectetur. Augue aliquam quis sodales tempor donec. Nulla malesuada dui fermentum rhoncus feugiat ac aliquam.
-        </h1>
-        <p class="text-sm text-blue-800 font-semibold mb-6">
-          Lorem ipsum dolor sit amet consectetur.
-        </p>
-
-        <!-- Filters -->
-        <form class="flex flex-wrap gap-3 items-center">
-          <select class="border border-blue-500 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" aria-label="Regional">
-            <option value="">Regional</option>
-            <option value="jakarta">Jakarta</option>
-            <option value="bandung">Bandung</option>
-            <option value="surabaya">Surabaya</option>
-          </select>
-          <input
-            type="text"
-            placeholder="Sektor bidang (Leave blank for all jobs)"
-            class="border border-gray-300 rounded-md px-3 py-2 text-sm w-64 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            aria-label="Job sector"
-          />
-          <button
-            type="submit"
-            class="bg-blue-900 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-blue-800 transition"
-          >
-            Show Jobs
-          </button>
-        </form>
-      </div>
-
-      <!-- Placeholder image -->
-      <div class="md:w-1/3 h-36 bg-gray-300 rounded-md"></div>
-    </div>
 
     <!-- Job Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">

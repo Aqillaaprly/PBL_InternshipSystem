@@ -11,7 +11,7 @@
     <div>
       <h5 class="font-semibold mb-4">Perusahaan</h5>
       <ul class="space-y-2">
-        <li><a href="job.php"class="hover:text-blue-600">Daftar Perusahaan</a></li>
+        <li><a href="Job.php"class="hover:text-blue-600">Daftar Perusahaan</a></li>
         <li><a href="#" class="hover:text-blue-600">Masuk perusahaan</a></li>
         <li><a href="#" class="hover:text-blue-600">Pasang loker</a></li>
         <li><a href="#" class="hover:text-blue-600">Kontak sales</a></li>
