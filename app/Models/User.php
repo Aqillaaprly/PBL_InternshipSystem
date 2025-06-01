@@ -1,41 +1,31 @@
 <?php
 
+// app/Models/User.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\DetailPembimbing;
 
-class User extends Authenticatable
+class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquent
 {
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
+        'name',
+        'email',
         'username',
         'password',
-        'role_id', // Tambahan kolom untuk role
+        'role_id',
+        'profile_picture',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -46,29 +36,14 @@ class User extends Authenticatable
 
     public function role()
     {
-       return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class);
     }
-
-    /**
-     * Helper methods for role-based access.
-     */
-    public function isAdmin(): bool
+    public function detailMahasiswa()
     {
-        return $this->role === '1';
+        return $this->hasOne(Mahasiswa::class, 'user_id', 'id');
     }
-
-    public function isMahasiswa(): bool
+    public function pembimbingDetail() // atau nama lain yang Anda inginkan
     {
-        return $this->role === 'mahasiswa';
-    }
-
-    public function isDosen(): bool
-    {
-        return $this->role === 'dosen';
-    }
-
-    public function isPerusahaan(): bool
-    {
-        return $this->role === 'perusahaan';
+        return $this->hasOne(Pembimbing::class, 'user_id');
     }
 }

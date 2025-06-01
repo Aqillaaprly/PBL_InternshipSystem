@@ -8,8 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Models\Role;
-
+use App\Models\Role; // Pastikan model Role di-import
 
 class AuthenticatedSessionController extends Controller
 {
@@ -33,10 +32,27 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         // Redirect berdasarkan role
-        if ($user->role_id == 1) {
-            return redirect()->intended(url('/admin/dashboard'));
+        if ($user->role) { // Periksa apakah pengguna memiliki peran
+            switch (strtolower($user->role->name)) { // Ubah nama peran menjadi huruf kecil untuk perbandingan case-insensitive
+                case 'admin':
+                    return redirect()->intended(route('admin.dashboard'));
+                case 'mahasiswa':
+                    return redirect()->intended(route('mahasiswa.dashboard'));
+                case 'perusahaan':
+                    return redirect()->intended(route('perusahaan.dashboard'));
+                case 'dosen':
+                    return redirect()->intended(route('dosen.dashboard'));
+                default:
+                    Auth::guard('web')->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    return redirect('/login')->with('error', 'Peran tidak dikenal atau dasbor tidak tersedia.');
+            }
         } else {
-            return redirect()->intended('#');
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/login')->with('error', 'Pengguna tidak memiliki peran yang valid.');
         }
     }
 

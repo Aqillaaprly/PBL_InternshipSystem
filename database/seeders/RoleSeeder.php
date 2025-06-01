@@ -1,19 +1,21 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders; // Ini harus jadi statement pertama setelah <?php
 
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Role;
+use App\Models\Role; // Pastikan model Role di-import dengan benar
 
 class RoleSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     */
     public function run(): void
     {
-        Role::insert([
-            ['role_id' => 1, 'name' => 'admin'],
-            ['role_id' => 2, 'name' => 'dosen'],
-            ['role_id' => 3, 'name' => 'mahasiswa'],
-            ['role_id' => 4, 'name' => 'perusahaan'],
-        ]);
+        Role::firstOrCreate(['name' => 'admin']);
+        Role::firstOrCreate(['name' => 'dosen']);
+        Role::firstOrCreate(['name' => 'mahasiswa']);
+        Role::firstOrCreate(['name' => 'perusahaan']);
     }
 }
