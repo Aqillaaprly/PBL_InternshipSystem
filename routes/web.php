@@ -91,4 +91,5 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::get('/lowongan/tambah', [CompanyController::class, 'createLowongan'])->name('tambah_lowongan');
     Route::post('/lowongan', [CompanyController::class, 'storeLowongan'])->name('lowongan.store');
     Route::get('/pendaftar', [CompanyController::class, 'pendaftar'])->name('pendaftar');
+
 });

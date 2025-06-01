@@ -23,7 +23,7 @@ session_start();
 
     <div class="max-w-4xl mx-auto mt-10 bg-white p-8 rounded-xl shadow">
         <h1 class="text-2xl font-bold text-blue-800 mb-6">Tambah Lowongan Magang</h1>
-        <form action="proses_tambah_lowongan.php" method="POST">
+        <form action="tambah_lowongan.php" method="POST">
             <div class="mb-4">
                 <label class="block text-gray-700 font-medium mb-2">Judul Lowongan</label>
                 <input type="text" name="judul" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400" required>
