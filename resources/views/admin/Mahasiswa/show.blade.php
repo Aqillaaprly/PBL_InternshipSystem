@@ -61,7 +61,7 @@
             </div>
 
             <div class="mt-6 flex justify-end space-x-3">
-                <a href="{{ route('admin.users.edit', $mahasiswa->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md">
+                <a href="{{ route('admin.mahasiswa.edit', $mahasiswa->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md">
                     Edit User
                 </a>
                 {{-- Anda bisa menambahkan tombol lain jika perlu, misal "Edit Detail Mahasiswa" jika ada controller terpisah --}}

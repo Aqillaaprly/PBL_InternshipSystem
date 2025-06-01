@@ -10,51 +10,50 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log; // Added for logging errors
+use Illuminate\Support\Facades\Log; // Gunakan ini untuk logging jika perlu
+use Illuminate\Validation\Rule;
 
 class CompanyController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $companies = Company::with('user')->latest()->paginate(10);
-        // $jumlahPerusahaan = Company::count(); // Ini mungkin lebih cocok di DashboardController
-        // return view('admin.perusahaan', compact('companies', 'jumlahPerusahaan'));
-        return view('admin.Company.perusahaan', compact('companies')); // Corrected view path
+        $query = Company::with('user')->latest();
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('nama_perusahaan', 'like', "%{$searchTerm}%")
+                  ->orWhere('email_perusahaan', 'like', "%{$searchTerm}%")
+                  ->orWhere('kota', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('user', function($userQuery) use ($searchTerm) {
+                      $userQuery->where('username', 'like', "%{$searchTerm}%");
+                  });
+            });
+        }
+        $companies = $query->paginate(10)->withQueryString();
+        return view('admin.Company.perusahaan', compact('companies'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        // Pastikan view ini ada: resources/views/admin/Company/create.blade.php
-        // Sesuai permintaan sebelumnya, ini adalah nama view yang ada
         return view('admin.Company.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'nama_perusahaan' => 'required|string|max:255|unique:companies,nama_perusahaan',
+            'email_perusahaan' => 'required|string|email|max:255|unique:companies,email_perusahaan,NULL,id,deleted_at,NULL',
+            'website' => 'required|url|max:255',
+            'logo_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
+            'username' => 'required|string|max:255|unique:users,username,NULL,id,deleted_at,NULL',
+            'password' => 'required|string|min:6|confirmed',
+            'telepon' => 'nullable|string|max:20|unique:companies,telepon,NULL,id,deleted_at,NULL',
             'alamat' => 'nullable|string',
             'kota' => 'nullable|string|max:100',
             'provinsi' => 'nullable|string|max:100',
             'kode_pos' => 'nullable|string|max:10',
-            'telepon' => 'nullable|string|max:20|unique:companies,telepon',
-            'email_perusahaan' => 'required|string|email|max:255|unique:companies,email_perusahaan',
-            'website' => 'required|url|max:255',
             'deskripsi' => 'nullable|string',
-            'logo_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
-            // Validasi untuk User terkait Perusahaan
-            'username' => 'required|string|max:255|unique:users,username',
-            'password' => 'required|string|min:6|confirmed', // 'confirmed' akan mencari field 'password_confirmation'
         ]);
 
         if ($validator->fails()) {
@@ -63,154 +62,155 @@ class CompanyController extends Controller
                         ->withInput();
         }
 
-        $logoPath = null;
-        if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
-            $logoPath = $request->file('logo_path')->store('logos', 'public');
-        } else {
-            // Seharusnya tidak terjadi jika validasi 'required' bekerja
-            return redirect()->route('admin.perusahaan.create')
-                             ->with('error', 'Logo perusahaan wajib diunggah dan valid.')
-                             ->withInput();
-        }
+        $logoPath = $request->file('logo_path')->store('logos', 'public');
+        $perusahaanRole = Role::where('name', 'perusahaan')->firstOrFail();
 
-        $perusahaanRole = Role::where('name', 'perusahaan')->first();
-        if (!$perusahaanRole) {
-            Log::error("Role 'perusahaan' tidak ditemukan saat membuat perusahaan baru via admin.");
-            return redirect()->route('admin.perusahaan.create')
-                             ->with('error', 'Kesalahan konfigurasi: Role perusahaan tidak ditemukan.')
-                             ->withInput();
-        }
-
-        // Buat User untuk perusahaan
         $user = User::create([
-            'name' => $request->nama_perusahaan, // Atau nama kontak perusahaan
-            'email' => $request->email_perusahaan, // Atau email login khusus untuk user perusahaan
+            'name' => $request->nama_perusahaan,
+            'email' => $request->email_perusahaan, // Sebaiknya email user unik dan berbeda dari email perusahaan jika perlu
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'role_id' => $perusahaanRole->id,
+            'email_verified_at' => now(),
         ]);
 
-        Company::create([
-            'user_id' => $user->id, // Kaitkan dengan user yang baru dibuat
-            'nama_perusahaan' => $request->nama_perusahaan,
-            'alamat' => $request->alamat,
-            'kota' => $request->kota,
-            'provinsi' => $request->provinsi,
-            'kode_pos' => $request->kode_pos,
-            'telepon' => $request->telepon,
-            'email_perusahaan' => $request->email_perusahaan, // Email resmi perusahaan
-            'website' => $request->website,
-            'deskripsi' => $request->deskripsi,
-            'logo_path' => $logoPath,
-            'status_kerjasama' => $request->status_kerjasama,
-        ]);
+        Company::create(array_merge(
+            $request->only(['nama_perusahaan', 'alamat', 'kota', 'provinsi', 'kode_pos', 'telepon', 'email_perusahaan', 'website', 'deskripsi', 'status_kerjasama']),
+            ['user_id' => $user->id, 'logo_path' => $logoPath]
+        ));
 
-        return redirect()->route('admin.perusahaan.index')->with('success', 'Perusahaan berhasil ditambahkan.');
+        return redirect()->route('admin.perusahaan.index')->with('success', 'Perusahaan berhasil ditambahkan beserta akun loginnya.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Company $company)
-    {
-        // Pastikan view ini ada: resources/views/admin/Company/show.blade.php (atau sesuaikan)
-        // Jika tidak ada view show khusus, Anda mungkin mengarahkannya ke edit atau index.
-        // Untuk saat ini, kita asumsikan view 'show' ada atau akan dibuat.
-        return view('admin.Company.show', compact('company'));
+    // Menggunakan Route Model Binding (Company $company)
+   public function show($companyId) // Ubah parameter menjadi $companyId (bukan Company $company)
+{
+    \Illuminate\Support\Facades\Log::info("Attempting to find Company with ID: " . $companyId);
+
+    // Coba ambil data secara manual menggunakan Eloquent
+    $company = \App\Models\Company::find($companyId); // Gunakan find() bukan findOrFail() untuk tes awal 
+
+    if (!$company) {
+        // Jika tidak ditemukan, ini akan menghasilkan error 404 standar
+        // atau Anda bisa menangani secara custom jika dd() di atas menampilkan null
+        abort(404, "Perusahaan dengan ID {$companyId} tidak ditemukan via find().");
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Company $company)
+    $company->load('user');
+    return view('admin.Company.show', compact('company'));
+}
+
+    // Menggunakan Route Model Binding (Company $company)
+    public function edit($companyId) // Ubah parameter menjadi $companyId
     {
-        // Pastikan view ini ada: resources/views/admin/Company/edit.blade.php
+        Log::info("AdminCompanyController@edit: Mencoba mengambil perusahaan untuk diedit dengan ID: " . $companyId);
+
+        // Coba ambil data secara manual menggunakan Eloquent
+        $company = Company::find($companyId); // Gunakan find()
+
+        // Untuk debugging, Anda bisa uncomment dd() di sini untuk melihat data $company
+        // dd($company ? $company->toArray() : null, 'Data dari find() di edit method untuk ID: ' . $companyId);
+
+        if (!$company) {
+            // Jika perusahaan tidak ditemukan, tampilkan halaman 404 Not Found.
+            // Ini akan mencegah view 'edit' dirender dengan $company yang null.
+            Log::error("AdminCompanyController@edit: Perusahaan dengan ID {$companyId} tidak ditemukan untuk diedit.");
+            abort(404, "Perusahaan dengan ID {$companyId} tidak ditemukan untuk proses edit.");
+        }
+
+        // Jika perusahaan ditemukan, muat relasi user dan tampilkan view edit
+        $company->load('user');
         return view('admin.Company.edit', compact('company'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
+    // Menggunakan Route Model Binding (Company $company)
     public function update(Request $request, Company $company)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_perusahaan' => 'required|string|max:255|unique:companies,nama_perusahaan,' . $company->id,
+        $userIdToIgnore = $company->user ? $company->user->id : 0;
+        $companyIdToIgnore = $company->id;
+
+        $rules = [
+            'nama_perusahaan' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($companyIdToIgnore)],
+            'email_perusahaan' => ['required', 'string', 'email', 'max:255', Rule::unique('companies','email_perusahaan')->ignore($companyIdToIgnore)],
+            'website' => 'required|url|max:255',
+            'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
+            'telepon' => ['nullable', 'string', 'max:20', Rule::unique('companies','telepon')->ignore($companyIdToIgnore)],
+            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'alamat' => 'nullable|string',
             'kota' => 'nullable|string|max:100',
             'provinsi' => 'nullable|string|max:100',
             'kode_pos' => 'nullable|string|max:10',
-            'telepon' => 'nullable|string|max:20|unique:companies,telepon,' . $company->id,
-            'email_perusahaan' => 'required|string|email|max:255|unique:companies,email_perusahaan,' . $company->id,
-            'website' => 'required|url|max:255',
             'deskripsi' => 'nullable|string',
-            'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Logo opsional saat update
-            'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
-            // Validasi untuk User terkait Perusahaan (jika diupdate)
-            // Pastikan user_id ada di $company sebelum mencoba mengakses $company->user->id
-            'username' => 'sometimes|required|string|max:255|unique:users,username,' . ($company->user_id ? $company->user->id : 'NULL') . ',id',
-            'password' => 'nullable|string|min:6|confirmed',
-        ]);
+        ];
+
+        if ($company->user) {
+            $rules['username'] = ['sometimes', 'required', 'string', 'max:255', Rule::unique('users')->ignore($userIdToIgnore)];
+            $rules['user_email_login'] = ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userIdToIgnore)];
+            $rules['password'] = 'nullable|string|min:6|confirmed';
+        } else {
+            $rules['new_username'] = ['required', 'string', 'max:255', Rule::unique('users', 'username')];
+            $rules['new_user_email'] = ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')];
+            $rules['new_password'] = 'required|string|min:6|confirmed';
+        }
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return redirect()->route('admin.perusahaan.edit', $company->id)
+            return redirect()->route('admin.perusahaan.edit', $companyIdToIgnore)
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $data = $request->except(['_token', '_method', 'logo_path', 'username', 'password', 'password_confirmation']);
+        $companyData = $request->only([
+            'nama_perusahaan', 'alamat', 'kota', 'provinsi', 'kode_pos', 
+            'telepon', 'email_perusahaan', 'website', 'deskripsi', 'status_kerjasama'
+        ]);
 
-        if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
-            // Hapus logo lama jika ada
+        if ($request->hasFile('logo_path')) {
             if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
                 Storage::disk('public')->delete($company->logo_path);
             }
-            $data['logo_path'] = $request->file('logo_path')->store('logos', 'public');
+            $companyData['logo_path'] = $request->file('logo_path')->store('logos', 'public');
         }
-        // Jika tidak ada logo baru yang diunggah, $data['logo_path'] tidak akan diset,
-        // sehingga $company->logo_path yang ada akan dipertahankan.
 
-        $company->update($data);
+        $company->update($companyData);
 
-        // Update detail User terkait jika ada dan jika data user dikirim
         if ($company->user) {
-            $userData = [];
-            if ($request->filled('username')) {
-                $userData['username'] = $request->username;
+            $userDataToUpdate = ['name' => $request->nama_perusahaan];
+            if ($request->filled('username')) $userDataToUpdate['username'] = $request->username;
+            if ($request->filled('user_email_login')) $userDataToUpdate['email'] = $request->user_email_login;
+            if ($request->filled('password')) $userDataToUpdate['password'] = Hash::make($request->password);
+            
+            if(count($userDataToUpdate) > 1 || ($request->filled('password'))) {
+                $company->user->update($userDataToUpdate);
             }
-            if ($request->filled('password')) {
-                $userData['password'] = Hash::make($request->password);
-            }
-            // Selalu update nama dan email user jika nama/email perusahaan berubah
-            // Ini asumsi bahwa 'name' di User adalah nama perusahaan dan 'email' adalah email login perusahaan.
-            // Sesuaikan jika field di User berbeda.
-            $userData['name'] = $request->nama_perusahaan;
-            // $userData['email'] = $request->email_perusahaan; // Hati-hati jika email ini untuk login user
-
-            if (!empty($userData)) {
-                $company->user->update($userData);
+        } else {
+            if ($request->filled('new_username') && $request->filled('new_user_email') && $request->filled('new_password')) {
+                $perusahaanRole = Role::where('name', 'perusahaan')->firstOrFail();
+                $newUser = User::create([
+                    'name' => $request->nama_perusahaan,
+                    'email' => $request->new_user_email,
+                    'username' => $request->new_username,
+                    'password' => Hash::make($request->new_password),
+                    'role_id' => $perusahaanRole->id,
+                    'email_verified_at' => now(),
+                ]);
+                $company->user_id = $newUser->id;
+                $company->save();
             }
         }
-
-
         return redirect()->route('admin.perusahaan.index')->with('success', 'Data perusahaan berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Company $company)
     {
-        // Hapus logo dari storage jika ada
         if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
             Storage::disk('public')->delete($company->logo_path);
         }
-
-        // Opsional: Hapus User terkait jika logika bisnis mengharuskannya
-        // Hati-hati dengan ini, user mungkin terkait dengan data lain.
-        // if ($company->user) {
-        //     $company->user->delete();
-        // }
-
+        if ($company->user) {
+            $company->user->delete(); 
+        }
         $company->delete();
         return redirect()->route('admin.perusahaan.index')->with('success', 'Perusahaan berhasil dihapus.');
     }
