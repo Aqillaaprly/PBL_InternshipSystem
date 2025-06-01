@@ -17,6 +17,13 @@
                 </a>
             </div>
 
+            <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
+                {{-- Menggunakan nama route yang sudah diperbaiki dan konsisten --}}
+                <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.data_pembimbing') ? 'border-blue-600 text-blue-600' : '' }}">Laporan Lowongan</a>
+                <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') ? 'border-blue-600 text-blue-600' : '' }}">Aktivitas Magang</a>
+                <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') ? 'border-blue-600 text-blue-600' : '' }}">Total Pendaftar</a>
+            </nav>
+
             <div class="flex items-center space-x-4">
                 {{-- Google Translate dengan Ikon Globe --}}
                 <div class="flex items-center space-x-1">
