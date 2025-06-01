@@ -50,6 +50,13 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+
+    Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // ... (route admin lainnya) ...
+
+    // Manajemen Penugasan Pembimbing
+    Route::resource('penugasan-pembimbing', PenugasanPembimbingController::class);
+});
 });
 
 // DOSEN GROUP
@@ -59,6 +66,8 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     })->name('dashboard');
     // Tambahkan route dosen lainnya di sini
 });
+
+
 
 // MAHASISWA GROUP
 Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {

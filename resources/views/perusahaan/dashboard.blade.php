@@ -36,21 +36,23 @@
             </div>
 
             {{-- Statistik --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-6"> {{-- Mengubah sm:grid-cols-3 menjadi sm:grid-cols-2 karena hanya ada 2 statistik --}}
-                <a href="{{ route('perusahaan.lowongan') }}" class="cursor-pointer block">
-                    <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                        {{-- Menggunakan nama variabel yang dikirim dari controller --}}
-                        <p class="text-2xl font-bold text-blue-600">{{ $jumlahLowonganAktif ?? 0 }}</p>
-                        <p class="text-sm text-gray-700 mt-1">Lowongan Aktif</p>
-                    </div>
-                </a>
-                <a href="{{ route('perusahaan.pendaftar') }}" class="cursor-pointer block">
-                    <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                        {{-- Menggunakan nama variabel yang dikirim dari controller --}}
-                        <p class="text-2xl font-bold text-blue-600">{{ $jumlahTotalPendaftar ?? 0 }}</p>
-                        <p class="text-sm text-gray-700 mt-1">Total Pendaftar</p>
-                    </div>
-                </a>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
+        <a href="{{ route('perusahaan.lowongan') }}" class="cursor-pointer block">
+            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:bg-blue-50 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div class="mb-4">
+                    <p class="text-4xl font-bold text-blue-600 mb-2">{{ $jumlahLowonganAktif ?? 0 }}</p>
+                    <p class="text-lg text-gray-700 font-medium">Lowongan Aktif</p>
+                </div>
+            </div>
+        </a>
+        
+        <a href="{{ route('perusahaan.pendaftar') }}" class="cursor-pointer block">
+            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:bg-blue-50 hover:shadow-xl transition-all duration-300 border border-gray-100">
+                <div class="mb-4">
+                    <p class="text-4xl font-bold text-blue-600 mb-2">{{ $jumlahTotalPendaftar ?? 0 }}</p>
+                    <p class="text-lg text-gray-700 font-medium">Total Pendaftar</p>
+                </div>
+                </div>
             </div>
         </div>
     </main>
