@@ -10,6 +10,7 @@
 @include('mahasiswa.template.navbar')
 <body class="bg-blue-50 text-gray-800 pt-20">
 
+
 <!-- Hero Section -->
 <div class="flex flex-col min-h-screen">
     <main class="p-6 max-w-7xl mx-auto w-full mt-4">
