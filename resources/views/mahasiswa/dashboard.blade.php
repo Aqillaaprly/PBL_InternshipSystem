@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<?php include('../navbar_mahasiswa.php')?>
+@include('mahasiswa.template.navbar')
+
 <body class="bg-blue-50 text-gray-800 pt-20">
 
 <!-- Hero Section -->
@@ -29,9 +30,7 @@
 </div>
 
 <!-- Job Cards Section -->
-<div class="px-6 md:px-20">
-    <?php include('jobcard.php'); ?>
-</div>
+@include('mahasiswa.job')
 
 <!-- Statistics Section -->
 <div class="grid grid-cols-3 gap-4 text-center my-12 px-6 md:px-20">
@@ -49,6 +48,6 @@
     </div>
 </div>
 
-<?php include '../footer.php'; ?>
+@include('mahasiswa.template.footer')
 </body>
 </html>

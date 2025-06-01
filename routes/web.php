@@ -77,14 +77,12 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/dashboard', function () {
         return view('dosen.dashboard'); // Pastikan view ini ada: resources/views/dosen/dashboard.blade.php
     })->name('dashboard');
-    // Tambahkan route lain untuk dosen di sini
 });
 
 // MAHASISWA GROUP
 Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/dashboard', function () {
-        // Path view diperbaiki dari 'admin.mahasiswa.dashboard' menjadi 'mahasiswa.dashboard'
-        return view('mahasiswa.dashboard'); // Pastikan view ini ada: resources/views/mahasiswa/dashboard.blade.php
+        return view('mahasiswa.dashboard'); 
     })->name('dashboard');
 
     // Route untuk halaman yang ada di folder mahasiswa
@@ -98,7 +96,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 // PERUSAHAAN GROUP
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
     Route::get('/dashboard', function () {
-        return view('company.dashboard'); // Pastikan view ini ada: resources/views/company/dashboard.blade.php
+        return view('perusahaan.dashboard'); // Pastikan view ini ada: resources/views/company/dashboard.blade.php
     })->name('dashboard');
 
     Route::get('/lowongan', function () { return view('company.lowongan'); })->name('lowongan');
