@@ -18,36 +18,32 @@
 <div class="pt-20 pb-10 px-4 md:px-10 max-w-7xl mx-auto">
     @forelse ($companies as $company)
     <div class="bg-white rounded-lg shadow-md p-6 mb-10">
-        {{-- Company Header --}}
-        <div class="mb-6">
-            @if ($company->image)
-            <img src="{{ $company->image }}" alt="{{ $company->name }}" class="w-full max-h-64 object-cover rounded-md mb-4">
-            @endif
-            <h2 class="text-2xl font-bold text-blue-800 mb-2">{{ $company->name }}</h2>
-            <p class="text-gray-700">{{ $company->description }}</p>
-        </div>
-
-        {{-- Jobs Section --}}
-        <div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                {{ $company->name }} Graduate Jobs & Opportunities
-            </h3>
-
-            @forelse ($company->lowongans as $job)
-            <div class="border rounded-lg p-4 mb-4 bg-gray-50 shadow-sm">
-                <h4 class="text-lg font-bold text-blue-700">{{ $job->judul }}</h4>
-                <p class="text-sm text-gray-600">Location: {{ $job->lokasi }}</p>
-                <p class="text-sm text-gray-600">Start: {{ \Carbon\Carbon::parse($job->tanggal_mulai)->format('d M Y') }}</p>
-                <p class="text-sm text-gray-600">End: {{ \Carbon\Carbon::parse($job->tanggal_tutup)->format('d M Y') }}</p>
-                @if ($company->website)
-                <a href="{{ $company->website }}" target="_blank" class="inline-block mt-2 text-blue-500 hover:underline">
-                    Visit Website
-                </a>
-                @endif
+        <div class="flex flex-col md:flex-row gap-6">
+            {{-- Company Logo --}}
+            @if ($company->logo_path)
+            <div class="md:w-1/3 flex justify-center items-start">
+                <img src="{{ asset($company->logo_path) }}" alt="{{ $company->nama_perusahaan }}" class="max-h-32 object-contain rounded-md">
             </div>
-            @empty
-            <p class="text-gray-500 italic">No job listings available for this company.</p>
-            @endforelse
+            @endif
+
+            {{-- Company Info --}}
+            <div class="md:w-2/3">
+                <h2 class="text-2xl font-bold text-blue-800 mb-2">{{ $company->nama_perusahaan }}</h2>
+                <p class="text-gray-700 mb-1"><strong>Alamat:</strong> {{ $company->alamat }}</p>
+                <p class="text-gray-700 mb-1"><strong>Kota:</strong> {{ $company->kota }}</p>
+                <p class="text-gray-700 mb-1"><strong>Provinsi:</strong> {{ $company->provinsi }}</p>
+                <p class="text-gray-700 mb-1"><strong>Kode Pos:</strong> {{ $company->kode_pos }}</p>
+                <p class="text-gray-700 mb-1"><strong>Telepon:</strong> {{ $company->telepon }}</p>
+                <p class="text-gray-700 mb-1"><strong>Email:</strong> <a href="mailto:{{ $company->email_perusahaan }}" class="text-blue-500 hover:underline">{{ $company->email_perusahaan }}</a></p>
+                @if ($company->website)
+                <p class="text-gray-700 mb-1"><strong>Website:</strong>
+                    <a href="{{ $company->website }}" target="_blank" class="text-blue-500 hover:underline">
+                        {{ $company->website }}
+                    </a>
+                </p>
+                @endif
+                <p class="text-gray-700 mt-4"><strong>Deskripsi:</strong> {{ $company->deskripsi }}</p>
+            </div>
         </div>
     </div>
     @empty
