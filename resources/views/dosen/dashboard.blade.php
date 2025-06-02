@@ -16,7 +16,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Perusahaan - SIMMAGANG</title>
+    <title>Dashboard Pembimbing - STRIDEUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -114,6 +114,7 @@
                     </table>
                 </div>
             </div>
-        </body>
+        </main>
         @include('dosen.template.footer')
+        </body>
 </html>
