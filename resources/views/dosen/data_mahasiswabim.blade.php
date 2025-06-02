@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Mahasiswa - Admin SIMMAGANG</title>
+    <title>Data Mahasiswa - Dosen STRIDEUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -16,9 +16,7 @@
                 <div class="flex space-x-3">
                     <form method="GET" action="{{ route('dosen.datamahasiswabim') }}" class="flex">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
                     </form>
-                    {{-- <a href="{{ route('dosen.mahasiswa.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>  --}}
                 </div>
             </div>
 
