@@ -23,7 +23,7 @@ return new class extends Migration
     $table->decimal('gaji_max', 15, 2)->nullable();
     $table->date('tanggal_buka');
     $table->date('tanggal_tutup');
-    $table->enum('status', ['Aktif', 'Ditutup'])->default('Aktif');
+    $table->enum('status', ['Aktif', 'Non-Aktif'])->default('Aktif');
     $table->timestamps();
 });
     }

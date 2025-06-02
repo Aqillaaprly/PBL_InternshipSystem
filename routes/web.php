@@ -28,7 +28,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['show']);
-    Route::resource('lowongan', AdminLowonganController::class);
+  Route::resource('lowongan', AdminLowonganController::class);
     Route::resource('pendaftar', AdminPendaftarController::class);
 
     Route::get('/perusahaan', [AdminCompanyController::class, 'index'])->name('perusahaan.index');
