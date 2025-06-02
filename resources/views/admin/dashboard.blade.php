@@ -163,11 +163,6 @@
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl shadow hover:bg-blue-50 transition">
-                    <h2 class="font-semibold text-gray-700 mb-4">Pengguna Aktif Terkini (Contoh)</h2>
-                    <p class="text-sm text-gray-500">Fitur ini belum diimplementasikan.</p>
-                </div>
-            </div>
 
         </main>
     </div>

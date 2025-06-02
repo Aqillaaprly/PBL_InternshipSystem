@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\User; // Untuk menghitung mahasiswa atau dosen jika perlu
+use App\Models\User; 
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
-        // Ambil data statistik yang dibutuhkan untuk dashboard
+        
         $jumlahPerusahaan = Company::count();
         $jumlahLowongan = Lowongan::count();
         $jumlahPendaftar = Pendaftar::count();
