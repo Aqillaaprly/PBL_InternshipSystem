@@ -350,35 +350,35 @@ class PendaftarController extends Controller
      * Method helper untuk memeriksa dan mengubah status lamaran pendaftar
      * berdasarkan validitas dokumen wajib.
      */
-    protected function cekDanUbahStatusLamaranPendaftar(Pendaftar $pendaftar)
-    {
-        $semuaDokumenWajibValid = true;
-        $pesanDetail = []; 
-        $userNama = $pendaftar->user->name ?? $pendaftar->user->username;
+        protected function cekDanUbahStatusLamaranPendaftar(Pendaftar $pendaftar)
+        {
+            $semuaDokumenWajibValid = true;
+            $pesanDetail = []; 
+            $userNama = $pendaftar->user->name ?? $pendaftar->user->username;
 
-        foreach ($this->dokumenWajibNames as $namaDocWajib) {
-            $doc = $pendaftar->dokumenPendaftars()->where('nama_dokumen', $namaDocWajib)->first();
-            if (!$doc || $doc->status_validasi !== 'Valid') {
-                $semuaDokumenWajibValid = false;
-                $pesanDetail[] = $namaDocWajib . ($doc ? ' (Status: ' . $doc->status_validasi . ')' : ' (Belum diunggah)');
-                // Tidak perlu break jika ingin mengumpulkan semua dokumen yang bermasalah untuk pesan
+            foreach ($this->dokumenWajibNames as $namaDocWajib) {
+                $doc = $pendaftar->dokumenPendaftars()->where('nama_dokumen', $namaDocWajib)->first();
+                if (!$doc || $doc->status_validasi !== 'Valid') {
+                    $semuaDokumenWajibValid = false;
+                    $pesanDetail[] = $namaDocWajib . ($doc ? ' (Status: ' . $doc->status_validasi . ')' : ' (Belum diunggah)');
+                    // Tidak perlu break jika ingin mengumpulkan semua dokumen yang bermasalah untuk pesan
+                }
+            }
+
+            $currentStatus = $pendaftar->status_lamaran;
+
+            if ($semuaDokumenWajibValid) {
+                if ($currentStatus === 'Pending') {
+                    $pendaftar->status_lamaran = 'Ditinjau';
+                    $pendaftar->save();
+                    session()->flash('info', 'Semua dokumen wajib ' . $userNama . ' telah valid. Status lamaran diubah menjadi "Ditinjau".');
+                }
+            } else {
+                if (!in_array($currentStatus, ['Pending', 'Ditolak'])) {
+                    $pendaftar->status_lamaran = 'Pending';
+                    $pendaftar->save();
+                    session()->flash('warning', 'Dokumen pendaftar ' . $userNama . ' belum lengkap/valid (' . implode(', ', $pesanDetail) . '). Status lamaran dikembalikan ke "Pending".');
+                }
             }
         }
-
-        $currentStatus = $pendaftar->status_lamaran;
-
-        if ($semuaDokumenWajibValid) {
-            if ($currentStatus === 'Pending') {
-                $pendaftar->status_lamaran = 'Ditinjau';
-                $pendaftar->save();
-                session()->flash('info', 'Semua dokumen wajib ' . $userNama . ' telah valid. Status lamaran diubah menjadi "Ditinjau".');
-            }
-        } else {
-            if (!in_array($currentStatus, ['Pending', 'Ditolak'])) {
-                $pendaftar->status_lamaran = 'Pending';
-                $pendaftar->save();
-                session()->flash('warning', 'Dokumen pendaftar ' . $userNama . ' belum lengkap/valid (' . implode(', ', $pesanDetail) . '). Status lamaran dikembalikan ke "Pending".');
-            }
-        }
-    }
 }
