@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard Perusahaan - SIMMAGANG</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -36,24 +37,10 @@
             </div>
 
             {{-- Statistik --}}
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-10">
-        <a href="{{ route('perusahaan.lowongan') }}" class="cursor-pointer block">
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:bg-blue-50 hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div class="mb-4">
-                    <p class="text-4xl font-bold text-blue-600 mb-2">{{ $jumlahLowonganAktif ?? 0 }}</p>
-                    <p class="text-lg text-gray-700 font-medium">Lowongan Aktif</p>
-                </div>
-            </div>
-        </a>
-        
-        <a href="{{ route('perusahaan.pendaftar') }}" class="cursor-pointer block">
-            <div class="bg-white p-8 rounded-xl shadow-lg text-center hover:bg-blue-50 hover:shadow-xl transition-all duration-300 border border-gray-100">
-                <div class="mb-4">
-                    <p class="text-4xl font-bold text-blue-600 mb-2">{{ $jumlahTotalPendaftar ?? 0 }}</p>
-                    <p class="text-lg text-gray-700 font-medium">Total Pendaftar</p>
-                </div>
-                </div>
-            </div>
+
+            {{-- {{ dd($pendaftars) }} --}}
+
+        @include('perusahaan.components.statistik-pendaftar')
         </div>
     </main>
     {{-- Pastikan path include footer ini benar --}}

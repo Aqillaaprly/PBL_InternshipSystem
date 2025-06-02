@@ -30,14 +30,19 @@ class CompanyController extends Controller
 
         // Ambil statistik dasar untuk dasbor perusahaan
         $jumlahLowonganAktif = Lowongan::where('company_id', $company->id)
-                               ->where('status', 'Aktif') // Hanya lowongan dengan status 'Aktif'
-                               ->count();
-$jumlahTotalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
+                                ->where('status', 'Aktif') // Hanya lowongan dengan status 'Aktif'
+                                ->count();
+
+        $jumlahLowonganTidakAktif = Lowongan::where('company_id', $company->id)
+        ->where('status', 'Non-Aktif') // Hanya lowongan dengan status 'Non-Aktif'
+        ->count();
+
+        $jumlahTotalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
                                     $query->where('company_id', $company->id); // Pendaftar untuk lowongan milik perusahaan ini
                                 })->count();
 
         // Mengubah nama view yang dipanggil
-        return view('perusahaan.dashboard', compact('company', 'jumlahLowonganAktif', 'jumlahTotalPendaftar'));
+        return view('perusahaan.dashboard', compact('company', 'jumlahLowonganAktif', 'jumlahTotalPendaftar', 'jumlahLowonganTidakAktif'));
     }
 
     /**

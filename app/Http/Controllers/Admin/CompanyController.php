@@ -85,10 +85,10 @@ class CompanyController extends Controller
     // Menggunakan Route Model Binding (Company $company)
    public function show($companyId) // Ubah parameter menjadi $companyId (bukan Company $company)
 {
-    \Illuminate\Support\Facades\Log::info("Attempting to find Company with ID: " . $companyId);
+    Log::info("Attempting to find Company with ID: " . $companyId);
 
     // Coba ambil data secara manual menggunakan Eloquent
-    $company = \App\Models\Company::find($companyId); // Gunakan find() bukan findOrFail() untuk tes awal 
+    $company = Company::find($companyId); // Gunakan find() bukan findOrFail() untuk tes awal 
 
     if (!$company) {
         // Jika tidak ditemukan, ini akan menghasilkan error 404 standar
