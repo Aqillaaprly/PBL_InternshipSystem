@@ -12,8 +12,6 @@ class AuthorizeRole
     {
         $user = Auth::user();
 
-        // Debugging
-
 
         if (!$user || !$user->role || !in_array(strtolower($user->role->name), array_map('strtolower', $roles))) {
             abort(403, 'Unauthorized.');
