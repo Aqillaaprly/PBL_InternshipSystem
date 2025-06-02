@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Mahasiswa\MahasiswaController;
+use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileController;
 use App\Models\Company;
 
 // Mengarahkan halaman utama ('/') ke halaman login
@@ -73,34 +74,30 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     // Dashboard
     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
 
-    // Melihat pembimbing
+    // Pembimbing
     Route::get('/pembimbing', [MahasiswaController::class, 'lihatPembimbing'])->name('pembimbing');
 
     // Absensi
-    Route::get('/absensi', function () {
-        return view('mahasiswa.absensi');
-    })->name('absensi');
+    Route::get('/absensi', fn() => view('mahasiswa.absensi'))->name('absensi');
 
     // Job
-    Route::get('/job', function () {
-        return view('mahasiswa.job');
-    })->name('job');
+    Route::get('/job', fn() => view('mahasiswa.job'))->name('job');
 
-    Route::get('/profile', function () {
-        return view('mahasiswa.mahasiswaProfile');
-    })->name('profile');
+    // ✅ Profile (Controller-based, label retained)
+    Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
-    // Perusahaan (with data)
+    // Perusahaan
     Route::get('/perusahaan', function () {
         $companies = \App\Models\Company::with('lowongans')->get();
         return view('mahasiswa.perusahaan', compact('companies'));
     })->name('perusahaan');
 
     // Laporan
-    Route::get('/laporan', function () {
-        return view('mahasiswa.laporan');
-    })->name('laporan');
+    Route::get('/laporan', fn() => view('mahasiswa.laporan'))->name('laporan');
 });
+
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
