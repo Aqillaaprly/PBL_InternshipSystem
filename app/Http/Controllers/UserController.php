@@ -15,17 +15,17 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function view()
+    public function index() // NAMA METHOD DIUBAH DARI view MENJADI index
     {
         $search = request('search');
         $users = User::with('role')
-                     ->when($search, function ($query, $search) {
-                         return $query->where('name', 'like', "%{$search}%")
-                                      ->orWhere('username', 'like', "%{$search}%")
-                                      ->orWhere('email', 'like', "%{$search}%");
-                     })
-                     ->latest()
-                     ->paginate(15);
+                       ->when($search, function ($query, $search) {
+                           return $query->where('name', 'like', "%{$search}%")
+                                        ->orWhere('username', 'like', "%{$search}%")
+                                        ->orWhere('email', 'like', "%{$search}%");
+                       })
+                       ->latest()
+                       ->paginate(15);
         return view('admin.users.index', compact('users'));
     }
 
@@ -91,7 +91,7 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit(User $user) // Route Model Binding akan bekerja dengan {user} dari Route::resource
     {
         $roles = Role::orderBy('name')->get();
         if ($user->role && $user->role->name === 'mahasiswa') {
@@ -103,7 +103,7 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user) // Route Model Binding
     {
         $mahasiswaRoleId = Role::where('name', 'mahasiswa')->first()->id ?? null;
 
@@ -133,11 +133,13 @@ class UserController extends Controller
             $rules['alamat'] = 'nullable|string';
 
             if ($user->detailMahasiswa) {
+                // Memastikan NIM unik di tabel mahasiswas kecuali untuk dirinya sendiri
                 $rules['username'][] = Rule::unique('mahasiswas', 'nim')->ignore($user->detailMahasiswa->id);
                 $rules['email'][] = Rule::unique('mahasiswas', 'email')->ignore($user->detailMahasiswa->id);
             } else {
+                 // Jika belum ada detailMahasiswa, username (NIM) dan email harus unik di tabel mahasiswas
                 $rules['username'][] = Rule::unique('mahasiswas', 'nim');
-                 $rules['email'][] = Rule::unique('mahasiswas', 'email');
+                $rules['email'][] = Rule::unique('mahasiswas', 'email');
             }
         }
 
@@ -149,7 +151,7 @@ class UserController extends Controller
                         ->withInput();
         }
 
-        $previousRoleId = $user->role_id; // Simpan role ID sebelumnya
+        $previousRoleId = $user->role_id;
 
         $userData = [
             'name' => $request->name,
@@ -163,11 +165,11 @@ class UserController extends Controller
         }
 
         $user->update($userData);
-        $user->refresh(); // Refresh model user untuk mendapatkan role_id yang baru
+        $user->refresh(); 
 
         if ($request->role_id == $mahasiswaRoleId) {
             $mahasiswaDetailData = [
-                'nim' => $request->username,
+                'nim' => $request->username, // Menggunakan username sebagai NIM
                 'nama' => $request->name,
                 'email' => $request->email,
                 'kelas' => $request->kelas,
@@ -178,19 +180,22 @@ class UserController extends Controller
             if ($user->detailMahasiswa) {
                 $user->detailMahasiswa->update($mahasiswaDetailData);
             } else {
+                // Buat detail mahasiswa jika belum ada
                 Mahasiswa::create(array_merge(['user_id' => $user->id], $mahasiswaDetailData));
             }
         } elseif ($previousRoleId == $mahasiswaRoleId && $request->role_id != $mahasiswaRoleId) {
-            // Jika role diubah DARI mahasiswa KE role lain
+            // Jika role diubah DARI mahasiswa KE role lain, hapus detail mahasiswa jika ada
             if ($user->detailMahasiswa) {
                 $user->detailMahasiswa->delete();
             }
         }
 
-        // Logika Redirect yang Diubah
-        if ($user->role_id == $mahasiswaRoleId) {
+        // Logika Redirect yang lebih sesuai
+        if ($user->role_id == $mahasiswaRoleId && $request->role_id == $mahasiswaRoleId) {
+             // Jika role tetap mahasiswa atau diubah menjadi mahasiswa
             return redirect()->route('admin.datamahasiswa')->with('success', 'Data mahasiswa berhasil diperbarui.');
         } else {
+            // Jika role adalah non-mahasiswa atau diubah menjadi non-mahasiswa
             return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
         }
     }
@@ -198,8 +203,14 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(User $user) // Route Model Binding
     {
+        // Jika user adalah mahasiswa dan memiliki detailMahasiswa, detailnya juga akan terhapus
+        // jika ada foreign key constraint dengan onDelete('cascade') di migrasi mahasiswas table untuk user_id.
+        // Jika tidak ada cascade, Anda mungkin perlu menghapusnya secara manual:
+        // if ($user->detailMahasiswa) {
+        //     $user->detailMahasiswa->delete();
+        // }
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
     }
