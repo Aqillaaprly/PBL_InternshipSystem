@@ -28,9 +28,16 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['show']);
-  Route::resource('lowongan', AdminLowonganController::class);
-    Route::resource('pendaftar', AdminPendaftarController::class);
+    Route::resource('lowongan', AdminLowonganController::class);
+    Route::resource('pendaftar', AdminPendaftarController::class); // Ini mungkin sudah ada
 
+    // Route baru untuk menampilkan dokumen pendaftar spesifik dan form upload
+    Route::get('/pendaftar/{pendaftar}/dokumen', [AdminPendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
+    Route::post('/pendaftar/{pendaftar}/upload-dokumen-batch', [AdminPendaftarController::class, 'uploadDokumenBatch'])->name('pendaftar.uploadDokumenBatch');
+    Route::delete('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}', [AdminPendaftarController::class, 'destroyDokumen'])->name('pendaftar.dokumen.destroy');
+    Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [AdminPendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
+    Route::patch('/pendaftar/{pendaftar}/dokumen/update-all-status', [AdminPendaftarController::class, 'updateAllStatusDokumen'])->name('pendaftar.dokumen.updateAllStatus');
+    
     Route::get('/perusahaan', [AdminCompanyController::class, 'index'])->name('perusahaan.index');
     Route::get('/perusahaan/create', [AdminCompanyController::class, 'create'])->name('perusahaan.create');
     Route::post('/perusahaan', [AdminCompanyController::class, 'store'])->name('perusahaan.store');

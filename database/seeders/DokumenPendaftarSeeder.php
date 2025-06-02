@@ -5,73 +5,85 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\DokumenPendaftar;
-use App\Models\Pendaftar; // Kita butuh Pendaftar untuk mendapatkan pendaftar_id
-use Illuminate\Support\Facades\Storage; // Untuk mengelola file dummy jika diperlukan
+use App\Models\Pendaftar;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DokumenPendaftarSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Ambil beberapa pendaftar yang sudah ada (misalnya 5 pendaftar pertama)
-        // Pastikan PendaftarSeeder atau data pendaftar sudah ada
-        $pendaftars = Pendaftar::take(5)->get();
+        $pendaftars = Pendaftar::take(10)->get(); // Ambil lebih banyak pendaftar jika perlu
 
         if ($pendaftars->isEmpty()) {
-            $this->command->info('Tidak ada data pendaftar ditemukan, DokumenPendaftarSeeder tidak dijalankan.');
+            $this->command->info('Tidak ada data pendaftar, DokumenPendaftarSeeder tidak dijalankan.');
             return;
         }
 
-        $tipeDokumenUmum = [
-            'CV' => 'cv.pdf',
-            'Surat Lamaran' => 'surat_lamaran.pdf',
-            'Transkrip Nilai' => 'transkrip.pdf',
+        $predefinedDokumenTypes = [
+            'Sertifikat Kompetensi' => 'sertifikat_kompetensi.pdf',
+            'Surat Balasan Industri' => 'surat_balasan_industri.pdf',
+            'Pakta Integritas' => 'pakta_integritas.pdf',
+            'Daftar Riwayat Hidup' => 'cv.pdf',
+            'KHS atau Transkrip Nilai' => 'khs_transkrip.pdf',
             'KTP' => 'ktp.jpg',
-            'Sertifikat Keahlian' => 'sertifikat_keahlian.pdf',
+            'KTM' => 'ktm.jpg',
+            'Surat Izin Orang Tua' => 'surat_izin_ortu.pdf',
+            'Kartu BPJS atau Asuransi Lain' => 'bpjs_asuransi.pdf',
+            'SKTM atau KIP Kuliah' => 'sktm_kip.pdf',
+            'Proposal Magang' => 'proposal_magang.pdf',
         ];
 
-        // Membuat direktori dummy jika belum ada
-        if (!Storage::disk('public')->exists('dokumen_pendaftar_dummies')) {
-            Storage::disk('public')->makeDirectory('dokumen_pendaftar_dummies');
+        $dummyDir = 'dokumen_pendaftar_dummies';
+        if (!Storage::disk('public')->exists($dummyDir)) {
+            Storage::disk('public')->makeDirectory($dummyDir);
         }
 
-        // Membuat file dummy jika belum ada
-        foreach ($tipeDokumenUmum as $nama => $file) {
-            if (!Storage::disk('public')->exists('dokumen_pendaftar_dummies/' . $file)) {
-                Storage::disk('public')->put('dokumen_pendaftar_dummies/' . $file, 'Ini adalah konten file dummy untuk ' . $nama);
+        $dummyFilePaths = [];
+        foreach ($predefinedDokumenTypes as $namaDokumen => $namaFile) {
+            $fullPath = $dummyDir . '/' . $namaFile;
+            if (!Storage::disk('public')->exists($fullPath)) {
+                Storage::disk('public')->put($fullPath, "Dummy content for {$namaDokumen}. Original: {$namaFile}");
             }
+            $dummyFilePaths[$namaDokumen] = $fullPath;
         }
 
+        $totalDokumenDibuat = 0;
+        $statuses = ['Belum Diverifikasi', 'Valid', 'Tidak Valid', 'Perlu Revisi'];
 
         foreach ($pendaftars as $pendaftar) {
-            // Untuk setiap pendaftar, tambahkan beberapa dokumen umum
-            foreach ($tipeDokumenUmum as $namaDokumen => $namaFileDummy) {
-                DokumenPendaftar::create([
-                    'pendaftar_id' => $pendaftar->id,
-                    'nama_dokumen' => $namaDokumen,
-                    // Simpan path relatif ke direktori public/storage
-                    'file_path' => 'dokumen_pendaftar_dummies/' . $namaFileDummy,
-                    'tipe_file' => pathinfo($namaFileDummy, PATHINFO_EXTENSION), // Mendapatkan ekstensi file
-                ]);
+            $jumlahDokumenUntukPendaftar = rand(5, count($predefinedDokumenTypes));
+            $dokumenDipilihUntukPendaftar = array_rand($predefinedDokumenTypes, $jumlahDokumenUntukPendaftar);
+            
+            if (!is_array($dokumenDipilihUntukPendaftar)) {
+                $dokumenDipilihUntukPendaftar = [$dokumenDipilihUntukPendaftar];
             }
 
-            // Contoh menambahkan dokumen spesifik untuk pendaftar tertentu jika diperlukan
-            if ($pendaftar->id % 2 == 0) { // Hanya untuk pendaftar dengan ID genap misalnya
-                $namaFilePortofolio = 'portofolio_pendaftar_' . $pendaftar->id . '.pdf';
-                if (!Storage::disk('public')->exists('dokumen_pendaftar_dummies/' . $namaFilePortofolio)) {
-                    Storage::disk('public')->put('dokumen_pendaftar_dummies/' . $namaFilePortofolio, 'Konten portofolio untuk pendaftar ' . $pendaftar->id);
-                }
-                DokumenPendaftar::create([
-                    'pendaftar_id' => $pendaftar->id,
-                    'nama_dokumen' => 'Portofolio Proyek',
-                    'file_path' => 'dokumen_pendaftar_dummies/' . $namaFilePortofolio,
-                    'tipe_file' => 'pdf',
-                ]);
+            foreach ($dokumenDipilihUntukPendaftar as $namaDokumenKey) {
+                $filePathToStore = $dummyFilePaths[$namaDokumenKey];
+                $fileExtension = pathinfo($predefinedDokumenTypes[$namaDokumenKey], PATHINFO_EXTENSION);
+
+                DokumenPendaftar::firstOrCreate(
+                    [
+                        'pendaftar_id' => $pendaftar->id,
+                        'nama_dokumen' => $namaDokumenKey,
+                    ],
+                    [
+                        'file_path' => $filePathToStore,
+                        'tipe_file' => $fileExtension,
+                        // Secara acak menentukan status validasi, atau set default 'Belum Diverifikasi'
+                        'status_validasi' => $statuses[array_rand($statuses)],
+                        // 'status_validasi' => 'Belum Diverifikasi', // Default yang lebih aman
+                    ]
+                );
+                $totalDokumenDibuat++;
             }
         }
 
-        $this->command->info( ($pendaftars->count() * count($tipeDokumenUmum)) . ' dokumen pendaftar umum telah ditambahkan.');
+        if ($totalDokumenDibuat > 0) {
+            $this->command->info($totalDokumenDibuat . ' data dokumen pendaftar telah di-seed dengan status validasi.');
+        } else {
+            $this->command->warn('Tidak ada dokumen pendaftar baru yang di-seed.');
+        }
     }
 }
