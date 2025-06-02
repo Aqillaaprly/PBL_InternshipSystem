@@ -15,9 +15,6 @@ use Illuminate\Validation\Rule;
 
 class PendaftarController extends Controller
 {
-    // Daftar nama dokumen yang dianggap wajib untuk bisa lanjut dari status 'Pending'
-    // Pastikan nama-nama ini SAMA PERSIS dengan yang ada di getPredefinedDokumenTypesForStorage()
-    // dan yang disimpan di kolom 'nama_dokumen' pada tabel dokumen_pendaftars.
     private $dokumenWajibNames = [
         'Daftar Riwayat Hidup',
         'KHS atau Transkrip Nilai',
@@ -25,13 +22,8 @@ class PendaftarController extends Controller
         'KTM',
         'Surat Izin Orang Tua',
         'Pakta Integritas',
-        // 'Surat Balasan Industri', // Tambahkan jika ini juga wajib divalidasi agar status lamaran bisa maju
     ];
 
-    /**
-     * Helper untuk mendapatkan daftar nama dokumen standar untuk penyimpanan.
-     * Kuncinya adalah 'file_input_name' di form, nilainya adalah 'Nama Dokumen Standar di DB'.
-     */
     private function getPredefinedDokumenTypesForStorage(): array
     {
         return [
@@ -49,12 +41,9 @@ class PendaftarController extends Controller
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
-        $query = Pendaftar::with(['user', 'lowongan.company', 'dokumenPendaftars']); // Eager load dokumenPendaftars
+        $query = Pendaftar::with(['user', 'lowongan.company', 'dokumenPendaftars']);
 
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
@@ -72,17 +61,32 @@ class PendaftarController extends Controller
             });
         }
 
-        $pendaftars = $query->latest('tanggal_daftar')->paginate(10)->withQueryString();
+        // PERUBAHAN DI SINI: Mengurutkan berdasarkan updated_at terbaru
+        $pendaftars = $query->orderBy('updated_at', 'desc')->paginate(10)->withQueryString();
         
-        // Mengirim daftar dokumen wajib ke view agar konsisten
+        foreach ($pendaftars as $pendaftar) {
+            $semuaDokumenWajibValid = true; 
+            if (!empty($this->dokumenWajibNames)) { 
+                foreach ($this->dokumenWajibNames as $namaDocWajib) {
+                    $dokumenPendaftarValid = $pendaftar->dokumenPendaftars
+                                                ->where('nama_dokumen', $namaDocWajib)
+                                                ->where('status_validasi', 'Valid')
+                                                ->isNotEmpty();
+                    
+                    if (!$dokumenPendaftarValid) {
+                        $semuaDokumenWajibValid = false; 
+                        break; 
+                    }
+                }
+            }
+            $pendaftar->status_kelengkapan_dokumen = $semuaDokumenWajibValid ? 'Validate' : 'Invalidate';
+        }
+        
         $dokumenWajibGlobal = $this->dokumenWajibNames;
 
         return view('admin.Company.pendaftar', compact('pendaftars', 'dokumenWajibGlobal'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
         $mahasiswas = User::whereHas('role', function ($query) {
@@ -95,13 +99,13 @@ class PendaftarController extends Controller
         return view('admin.pendaftar.create', compact('mahasiswas', 'lowongans'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:users,id|unique:pendaftars,user_id,NULL,id,lowongan_id,' . $request->lowongan_id,
+            'user_id' => ['required', 'exists:users,id', Rule::unique('pendaftars')->where(function ($query) use ($request) {
+                return $query->where('user_id', $request->user_id)
+                             ->where('lowongan_id', $request->lowongan_id);
+            })],
             'lowongan_id' => 'required|exists:lowongans,id',
             'tanggal_daftar' => 'required|date',
             'status_lamaran' => 'required|in:Pending,Ditinjau,Wawancara,Diterima,Ditolak',
@@ -118,35 +122,24 @@ class PendaftarController extends Controller
 
         $pendaftar = Pendaftar::create($request->only(['user_id', 'lowongan_id', 'tanggal_daftar', 'status_lamaran', 'catatan_admin']));
         
-        // Panggil pengecekan setelah pendaftar dibuat, untuk memastikan status lamaran awal benar
-        // (misalnya, jika status default seharusnya 'Pending' karena belum ada dokumen)
         $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh());
 
 
         return redirect()->route('admin.pendaftar.index')->with('success', 'Data pendaftar berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Pendaftar $pendaftar)
     {
         $pendaftar->load(['user', 'lowongan.company', 'dokumenPendaftars']);
         return view('admin.pendaftar.show', compact('pendaftar'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Pendaftar $pendaftar)
     {
         $pendaftar->load('user', 'lowongan.company');
         return view('admin.pendaftar.edit', compact('pendaftar'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Pendaftar $pendaftar)
     {
         $validator = Validator::make($request->all(), [
@@ -164,7 +157,6 @@ class PendaftarController extends Controller
         $newStatusLamaran = $request->status_lamaran;
         $oldStatusLamaran = $pendaftar->status_lamaran;
 
-        // Logika pengecekan dokumen sebelum mengubah status ke tahap lanjut
         if (!in_array($newStatusLamaran, ['Pending', 'Ditolak'])) {
             $semuaDokumenWajibValid = true;
             $dokumenBelumValidInfo = [];
@@ -179,7 +171,7 @@ class PendaftarController extends Controller
 
             if (!$semuaDokumenWajibValid) {
                 $pesanError = 'Tidak dapat mengubah status lamaran ke "' . $newStatusLamaran . '". Dokumen berikut belum valid atau belum diunggah: ' . implode(', ', $dokumenBelumValidInfo) . '. Harap validasi dokumen terlebih dahulu atau set status ke "Pending".';
-                return redirect()->route('admin.pendaftar.edit', $pendaftar->id) // Bisa juga redirect ke showDokumen
+                return redirect()->route('admin.pendaftar.edit', $pendaftar->id)
                              ->with('error', $pesanError)
                              ->withInput();
             }
@@ -187,9 +179,6 @@ class PendaftarController extends Controller
 
         $pendaftar->update($request->only(['tanggal_daftar', 'status_lamaran', 'catatan_admin']));
         
-        // Jika status lamaran secara manual diubah (misalnya dari Ditinjau ke Pending),
-        // panggil cekDanUbahStatusLamaranPendaftar untuk memastikan konsistensi.
-        // Atau jika statusnya tetap Pending dan dokumen sudah diupdate.
         if ($oldStatusLamaran !== $newStatusLamaran || $newStatusLamaran === 'Pending') {
             $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh());
         }
@@ -197,24 +186,16 @@ class PendaftarController extends Controller
         return redirect()->route('admin.pendaftar.index')->with('success', 'Status pendaftar berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Pendaftar $pendaftar)
     {
-        // Hapus file fisik dokumen pendaftar dari storage
         foreach ($pendaftar->dokumenPendaftars as $dokumen) {
             if ($dokumen->file_path && Storage::disk('public')->exists($dokumen->file_path)) {
                 Storage::disk('public')->delete($dokumen->file_path);
             }
         }
-        // Record DokumenPendaftar akan terhapus otomatis jika onDelete('cascade') di-set pada foreign key di migrasi.
-        // Jika tidak, Anda perlu menghapusnya secara manual: $pendaftar->dokumenPendaftars()->delete();
         $pendaftar->delete();
         return redirect()->route('admin.pendaftar.index')->with('success', 'Data pendaftar berhasil dihapus.');
     }
-
-    // === METODE UNTUK MANAJEMEN DOKUMEN ===
 
     public function showDokumen(Pendaftar $pendaftar)
     {
@@ -228,7 +209,6 @@ class PendaftarController extends Controller
             $opsionalKeywords = ['sertifikat kompetensi', 'surat balasan', 'bpjs atau asuransi lain', 'sktm atau kip kuliah', 'proposal magang'];
             $isOptional = false;
             foreach ($opsionalKeywords as $keyword) {
-                // Memastikan kata kunci ditemukan sebagai kata utuh atau bagian dari nama dokumen
                 if (stripos($namaDokumenStandar, $keyword) !== false) {
                     $isOptional = true;
                     break;
@@ -249,7 +229,7 @@ class PendaftarController extends Controller
 
         $rules = [];
         foreach (array_keys($predefinedDokumenTypesOnStore) as $key) {
-            $rules["dokumen[{$key}]"] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,zip|max:5120'; // Max 5MB
+            $rules["dokumen[{$key}]"] = 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png,zip|max:5120';
         }
 
         $validator = Validator::make($request->all(), $rules, [
@@ -276,7 +256,7 @@ class PendaftarController extends Controller
                         if ($existingDoc->file_path && Storage::disk('public')->exists($existingDoc->file_path)) {
                             Storage::disk('public')->delete($existingDoc->file_path);
                         }
-                        $existingDoc->delete(); // Hapus record lama untuk digantikan
+                        $existingDoc->delete(); 
                     }
 
                     $filePath = $uploadedFile->store("dokumen_pendaftar/{$pendaftar->id}", 'public');
@@ -285,15 +265,14 @@ class PendaftarController extends Controller
                         'nama_dokumen' => $namaDokumenStandar,
                         'file_path' => $filePath,
                         'tipe_file' => $uploadedFile->getClientOriginalExtension(),
-                        'status_validasi' => 'Belum Diverifikasi', // Default status saat unggah baru
+                        'status_validasi' => 'Belum Diverifikasi', 
                     ]);
                     $dokumenUploadedCount++;
                 }
             }
         }
 
-        // Panggil pengecekan status lamaran setelah dokumen diunggah/diperbarui
-        $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh()); // Gunakan fresh() untuk data terbaru
+        $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh()); 
 
         if ($dokumenUploadedCount > 0) {
             return redirect()->route('admin.pendaftar.showDokumen', $pendaftar->id)
@@ -316,14 +295,14 @@ class PendaftarController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.pendaftar.showDokumen', $pendaftar->id)
-                        ->withErrors($validator, 'updateStatusDokumenError_' . $dokumenPendaftar->id) // Error bag unik
+                        ->withErrors($validator, 'updateStatusDokumenError_' . $dokumenPendaftar->id) 
                         ->withInput();
         }
 
         $dokumenPendaftar->status_validasi = $request->status_validasi;
         $dokumenPendaftar->save();
 
-        $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh()); // Gunakan fresh()
+        $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh()); 
 
         return redirect()->route('admin.pendaftar.showDokumen', $pendaftar->id)
                          ->with('success', 'Status validasi dokumen "' . $dokumenPendaftar->nama_dokumen . '" berhasil diperbarui.');
@@ -340,45 +319,41 @@ class PendaftarController extends Controller
         }
         $dokumenPendaftar->delete();
 
-        $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh()); // Gunakan fresh()
+        $this->cekDanUbahStatusLamaranPendaftar($pendaftar->fresh()); 
 
         return redirect()->route('admin.pendaftar.showDokumen', $pendaftar->id)
                          ->with('success', 'Dokumen berhasil dihapus.');
     }
 
-    /**
-     * Method helper untuk memeriksa dan mengubah status lamaran pendaftar
-     * berdasarkan validitas dokumen wajib.
-     */
-        protected function cekDanUbahStatusLamaranPendaftar(Pendaftar $pendaftar)
-        {
-            $semuaDokumenWajibValid = true;
-            $pesanDetail = []; 
-            $userNama = $pendaftar->user->name ?? $pendaftar->user->username;
+    protected function cekDanUbahStatusLamaranPendaftar(Pendaftar $pendaftar)
+    {
+        $semuaDokumenWajibValid = true;
+        $pesanDetail = []; 
+        $userNama = $pendaftar->user->name ?? $pendaftar->user->username;
 
-            foreach ($this->dokumenWajibNames as $namaDocWajib) {
-                $doc = $pendaftar->dokumenPendaftars()->where('nama_dokumen', $namaDocWajib)->first();
-                if (!$doc || $doc->status_validasi !== 'Valid') {
-                    $semuaDokumenWajibValid = false;
-                    $pesanDetail[] = $namaDocWajib . ($doc ? ' (Status: ' . $doc->status_validasi . ')' : ' (Belum diunggah)');
-                    // Tidak perlu break jika ingin mengumpulkan semua dokumen yang bermasalah untuk pesan
-                }
-            }
-
-            $currentStatus = $pendaftar->status_lamaran;
-
-            if ($semuaDokumenWajibValid) {
-                if ($currentStatus === 'Pending') {
-                    $pendaftar->status_lamaran = 'Ditinjau';
-                    $pendaftar->save();
-                    session()->flash('info', 'Semua dokumen wajib ' . $userNama . ' telah valid. Status lamaran diubah menjadi "Ditinjau".');
-                }
-            } else {
-                if (!in_array($currentStatus, ['Pending', 'Ditolak'])) {
-                    $pendaftar->status_lamaran = 'Pending';
-                    $pendaftar->save();
-                    session()->flash('warning', 'Dokumen pendaftar ' . $userNama . ' belum lengkap/valid (' . implode(', ', $pesanDetail) . '). Status lamaran dikembalikan ke "Pending".');
-                }
+        foreach ($this->dokumenWajibNames as $namaDocWajib) {
+            $doc = $pendaftar->dokumenPendaftars()->where('nama_dokumen', $namaDocWajib)->first();
+            if (!$doc || $doc->status_validasi !== 'Valid') {
+                $semuaDokumenWajibValid = false;
+                $pesanDetail[] = $namaDocWajib . ($doc ? ' (Status: ' . $doc->status_validasi . ')' : ' (Belum diunggah)');
             }
         }
+
+        $currentStatus = $pendaftar->status_lamaran;
+
+        if ($semuaDokumenWajibValid) {
+            if ($currentStatus === 'Pending') {
+                $pendaftar->status_lamaran = 'Ditinjau';
+                $pendaftar->save();
+                session()->flash('info', 'Semua dokumen wajib ' . $userNama . ' telah valid. Status lamaran diubah menjadi "Ditinjau".');
+            }
+        } else {
+            if (!in_array($currentStatus, ['Pending', 'Ditolak'])) { 
+                $oldStatusForMsg = $pendaftar->status_lamaran; 
+                $pendaftar->status_lamaran = 'Pending'; 
+                $pendaftar->save();
+                session()->flash('warning', 'Dokumen pendaftar ' . $userNama . ' belum lengkap/valid (' . implode(', ', $pesanDetail) . '). Status lamaran (' . $oldStatusForMsg . ') dikembalikan ke "Pending".');
+            }
+        }
+    }
 }

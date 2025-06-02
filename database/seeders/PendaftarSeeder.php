@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Pendaftar;
 use App\Models\User;
 use App\Models\Lowongan;
-use App\Models\Role;
+use App\Models\Role; // Pastikan Role di-import jika digunakan untuk mengambil mahasiswa
 use Carbon\Carbon;
 
 class PendaftarSeeder extends Seeder
@@ -28,28 +28,49 @@ class PendaftarSeeder extends Seeder
             return;
         }
 
-        // Setiap mahasiswa mendaftar ke 1-2 lowongan acak
+        $jumlahPendaftarDibuat = 0;
+
         foreach ($mahasiswas as $mahasiswa) {
-            $jumlahLamaran = rand(1, min(2, $lowongans->count())); // Mendaftar maksimal 2 atau sejumlah lowongan yang ada
-            $lowongansDipilih = $lowongans->random($jumlahLamaran);
+            // Setiap mahasiswa mendaftar ke 1-2 lowongan acak
+            $jumlahLamaran = rand(1, min(2, $lowongans->count())); 
+            $lowongansDipilih = $lowongans->shuffle()->take($jumlahLamaran); // Ambil secara acak
 
             foreach ($lowongansDipilih as $lowongan) {
-                // Hindari duplikasi pendaftaran
-                Pendaftar::firstOrCreate(
-                    [
-                        'user_id' => $mahasiswa->id,
-                        'lowongan_id' => $lowongan->id,
-                    ],
-                    [
-                        'tanggal_daftar' => Carbon::now()->subDays(rand(1, 30))->toDateString(),
-                        'status_lamaran' => ['Pending', 'Ditinjau', 'Wawancara', 'Diterima', 'Ditolak'][array_rand(['Pending', 'Ditinjau', 'Wawancara', 'Diterima', 'Ditolak'])],
-                        'surat_lamaran_path' => 'dokumen_pendaftar_dummies/surat_lamaran_contoh.pdf', // Path dummy
-                        'cv_path' => 'dokumen_pendaftar_dummies/cv_contoh.pdf', // Path dummy
-                        'catatan_pendaftar' => 'Saya sangat tertarik dengan posisi ini.',
-                    ]
-                );
+                // Cek apakah pendaftar sudah ada untuk kombinasi user dan lowongan ini
+                $existingPendaftar = Pendaftar::where('user_id', $mahasiswa->id)
+                                            ->where('lowongan_id', $lowongan->id)
+                                            ->first();
+
+                if (!$existingPendaftar) {
+                    Pendaftar::create(
+                        [
+                            'user_id' => $mahasiswa->id,
+                            'lowongan_id' => $lowongan->id,
+                            'tanggal_daftar' => Carbon::now()->subDays(rand(1, 30))->toDateString(),
+                            'status_lamaran' => 'Pending', // <-- PERUBAHAN DI SINI: Set default ke Pending
+                            'surat_lamaran_path' => 'dokumen_pendaftar_dummies/surat_lamaran_contoh.pdf',
+                            'cv_path' => 'dokumen_pendaftar_dummies/cv_contoh.pdf',
+                            'catatan_pendaftar' => 'Saya sangat tertarik dengan posisi ini.',
+                        ]
+                    );
+                    $jumlahPendaftarDibuat++;
+                }
             }
         }
-        $this->command->info(Pendaftar::count() . ' data pendaftar telah di-seed.');
+
+        if ($jumlahPendaftarDibuat > 0) {
+            $this->command->info($jumlahPendaftarDibuat . ' data pendaftar baru telah di-seed dengan status lamaran "Pending".');
+        } else {
+            $this->command->info('Tidak ada data pendaftar baru yang di-seed (mungkin semua kombinasi sudah ada).');
+        }
+        
+        $this->command->info('Memperbarui status lamaran pendaftar yang sudah ada menjadi "Pending" (kecuali Ditolak)...');
+        $updatedCount = Pendaftar::whereNotIn('status_lamaran', ['Pending', 'Ditolak'])
+                                 ->update(['status_lamaran' => 'Pending']);
+        if ($updatedCount > 0) {
+            $this->command->info($updatedCount . ' status pendaftar yang sudah ada telah diubah menjadi "Pending".');
+        } else {
+            $this->command->info('Tidak ada status pendaftar yang perlu diubah (semua sudah Pending atau Ditolak).');
+        }
     }
 }

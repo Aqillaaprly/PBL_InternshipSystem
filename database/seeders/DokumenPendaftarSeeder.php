@@ -13,77 +13,115 @@ class DokumenPendaftarSeeder extends Seeder
 {
     public function run(): void
     {
-        $pendaftars = Pendaftar::take(10)->get(); // Ambil lebih banyak pendaftar jika perlu
+        $pendaftars = Pendaftar::take(20)->get(); 
 
         if ($pendaftars->isEmpty()) {
             $this->command->info('Tidak ada data pendaftar, DokumenPendaftarSeeder tidak dijalankan.');
             return;
         }
 
-        $predefinedDokumenTypes = [
-            'Sertifikat Kompetensi' => 'sertifikat_kompetensi.pdf',
-            'Surat Balasan Industri' => 'surat_balasan_industri.pdf',
-            'Pakta Integritas' => 'pakta_integritas.pdf',
-            'Daftar Riwayat Hidup' => 'cv.pdf',
-            'KHS atau Transkrip Nilai' => 'khs_transkrip.pdf',
-            'KTP' => 'ktp.jpg',
-            'KTM' => 'ktm.jpg',
-            'Surat Izin Orang Tua' => 'surat_izin_ortu.pdf',
-            'Kartu BPJS atau Asuransi Lain' => 'bpjs_asuransi.pdf',
-            'SKTM atau KIP Kuliah' => 'sktm_kip.pdf',
-            'Proposal Magang' => 'proposal_magang.pdf',
+        $dokumenWajibData = [
+            'Daftar Riwayat Hidup'      => 'cv_wajib_seeder.pdf',
+            'KHS atau Transkrip Nilai' => 'khs_transkrip_wajib_seeder.pdf',
+            'KTP'                      => 'ktp_wajib_seeder.jpg',
+            'KTM'                      => 'ktm_wajib_seeder.jpg',
+            'Surat Izin Orang Tua'     => 'surat_izin_ortu_wajib_seeder.pdf',
+            'Pakta Integritas'         => 'pakta_integritas_wajib_seeder.pdf',
+            // Contoh jika 'Surat Balasan Industri' juga wajib:
+            // 'Surat Balasan Industri'  => 'sbi_wajib_seeder.pdf',
         ];
 
-        $dummyDir = 'dokumen_pendaftar_dummies';
+        // Daftar dokumen opsional (jika ada yang ingin di-seed juga secara acak)
+        $dokumenOpsionalData = [
+            'Sertifikat Kompetensi'       => 'sertifikat_kompetensi_ops_seeder.pdf',
+            'Proposal Magang'             => 'proposal_magang_ops_seeder.pdf',
+            'Kartu BPJS atau Asuransi Lain' => 'bpjs_asuransi_ops_seeder.pdf',
+            'SKTM atau KIP Kuliah'        => 'sktm_kip_ops_seeder.pdf',
+             // Jika Surat Balasan Industri tidak wajib, bisa menjadi opsional
+            'Surat Balasan Industri'      => 'sbi_opsional_seeder.pdf',
+        ];
+        
+        // Gabungkan semua tipe dokumen untuk pembuatan dummy file agar tidak duplikat
+        $semuaDokumenUntukDummy = array_merge($dokumenWajibData, $dokumenOpsionalData);
+
+        $dummyDir = 'dokumen_pendaftar_dummies'; // Direktori untuk menyimpan file dummy di public/storage
         if (!Storage::disk('public')->exists($dummyDir)) {
             Storage::disk('public')->makeDirectory($dummyDir);
         }
 
-        $dummyFilePaths = [];
-        foreach ($predefinedDokumenTypes as $namaDokumen => $namaFile) {
-            $fullPath = $dummyDir . '/' . $namaFile;
+        // Buat file dummy jika belum ada
+        foreach ($semuaDokumenUntukDummy as $namaDokumenDb => $namaFileDummy) {
+            $fullPath = $dummyDir . '/' . $namaFileDummy;
             if (!Storage::disk('public')->exists($fullPath)) {
-                Storage::disk('public')->put($fullPath, "Dummy content for {$namaDokumen}. Original: {$namaFile}");
+                // Membuat file dummy sederhana
+                Storage::disk('public')->put($fullPath, "Ini adalah konten dummy untuk dokumen: {$namaDokumenDb}. Nama file: {$namaFileDummy}");
             }
-            $dummyFilePaths[$namaDokumen] = $fullPath;
         }
 
-        $totalDokumenDibuat = 0;
-        $statuses = ['Belum Diverifikasi', 'Valid', 'Tidak Valid', 'Perlu Revisi'];
+        $totalDokumenWajibBaru = 0;
 
         foreach ($pendaftars as $pendaftar) {
-            $jumlahDokumenUntukPendaftar = rand(5, count($predefinedDokumenTypes));
-            $dokumenDipilihUntukPendaftar = array_rand($predefinedDokumenTypes, $jumlahDokumenUntukPendaftar);
-            
-            if (!is_array($dokumenDipilihUntukPendaftar)) {
-                $dokumenDipilihUntukPendaftar = [$dokumenDipilihUntukPendaftar];
-            }
+            // Seed semua dokumen wajib untuk pendaftar ini
+            foreach ($dokumenWajibData as $namaDokumenDb => $namaFileDummy) {
+                $filePathToStore = $dummyDir . '/' . $namaFileDummy; // Path relatif terhadap storage/app/public
+                $fileExtension = pathinfo($namaFileDummy, PATHINFO_EXTENSION);
 
-            foreach ($dokumenDipilihUntukPendaftar as $namaDokumenKey) {
-                $filePathToStore = $dummyFilePaths[$namaDokumenKey];
-                $fileExtension = pathinfo($predefinedDokumenTypes[$namaDokumenKey], PATHINFO_EXTENSION);
-
-                DokumenPendaftar::firstOrCreate(
+                $dokumen = DokumenPendaftar::firstOrCreate(
                     [
                         'pendaftar_id' => $pendaftar->id,
-                        'nama_dokumen' => $namaDokumenKey,
+                        'nama_dokumen' => $namaDokumenDb,
                     ],
                     [
                         'file_path' => $filePathToStore,
                         'tipe_file' => $fileExtension,
-                        // Secara acak menentukan status validasi, atau set default 'Belum Diverifikasi'
-                        'status_validasi' => $statuses[array_rand($statuses)],
-                        // 'status_validasi' => 'Belum Diverifikasi', // Default yang lebih aman
+                        'status_validasi' => 'Belum Diverifikasi', // Status default untuk dokumen baru
                     ]
                 );
-                $totalDokumenDibuat++;
+                // Jika record baru dibuat oleh firstOrCreate, $dokumen->wasRecentlyCreated akan true
+                if($dokumen->wasRecentlyCreated) {
+                    $totalDokumenWajibBaru++;
+                }
+            }
+
+            // Opsional: Seed beberapa dokumen opsional secara acak untuk pendaftar ini
+            if (!empty($dokumenOpsionalData)) {
+                $jumlahOpsionalUntukPendaftar = rand(0, count($dokumenOpsionalData) / 2); // Ambil 0 hingga setengah dari opsional
+                if ($jumlahOpsionalUntukPendaftar > 0) {
+                    // Ambil kunci secara acak dari dokumen opsional
+                    $randomKeysOpsional = array_rand($dokumenOpsionalData, $jumlahOpsionalUntukPendaftar);
+                    if (!is_array($randomKeysOpsional)) { // array_rand bisa mengembalikan satu kunci jika jumlahnya 1
+                        $randomKeysOpsional = [$randomKeysOpsional];
+                    }
+
+                    foreach ($randomKeysOpsional as $namaDokumenDbOps) {
+                        $namaFileDummyOps = $dokumenOpsionalData[$namaDokumenDbOps];
+                        $filePathToStoreOps = $dummyDir . '/' . $namaFileDummyOps;
+                        $fileExtensionOps = pathinfo($namaFileDummyOps, PATHINFO_EXTENSION);
+
+                        DokumenPendaftar::firstOrCreate(
+                            [
+                                'pendaftar_id' => $pendaftar->id,
+                                'nama_dokumen' => $namaDokumenDbOps,
+                            ],
+                            [
+                                'file_path' => $filePathToStoreOps,
+                                'tipe_file' => $fileExtensionOps,
+                                'status_validasi' => 'Belum Diverifikasi',
+                            ]
+                        );
+                    }
+                }
             }
         }
-
-        if ($totalDokumenDibuat > 0) {
-            $this->command->info($totalDokumenDibuat . ' data dokumen pendaftar telah di-seed dengan status validasi.');
+        
+        $this->command->info('Proses seeding DokumenPendaftar telah selesai.');
+        if ($totalDokumenWajibBaru > 0) {
+            $this->command->info("{$totalDokumenWajibBaru} entri dokumen wajib pendaftar baru telah di-seed dengan status 'Belum Diverifikasi'.");
         } else {
-            $this->command->warn('Tidak ada dokumen pendaftar baru yang di-seed.');
+            $this->command->info('Semua dokumen wajib untuk pendaftar yang diproses sudah ada di database.');
+        }
+        if (!empty($dokumenOpsionalData) && $pendaftars->isNotEmpty()) {
+           $this->command->info('Beberapa dokumen opsional mungkin juga telah ditambahkan/dipastikan ada.');
         }
     }
 }
