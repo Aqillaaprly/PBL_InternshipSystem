@@ -126,13 +126,6 @@
                     <a href="{{ route('admin.perusahaan.edit', $company->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md shadow-sm">
                         Edit Perusahaan
                     </a>
-                    <form action="{{ route('admin.perusahaan.destroy', $company->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus perusahaan ini? Menghapus perusahaan ini juga akan menghapus user terkait jika ada, dan semua lowongan serta pendaftar terkait.');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md shadow-sm">
-                            Hapus Perusahaan
-                        </button>
-                    </form>
                 </div>
             @else
                 {{-- Pesan jika $company tidak valid atau tidak ditemukan --}}
