@@ -1,4 +1,3 @@
-{{-- resources/views/admin/template/navbar.blade.php --}}
 <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
@@ -18,7 +17,7 @@
             </div>
                 <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
                 {{-- Menggunakan nama route yang sudah diperbaiki dan konsisten --}}
-                <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.datamahasiswa') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
+                <a href="{{ route('dosen.data_mahasiswabim') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.data_mahasiswabim') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
                 <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.data_pembimbing') ? 'border-blue-600 text-blue-600' : '' }}">Absensi Mahasiwa</a>
                 <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') ? 'border-blue-600 text-blue-600' : '' }}">Laporan Magang</a>
             </nav>

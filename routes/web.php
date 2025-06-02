@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
+use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
+use App\Http\Controllers\Dosen\AbsensiMahasiswaController; //dosen
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -62,7 +64,9 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/dashboard', function () {
         return view('dosen.dashboard');
     })->name('dashboard');
-    // Tambahkan route dosen lainnya di sini
+    // Route untuk melihat daftar mahasiswa bimbingan
+    Route::get('/mahasiswa-bimbingan', [MahasiswaBimbinganController::class, 'index'])->name('data_mahasiswabim');
+    Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
 });
 
 

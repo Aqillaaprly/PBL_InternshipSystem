@@ -59,7 +59,6 @@
                     {{-- Konten pengguna aktif --}}
                 </div>
             </div>
-            @include('dosen.Job')
 
 {{--Tabel mahasiswa bimbingan--}}
       <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
