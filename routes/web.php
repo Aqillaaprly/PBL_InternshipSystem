@@ -31,23 +31,16 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('lowongan', AdminLowonganController::class);
-    Route::resource('pendaftar', AdminPendaftarController::class); // Ini mungkin sudah ada
+    Route::resource('pendaftar', AdminPendaftarController::class);
 
-    // Route baru untuk menampilkan dokumen pendaftar spesifik dan form upload
     Route::get('/pendaftar/{pendaftar}/dokumen', [AdminPendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
     Route::post('/pendaftar/{pendaftar}/upload-dokumen-batch', [AdminPendaftarController::class, 'uploadDokumenBatch'])->name('pendaftar.uploadDokumenBatch');
     Route::delete('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}', [AdminPendaftarController::class, 'destroyDokumen'])->name('pendaftar.dokumen.destroy');
     Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [AdminPendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
     Route::patch('/pendaftar/{pendaftar}/dokumen/update-all-status', [AdminPendaftarController::class, 'updateAllStatusDokumen'])->name('pendaftar.dokumen.updateAllStatus');
     
-    Route::get('/perusahaan', [AdminCompanyController::class, 'index'])->name('perusahaan.index');
-    Route::get('/perusahaan/create', [AdminCompanyController::class, 'create'])->name('perusahaan.create');
-    Route::post('/perusahaan', [AdminCompanyController::class, 'store'])->name('perusahaan.store');
-    Route::get('/perusahaan/{companyId}', [AdminCompanyController::class, 'show'])->name('perusahaan.show'); // Gunakan {companyId}
-    Route::get('/perusahaan/{companyId}/edit', [AdminCompanyController::class, 'edit'])->name('perusahaan.edit'); // Gunakan {companyId}
-    Route::put('/perusahaan/{companyId}', [AdminCompanyController::class, 'update'])->name('perusahaan.update'); // Gunakan {companyId}
-    Route::delete('/perusahaan/{companyId}', [AdminCompanyController::class, 'destroy'])->name('perusahaan.destroy'); // Gunakan {companyId}
-
+    // Menggunakan 'company' sebagai parameter untuk AdminCompanyController agar sesuai dengan Route Model Binding
+    Route::resource('perusahaan', AdminCompanyController::class)->parameters(['perusahaan' => 'company']);
 
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
     Route::get('/data-mahasiswa/create', [AdminMahasiswaController::class, 'create'])->name('mahasiswa.create');
@@ -57,14 +50,14 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::put('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'update'])->name('mahasiswa.update');
     Route::delete('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'destroy'])->name('mahasiswa.destroy');
 
-    Route::get('/data-pembimbing', [AdminPembimbingController::class, 'index'])->name('data_pembimbing');
+    // CRUD untuk Pembimbing
+    Route::resource('pembimbings', AdminPembimbingController::class);
+
     Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan');
     Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
-
-    // Manajemen Penugasan Pembimbing
     Route::resource('penugasan-pembimbing', PenugasanPembimbingController::class);
 });
 

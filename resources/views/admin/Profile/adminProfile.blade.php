@@ -1,90 +1,164 @@
-@ -0,0 +1,89 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Profil Admin - {{ $admin->name ?? $admin->username }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Admin - {{ Auth::user()->name ?? Auth::user()->username }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    {{-- <link rel="stylesheet" href="{{ asset('css/admin_style.css') }}"> --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            background-color: #f7f8fc; 
+        }
+       .profile-header {
+    background: linear-gradient(to right, #687EEA, #3B5998); 
+    color: white;
+    padding: 1rem 1rem; /* diperkecil dari 2.5rem */
+    border-radius: 1rem 1rem 0 0; 
+    margin-bottom: -1rem;
+    position: relative;
+    z-index: 10;
+}
+        .profile-picture {
+            width: 10rem; 
+            height: 10rem; 
+            border-radius: 9999px; 
+            object-fit: cover;
+            border: 5px solid white; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); 
+            margin-top: -5rem; 
+            position: relative;
+            z-index: 20; 
+        }
+        .info-card {
+            background-color: white;
+            border-radius: 1rem; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); 
+            padding: 2rem; 
+            padding-top: 6rem; 
+            position: relative;
+            z-index: 5;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0; 
+            border-bottom: 1px solid #f3f4f6; 
+        }
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #6b7280; 
+            font-size: 0.875rem; 
+            display: flex;
+            align-items: center;
+        }
+        .info-label i {
+            margin-right: 0.5rem; 
+            color: #9ca3af; 
+        }
+        .info-value {
+            color: #111827; 
+            font-weight: 500; 
+            text-align: right;
+        }
+        .action-button {
+            transition: all 0.2s ease-in-out;
+            padding: 0.625rem 1.25rem; 
+            font-size: 0.875rem; 
+            border-radius: 0.5rem; 
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .edit-button {
+            background-image: linear-gradient(to right, #4f46e5, #7c3aed); 
+        }
+        .edit-button:hover {
+             background-image: linear-gradient(to right, #4338ca, #6d28d9); 
+        }
+    </style>
 </head>
-<body class="bg-blue-50 text-gray-800">
+<body class="text-gray-800">
     @include('admin.template.navbar')
 
-    <main class="max-w-3xl mx-auto px-4 py-10 mt-20">
-        <div class="bg-white p-8 rounded-xl shadow-lg">
-            <div class="flex flex-col items-center mb-8">
-                {{-- Foto Profil --}}
-                @if ($admin->profile_picture && Storage::disk('public')->exists($admin->profile_picture))
-                    <img src="{{ asset('storage/' . $admin->profile_picture) }}" alt="Avatar Admin" class="w-32 h-32 rounded-full mb-4 border-4 border-blue-200 object-cover">
-                @else
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($admin->name ?? $admin->username) }}&background=random&color=fff&size=128" alt="Avatar Admin" class="w-32 h-32 rounded-full mb-4 border-4 border-blue-200 object-cover">
-                @endif
-                
-                {{-- Logo BEM (jika ada dan ingin ditampilkan di sini) --}}
-                {{-- Contoh: --}}
-                {{-- <img src="{{ asset('images/logo-bem-malang-raya.png') }}" alt="Logo BEM Malang Raya" class="h-16 mx-auto mb-3"> --}}
+    <main class="max-w-lg mx-auto px-3 py-8 mt-20">
+        
+        <div class="profile-header text-center">
+            <h1 class="text-2xl sm:text-3xl font-bold">Profile</h1>
+        </div>
 
-                <h1 class="text-3xl font-bold text-gray-800">{{ $admin->name ?? 'Nama Admin Belum Diatur' }}</h1>
-                
-                {{-- Username dan Badge Admin dalam satu baris, terpusat --}}
-                <div class="flex items-center justify-center mt-1 space-x-2">
-                    <p class="text-md text-gray-500">{{ '@' . ($admin->username ?? 'N/A') }}</p>
-                </div>
+        <div class="info-card text-center">
+    
+            <div class="flex justify-center">
+                @if (Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture))
+                    <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="Foto Profil {{ Auth::user()->name }}" 
+                         class="profile-picture">
+                @else
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? Auth::user()->username) }}&size=170&background=1D4ED8&color=fff&font-size=0.4&bold=true" 
+                         alt="Avatar {{ Auth::user()->name }}" 
+                         class="profile-picture">
+                @endif
             </div>
 
+            <h1 class="text-3xl font-bold text-gray-800 mt-4">{{ Auth::user()->name ?? 'Nama Admin' }}</h1>
+            <p class="text-gray-500 text-sm">{{ '@'.(Auth::user()->username ?? 'username') }}</p>
+            <p class="inline-block bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mt-2">
+                <i class="fas fa-user-shield mr-1"></i>{{ Str::ucfirst(Auth::user()->role->name ?? 'Administrator') }}
+            </p>
+            
             @if (session('success'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
-                    <span class="block sm:inline">{{ session('success') }}</span>
+                <div class="bg-green-50 border-l-4 border-green-400 text-green-700 p-4 rounded-md my-6" role="alert">
+                    <div class="flex">
+                        <div class="py-1"><i class="fas fa-check-circle fa-lg mr-3 text-green-500"></i></div>
+                        <div>
+                            <p class="font-bold">Sukses!</p>
+                            <p class="text-sm">{{ session('success') }}</p>
+                        </div>
+                    </div>
                 </div>
             @endif
 
-            <div class="border-t border-gray-200 pt-6">
-                <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Nama Lengkap</dt>
-                        <dd class="mt-1 text-md text-gray-900">{{ $admin->name ?? '-' }}</dd>
-                    </div>
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Username</dt>
-                        <dd class="mt-1 text-md text-gray-900">{{ $admin->username ?? '-' }}
-                            @if($admin->role)
-                    <span class="px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-700 rounded-full">
-                        {{ ucfirst($admin->role->name) }}
+            <div class="text-left mt-8">
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-envelope"></i>Email</span>
+                    <span class="info-value">{{ Auth::user()->email ?? '-' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-user-check"></i>Email Terverifikasi</span>
+                    <span class="info-value">
+                        @if(Auth::user()->email_verified_at)
+                            <span class="text-green-600 flex items-center justify-end">
+                                <i class="fas fa-check-circle mr-1"></i> Terverifikasi
+                            </span>
+                            <span class="text-xs text-gray-400 block">({{ Auth::user()->email_verified_at->isoFormat('D MMM YYYY') }})</span>
+                        @else
+                            <span class="text-red-600 flex items-center justify-end">
+                                <i class="fas fa-times-circle mr-1"></i> Belum
+                            </span>
+                        @endif
                     </span>
-                    @endif
-                        </dd>
-                    </div>
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Alamat Email</dt>
-                        <dd class="mt-1 text-md text-gray-900">{{ $admin->email ?? '-' }}</dd>
-                    </div>
-                    <div class="sm:col-span-1">
-                        <dt class="text-sm font-medium text-gray-500">Terdaftar Sejak</dt>
-                        <dd class="mt-1 text-md text-gray-900">{{ $admin->created_at ? $admin->created_at->isoFormat('D MMMM YYYY, HH:mm') : '-' }}</dd>
-                    </div>
-                    @if($admin->email_verified_at)
-                    <div class="sm:col-span-2">
-                        <dt class="text-sm font-medium text-gray-500">Email Terverifikasi</dt>
-                        <dd class="mt-1 text-md text-green-600">Ya, pada {{ $admin->email_verified_at->isoFormat('D MMMM YYYY, HH:mm') }}</dd>
-                    </div>
-                    @else
-                    <div class="sm:col-span-2">
-                        <dt class="text-sm font-medium text-gray-500">Email Terverifikasi</dt>
-                        <dd class="mt-1 text-md text-red-600">Belum</dd>
-                    </div>
-                    @endif
-                </dl>
+                </div>
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-calendar-alt"></i>Bergabung Sejak</span>
+                    <span class="info-value">{{ Auth::user()->created_at ? Auth::user()->created_at->isoFormat('D MMMM YYYY') : '-' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label"><i class="fas fa-history"></i>Terakhir Diperbarui</span>
+                    <span class="info-value">{{ Auth::user()->updated_at ? Auth::user()->updated_at->diffForHumans() : '-' }}</span>
+                </div>
             </div>
 
-            <div class="mt-8 flex justify-end">
-                <a href="{{ route('admin.profile.edit') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md shadow-sm">
-                    Edit Profil
+            <div class="mt-10 flex justify-center">
+                <a href="{{ route('admin.profile.edit') }}" 
+                   class="action-button edit-button inline-flex items-center text-white shadow-lg">
+                    <i class="fas fa-pencil-alt mr-2"></i>Edit Profil
                 </a>
             </div>
         </div>
     </main>
-
-    @include('admin.template.footer')
 </body>
 </html>
