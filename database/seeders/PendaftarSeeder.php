@@ -42,7 +42,7 @@ class PendaftarSeeder extends Seeder
                     ],
                     [
                         'tanggal_daftar' => Carbon::now()->subDays(rand(1, 30))->toDateString(),
-                        'status_lamaran' => ['Pending', 'Ditinjau', 'Wawancara', 'Diterima', 'Ditolak'][array_rand(['Pending', 'Ditinjau', 'Wawancara', 'Diterima', 'Ditolak'])],
+                        'status_lamaran' => ['Ditinjau','Diterima', 'Ditolak'][array_rand(['Ditinjau','Diterima', 'Ditolak'])],
                         'surat_lamaran_path' => 'dokumen_pendaftar_dummies/surat_lamaran_contoh.pdf', // Path dummy
                         'cv_path' => 'dokumen_pendaftar_dummies/cv_contoh.pdf', // Path dummy
                         'catatan_pendaftar' => 'Saya sangat tertarik dengan posisi ini.',

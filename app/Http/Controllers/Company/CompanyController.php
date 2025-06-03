@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
-use App\Models\Company; // Pastikan model Company di-import
+use App\Models\Company;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -19,30 +19,119 @@ class CompanyController extends Controller
     public function dashboard()
     {
         $user = Auth::user();
-        $company = $user->company; // Mengambil data perusahaan terkait pengguna yang login
+        $company = $user->company;
 
         if (!$company) {
-            // Jika pengguna perusahaan tidak memiliki entitas perusahaan terkait,
-            // redirect atau tampilkan error.
-            // Ini seharusnya tidak terjadi jika data di-seed dengan benar.
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
         // Ambil statistik dasar untuk dasbor perusahaan
         $jumlahLowonganAktif = Lowongan::where('company_id', $company->id)
-                                ->where('status', 'Aktif') // Hanya lowongan dengan status 'Aktif'
+                                ->where('status', 'Aktif')
                                 ->count();
 
         $jumlahLowonganTidakAktif = Lowongan::where('company_id', $company->id)
-        ->where('status', 'Non-Aktif') // Hanya lowongan dengan status 'Non-Aktif'
+        ->where('status', 'Non-Aktif')
         ->count();
 
         $jumlahTotalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
-                                    $query->where('company_id', $company->id); // Pendaftar untuk lowongan milik perusahaan ini
+                                    $query->where('company_id', $company->id);
                                 })->count();
 
-        // Mengubah nama view yang dipanggil
         return view('perusahaan.dashboard', compact('company', 'jumlahLowonganAktif', 'jumlahTotalPendaftar', 'jumlahLowonganTidakAktif'));
+    }
+
+    /**
+     * Menampilkan profil detail perusahaan.
+     */
+    public function show()
+    {
+        $user = Auth::user();
+        $company = $user->company;
+
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+
+        return view('perusahaan.detail', compact('company'));
+    }
+
+    /**
+     * Menampilkan form edit profil perusahaan.
+     */
+    public function edit()
+    {
+        $user = Auth::user();
+        $company = $user->company;
+
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+
+        return view('perusahaan.edit', compact('company'));
+    }
+
+    /**
+     * Update profil perusahaan.
+     */
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+        $company = $user->company;
+
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'nama_perusahaan' => 'required|string|max:255',
+            'email_perusahaan' => 'required|email|max:255',
+            'telepon' => 'nullable|string|max:20',
+            'website' => 'nullable|url|max:255',
+            'alamat' => 'nullable|string',
+            'kota' => 'nullable|string|max:100',
+            'provinsi' => 'nullable|string|max:100',
+            'kode_pos' => 'nullable|string|max:10',
+            'deskripsi' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($company->logo_path && \Storage::disk('public')->exists($company->logo_path)) {
+                \Storage::disk('public')->delete($company->logo_path);
+            }
+            
+            $logoPath = $request->file('logo')->store('company_logos', 'public');
+            $company->logo_path = $logoPath;
+        }
+
+        // Update company data
+        $company->update([
+            'nama_perusahaan' => $request->nama_perusahaan,
+            'email_perusahaan' => $request->email_perusahaan,
+            'telepon' => $request->telepon,
+            'website' => $request->website,
+            'alamat' => $request->alamat,
+            'kota' => $request->kota,
+            'provinsi' => $request->provinsi,
+            'kode_pos' => $request->kode_pos,
+            'deskripsi' => $request->deskripsi,
+        ]);
+
+        if (isset($logoPath)) {
+            $company->logo_path = $logoPath;
+            $company->save();
+        }
+
+        return redirect()->route('perusahaan.profil')->with('success', 'Profil perusahaan berhasil diperbarui.');
     }
 
     /**
@@ -59,11 +148,8 @@ class CompanyController extends Controller
 
         $lowongans = Lowongan::where('company_id', $company->id)
                              ->latest()
-                             ->paginate(10); // Menggunakan paginasi
+                             ->paginate(10);
 
-        // Pastikan view ini juga konsisten jika Anda mengubah struktur folder
-        // Jika view lowongan ada di resources/views/perusahaan/lowongan.blade.php
-        // maka panggilannya menjadi view('perusahaan.lowongan', ...)
         return view('perusahaan.lowongan', compact('company', 'lowongans'));
     }
 
@@ -72,8 +158,6 @@ class CompanyController extends Controller
      */
     public function createLowongan()
     {
-        // Pastikan view ini juga konsisten
-        // Jika view tambah lowongan ada di resources/views/perusahaan/tambah_lowongan.blade.php
         return view('perusahaan.tambah_lowongan');
     }
 
@@ -157,13 +241,11 @@ class CompanyController extends Controller
         $pendaftars = $query->latest('tanggal_daftar')->paginate(10);
         $lowonganPerusahaan = Lowongan::where('company_id', $company->id)->orderBy('judul')->get();
 
-        // Pastikan view ini juga konsisten
-        // Jika view pendaftar ada di resources/views/perusahaan/pendaftar.blade.php
         return view('perusahaan.pendaftar', compact('company', 'pendaftars', 'lowonganPerusahaan'));
     }
 
     /**
-     * Memperbarui status pendaftar (Contoh).
+     * Memperbarui status pendaftar.
      */
     public function updateStatusPendaftar(Request $request, Pendaftar $pendaftar)
     {
@@ -187,6 +269,7 @@ class CompanyController extends Controller
 
         $pendaftar->status_lamaran = $request->status_lamaran;
         if ($request->filled('catatan_perusahaan')) {
+            // Uncomment if you have catatan_perusahaan field
             // $pendaftar->catatan_perusahaan = $request->catatan_perusahaan;
         }
         $pendaftar->save();

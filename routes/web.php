@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Company\PendaftarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\UserController; // Untuk manajemen user data
@@ -94,9 +95,24 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
+    // Dashboard
     Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
+    
+    // Profile Management
+    Route::get('/profil', [CompanyController::class, 'show'])->name('profil');
+    Route::get('/profil/edit', [CompanyController::class, 'edit'])->name('profil.edit');
+    Route::put('/profil', [CompanyController::class, 'update'])->name('profil.update');
+    
+    // Lowongan Management
     Route::get('/lowongan', [CompanyController::class, 'lowongan'])->name('lowongan');
     Route::get('/lowongan/tambah', [CompanyController::class, 'createLowongan'])->name('tambah_lowongan');
     Route::post('/lowongan', [CompanyController::class, 'storeLowongan'])->name('lowongan.store');
+    
+    // Pendaftar Management
     Route::get('/pendaftar', [CompanyController::class, 'pendaftar'])->name('pendaftar');
+    Route::get('/pendaftar/{pendaftar}', [PendaftarController::class, 'show'])->name('pendaftar.show');
+    Route::put('/pendaftar/{pendaftar}/status', [CompanyController::class, 'updateStatusPendaftar'])->name('pendaftar.update_status');
+    
+    // Activities
+    Route::get('/aktivitas_magang', [CompanyController::class, 'aktivitas_magang'])->name('aktivitas_magang');
 });
