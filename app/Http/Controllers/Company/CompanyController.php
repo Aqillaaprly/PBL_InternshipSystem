@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage; // This line was added to resolve the 'Undefined type Storage' error.
 use Illuminate\Support\Facades\Auth;
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
@@ -16,7 +17,7 @@ class CompanyController extends Controller
     /**
      * Menampilkan dasbor perusahaan.
      */
-    public function dashboard()
+    public function dashboard(Request $request) // Add Request $request to get search and filter params
     {
         $user = Auth::user();
         $company = $user->company;
@@ -34,11 +35,35 @@ class CompanyController extends Controller
         ->where('status', 'Non-Aktif')
         ->count();
 
-        $jumlahTotalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
-                                    $query->where('company_id', $company->id);
-                                })->count();
+        // Fetch pendaftar data with search and pagination for the table
+        $lowonganIds = Lowongan::where('company_id', $company->id)->pluck('id');
+        $queryPendaftars = Pendaftar::with(['user', 'lowongan.company']) // Eager load company for lowongan
+                                   ->whereIn('lowongan_id', $lowonganIds);
 
-        return view('perusahaan.dashboard', compact('company', 'jumlahLowonganAktif', 'jumlahTotalPendaftar', 'jumlahLowonganTidakAktif'));
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $queryPendaftars->where(function ($q) use ($searchTerm) {
+                $q->whereHas('user', function ($uq) use ($searchTerm) {
+                    $uq->where('name', 'like', "%{$searchTerm}%")
+                       ->orWhere('username', 'like', "%{$searchTerm}%");
+                })
+                ->orWhereHas('lowongan', function ($lq) use ($searchTerm) {
+                    $lq->where('judul', 'like', "%{$searchTerm}%");
+                });
+            });
+        }
+        $pendaftars = $queryPendaftars->latest('tanggal_daftar')->paginate(5)->withQueryString(); // Paginate and pass search query
+
+        // Total pendaftar (without pagination for the total count display)
+        $jumlahTotalPendaftar = Pendaftar::whereIn('lowongan_id', $lowonganIds)->count();
+
+        return view('perusahaan.dashboard', compact(
+            'company',
+            'jumlahLowonganAktif',
+            'jumlahTotalPendaftar',
+            'jumlahLowonganTidakAktif',
+            'pendaftars' // Pass the paginated pendaftar data to the view
+        ));
     }
 
     /**
@@ -105,8 +130,8 @@ class CompanyController extends Controller
         // Handle logo upload
         if ($request->hasFile('logo')) {
             // Delete old logo if exists
-            if ($company->logo_path && \Storage::disk('public')->exists($company->logo_path)) {
-                \Storage::disk('public')->delete($company->logo_path);
+            if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
+                Storage::disk('public')->delete($company->logo_path);
             }
             
             $logoPath = $request->file('logo')->store('company_logos', 'public');
@@ -222,7 +247,7 @@ class CompanyController extends Controller
         $lowonganIds = Lowongan::where('company_id', $company->id)->pluck('id');
 
         $query = Pendaftar::with(['user', 'lowongan'])
-                           ->whereIn('lowongan_id', $lowonganIds);
+                            ->whereIn('lowongan_id', $lowonganIds);
 
         if ($request->filled('search')) {
             $searchTerm = $request->search;

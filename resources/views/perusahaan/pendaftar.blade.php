@@ -76,14 +76,6 @@
                                             </svg>
                                             <span>Detail</span>
                                         </a>
-                                        
-                                        {{-- Uncomment these if you want to add edit and delete functionality later --}}
-                                        {{-- <a href="{{ route('perusahaan.pendaftar.edit', $pendaftar->id) }}" class="text-xs bg-yellow-100 text-yellow-600 hover:bg-yellow-200 px-3 py-1 rounded">Ubah</a> --}}
-                                        {{-- <form action="{{ route('perusahaan.pendaftar.destroy', $pendaftar->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pendaftar ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded">Hapus</button>
-                                        </form> --}}
                                     </div>
                                 </td>
                             </tr>
