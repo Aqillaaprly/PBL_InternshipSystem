@@ -24,7 +24,7 @@
             <!-- Center: Navigation Menu -->
             <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
                 <a href="{{ route('mahasiswa.perusahaan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('mahasiswa.perusahaan') ? 'border-blue-600 text-blue-600' : '' }}">Perusahaan</a>
-                <a href="{{ route('mahasiswa.absensi') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('mahasiswa.absensi') ? 'border-blue-600 text-blue-600' : '' }}">Absensi</a>
+                <a href="{{ route('mahasiswa.laporan') }}"class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition ">Pendaftaran</a>
                 <a href="{{ route('mahasiswa.laporan') }}"class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition ">Report</a>
             </nav>
 

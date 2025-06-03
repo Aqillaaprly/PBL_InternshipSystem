@@ -29,7 +29,7 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function lowongans()
+    public function lowongan()
     {
         return $this->hasMany(Lowongan::class);
     }

@@ -40,22 +40,26 @@
 
         <!-- Statistics Section -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-            {{-- Ganti href ke route yang sesuai --}}
-            {{-- Asumsi ada route bernama 'admin.companies.index' atau sesuaikan --}}
-            <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                <p class="text-2xl font-bold text-blue-600">{{ $jumlahPerusahaan ?? 0 }}</p>
-                <p class="text-sm text-gray-700 mt-1">Perusahaan</p>
-            </div>
-            {{-- Asumsi ada route bernama 'admin.vacancies.index' atau sesuaikan --}}
-            <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                <p class="text-2xl font-bold text-blue-600">{{ $jumlahLowongan ?? 0 }}</p>
-                <p class="text-sm text-gray-700 mt-1">Lowongan</p>
-            </div>
-            {{-- Asumsi ada route bernama 'admin.applicants.index' atau sesuaikan --}}
-            <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition">
-                <p class="text-2xl font-bold text-blue-600">{{ $jumlahPendaftar ?? 0 }}</p>
-                <p class="text-sm text-gray-700 mt-1">Pendaftar</p>
-            </div>
+            <a href="{{ route('mahasiswa.perusahaan') }}">
+                <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition cursor-pointer">
+                    <p class="text-2xl font-bold text-blue-600">{{ $jumlahPerusahaan ?? 0 }}</p>
+                    <p class="text-sm text-gray-700 mt-1">Perusahaan</p>
+                </div>
+            </a>
+
+            <a href="{{ route('mahasiswa.lowongan.index') }}">
+                <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition cursor-pointer">
+                    <p class="text-2xl font-bold text-blue-600">{{ $jumlahLowongan ?? 0 }}</p>
+                    <p class="text-sm text-gray-700 mt-1">Lowongan</p>
+                </div>
+            </a>
+
+            <a href="#" onclick="alert('Pendaftar route coming soon!')" class="block">
+                <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition cursor-pointer">
+                    <p class="text-2xl font-bold text-blue-600">{{ $jumlahPendaftar ?? 0 }}</p>
+                    <p class="text-sm text-gray-700 mt-1">Pendaftar</p>
+                </div>
+            </a>
         </div>
 
         <!-- Job Cards Section -->

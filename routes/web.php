@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Mahasiswa\MahasiswaController;
 use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileController;
+use App\Http\Controllers\Mahasiswa\LowonganController as MahasiswaLowonganController;
 use App\Models\Company;
 
 // Mengarahkan halaman utama ('/') ke halaman login
@@ -83,20 +84,24 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     // Job
     Route::get('/job', fn() => view('mahasiswa.job'))->name('job');
 
-    // ✅ Profile (Controller-based, label retained)
+    // ✅ Profile (Controller-based)
     Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
     // Perusahaan
     Route::get('/perusahaan', function () {
-        $companies = \App\Models\Company::with('lowongans')->get();
+        $companies = \App\Models\Company::with('lowongan')->get();
         return view('mahasiswa.perusahaan', compact('companies'));
     })->name('perusahaan');
 
     // Laporan
     Route::get('/laporan', fn() => view('mahasiswa.laporan'))->name('laporan');
+
+    // ✅ Lowongan (dengan resource controller)
+    Route::resource('lowongan', MahasiswaLowonganController::class);
 });
+
 
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)

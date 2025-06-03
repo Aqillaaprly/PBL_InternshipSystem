@@ -30,25 +30,25 @@ class AdminDashboardController extends Controller
 
 
         $companies = Company::whereHas('lowongan') // Hanya perusahaan yang punya lowongan
-            ->with('lowongan')     // Eager load lowongan agar efisien di view
-            ->latest()
+        ->with('lowongan')     // Eager load lowongan agar efisien di view
+        ->latest()
             ->take(3) // Mengambil 3 perusahaan
             ->get();
 
         $acceptedPendaftars = Pendaftar::where('status_lamaran', 'Diterima')
-                                    ->with(['user.detailMahasiswa', 'user.role']) 
-                                    ->get();
+            ->with(['user.detailMahasiswa', 'user.role'])
+            ->get();
 
         $statsProdiDiterima = [
             'Teknik Informatika' => 0,
             'Sistem Informasi Bisnis' => 0,
-            'Lainnya' => 0, 
+            'Lainnya' => 0,
         ];
 
-        if ($mahasiswaRole) { 
+        if ($mahasiswaRole) {
             foreach ($acceptedPendaftars as $pendaftar) {
-                if ($pendaftar->user && 
-                    $pendaftar->user->role_id == $mahasiswaRole->id && 
+                if ($pendaftar->user &&
+                    $pendaftar->user->role_id == $mahasiswaRole->id &&
                     $pendaftar->user->detailMahasiswa &&
                     !empty($pendaftar->user->detailMahasiswa->program_studi)
                 ) {
@@ -56,10 +56,10 @@ class AdminDashboardController extends Controller
                     if (array_key_exists($prodi, $statsProdiDiterima)) {
                         $statsProdiDiterima[$prodi]++;
                     } else {
-                        $statsProdiDiterima['Lainnya']++; 
+                        $statsProdiDiterima['Lainnya']++;
                     }
                 } elseif($pendaftar->user && $pendaftar->user->role_id == $mahasiswaRole->id) {
-                     $statsProdiDiterima['Lainnya']++;
+                    $statsProdiDiterima['Lainnya']++;
                 }
             }
         }
