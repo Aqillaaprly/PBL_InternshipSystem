@@ -26,11 +26,11 @@ class CompanyController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('nama_perusahaan', 'like', "%{$searchTerm}%")
-                  ->orWhere('email_perusahaan', 'like', "%{$searchTerm}%")
-                  ->orWhere('kota', 'like', "%{$searchTerm}%")
-                  ->orWhereHas('user', function($userQuery) use ($searchTerm) {
-                      $userQuery->where('username', 'like', "%{$searchTerm}%");
-                  });
+                    ->orWhere('email_perusahaan', 'like', "%{$searchTerm}%")
+                    ->orWhere('kota', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                        $userQuery->where('username', 'like', "%{$searchTerm}%");
+                    });
             });
         }
 
@@ -69,8 +69,8 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.perusahaan.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $logoPath = null;
@@ -78,16 +78,16 @@ class CompanyController extends Controller
             $logoPath = $request->file('logo_path')->store('logos', 'public');
         } else {
             return redirect()->route('admin.perusahaan.create')
-                             ->with('error', 'Logo perusahaan wajib diunggah dan valid.')
-                             ->withInput();
+                ->with('error', 'Logo perusahaan wajib diunggah dan valid.')
+                ->withInput();
         }
 
         $perusahaanRole = Role::where('name', 'perusahaan')->first();
         if (!$perusahaanRole) {
             Log::error("Role 'perusahaan' tidak ditemukan saat membuat perusahaan baru via admin.");
             return redirect()->route('admin.perusahaan.create')
-                             ->with('error', 'Kesalahan konfigurasi: Role perusahaan tidak ditemukan.')
-                             ->withInput();
+                ->with('error', 'Kesalahan konfigurasi: Role perusahaan tidak ditemukan.')
+                ->withInput();
         }
 
         $user = User::create([
@@ -108,22 +108,22 @@ class CompanyController extends Controller
     }
 
     // Menggunakan Route Model Binding (Company $company)
-   public function show($companyId) // Ubah parameter menjadi $companyId (bukan Company $company)
-{
-    Log::info("Attempting to find Company with ID: " . $companyId);
+    public function show($companyId) // Ubah parameter menjadi $companyId (bukan Company $company)
+    {
+        Log::info("Attempting to find Company with ID: " . $companyId);
 
-    // Coba ambil data secara manual menggunakan Eloquent
-    $company = Company::find($companyId); // Gunakan find() bukan findOrFail() untuk tes awal 
+        // Coba ambil data secara manual menggunakan Eloquent
+        $company = Company::find($companyId); // Gunakan find() bukan findOrFail() untuk tes awal 
 
-    if (!$company) {
-        // Jika tidak ditemukan, ini akan menghasilkan error 404 standar
-        // atau Anda bisa menangani secara custom jika dd() di atas menampilkan null
-        abort(404, "Perusahaan dengan ID {$companyId} tidak ditemukan via find().");
+        if (!$company) {
+            // Jika tidak ditemukan, ini akan menghasilkan error 404 standar
+            // atau Anda bisa menangani secara custom jika dd() di atas menampilkan null
+            abort(404, "Perusahaan dengan ID {$companyId} tidak ditemukan via find().");
+        }
+
+        $company->load('user');
+        return view('admin.Company.show', compact('company'));
     }
-
-    $company->load('user');
-    return view('admin.Company.show', compact('company'));
-}
 
     // Menggunakan Route Model Binding (Company $company)/ Ubah parameter menjadi $companyId
     /**
@@ -150,19 +150,17 @@ class CompanyController extends Controller
     /**
      * Memperbarui data perusahaan di database.
      */
-    public function update(Request $request, $companyId) // Menerima $companyId
+   public function update(Request $request, $companyId)
     {
-        $company = Company::findOrFail($companyId); // Mengambil company berdasarkan ID
-
+        $company = Company::findOrFail($companyId);
         $userIdToIgnore = $company->user ? $company->user->id : 0;
-        // $companyIdToIgnore variabel tidak lagi diperlukan karena kita menggunakan $company->id
 
         $rules = [
             'nama_perusahaan' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
             'email_perusahaan' => ['required', 'string', 'email', 'max:255', Rule::unique('companies', 'email_perusahaan')->ignore($company->id)],
             'website' => 'required|url|max:255',
             'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
-            'telepon' => ['nullable', 'string', 'max:20', Rule::unique('companies', 'telepon')->ignore($company->id)],
+            'telepon' => ['nullable', 'string', 'max:20', Rule::unique('companies', 'telepon')->ignore($company->id)->whereNull('deleted_at')],
             'logo_path' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'alamat' => 'nullable|string',
             'kota' => 'nullable|string|max:100',
@@ -201,17 +199,23 @@ class CompanyController extends Controller
             $companyData['logo_path'] = $request->file('logo_path')->store('logos', 'public');
         }
 
+        // Log::info('Data untuk update perusahaan (ID: '.$company->id.'): ', $companyData);
         $company->update($companyData);
+        // Log::info('Perusahaan setelah update (ID: '.$company->id.'): ', $company->fresh()->toArray());
+
 
         if ($company->user) {
-            $userDataToUpdate = ['name' => $request->nama_perusahaan];
+            $userDataToUpdate = ['name' => $request->nama_perusahaan]; // Selalu update nama user jika nama perusahaan berubah
             if ($request->filled('username')) $userDataToUpdate['username'] = $request->username;
             if ($request->filled('user_email_login')) $userDataToUpdate['email'] = $request->user_email_login;
             if ($request->filled('password')) $userDataToUpdate['password'] = Hash::make($request->password);
             
-            if(count($userDataToUpdate) > 1 || $request->filled('password')) {
+            if(count($userDataToUpdate) > 1 || $request->filled('password')) { // Cek jika ada data user lain yang diupdate selain name
                 $company->user->update($userDataToUpdate);
+            } else if ($company->user->name !== $request->nama_perusahaan){ // Jika hanya nama yang berubah
+                 $company->user->update(['name' => $request->nama_perusahaan]);
             }
+
         } elseif ($request->filled('new_username') && $request->filled('new_user_email') && $request->filled('new_password')) {
             $perusahaanRole = Role::where('name', 'perusahaan')->firstOrFail();
             $newUser = User::create([
@@ -223,7 +227,7 @@ class CompanyController extends Controller
                 'email_verified_at' => now(),
             ]);
             $company->user_id = $newUser->id;
-            $company->save();
+            $company->save(); // Simpan company setelah mengaitkan user_id baru
         }
 
         return redirect()->route('admin.perusahaan.index')->with('success', 'Data perusahaan berhasil diperbarui.');
