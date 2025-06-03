@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// ... other necessary imports ...
-use App\Models\User; // Used in the index method
+use App\Models\User;
 
-class MahasiswaBimbinganController extends Controller
+class LogBimbingan extends Controller
 {
     public function index(Request $request)
     {
@@ -23,13 +22,15 @@ class MahasiswaBimbinganController extends Controller
         $mahasiswas = $query->with('detailMahasiswa')->paginate(10);
 
         // This view needs to exist at: resources/views/dosen/data_mahasiswabim.blade.php
-        return view('dosen.data_mahasiswabim', compact('mahasiswas'));
+        return view('dosen.data_log', compact('mahasiswas'));
     }
 
     public function show($id)
     {
         $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
         // This view needs to exist at: resources/views/dosen/mahasiswa_bimbingan/show.blade.php
-        return view('dosen.showdataM', compact('mahasiswa'));
+        return view('dosen.showLog', compact('mahasiswa'));
     }
+
+   
 }

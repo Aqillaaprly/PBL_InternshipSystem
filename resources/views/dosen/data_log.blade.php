@@ -14,7 +14,7 @@
             <div class="flex justify-between items-center pb-4">
                 <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Mahasiswa</h1>
                 <div class="flex space-x-3">
-                    <form method="GET" action="{{ route('dosen.data_mahasiswabim') }}" class="flex">
+                    <form method="GET" action="{{ route('dosen.data_log') }}" class="flex">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </form>
                 </div>
@@ -57,7 +57,7 @@
                                 <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->kelas ?? '-' }}</td>
                                 <td class="px-5 py-4">
                                     <div class="flex item-center justify-center space-x-1">
-                                        <a href="{{ route('dosen.mahasiswa.show', $mahasiswa->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                        <a href="{{ route('dosen.data_log.show', $mahasiswa->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
                                             Show
                                         </a>
                                             @csrf

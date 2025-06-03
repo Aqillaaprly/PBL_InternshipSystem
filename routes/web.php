@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
 use App\Http\Controllers\Dosen\AbsensiMahasiswaController; //dosen
+use App\Http\Controllers\Dosen\LogBimbingan; //dosen
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -29,9 +30,16 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name
 Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['show']);
-  Route::resource('lowongan', AdminLowonganController::class);
-    Route::resource('pendaftar', AdminPendaftarController::class);
+    Route::resource('lowongan', AdminLowonganController::class);
+    Route::resource('pendaftar', AdminPendaftarController::class); // Ini mungkin sudah ada
 
+    // Route baru untuk menampilkan dokumen pendaftar spesifik dan form upload
+    Route::get('/pendaftar/{pendaftar}/dokumen', [AdminPendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
+    Route::post('/pendaftar/{pendaftar}/upload-dokumen-batch', [AdminPendaftarController::class, 'uploadDokumenBatch'])->name('pendaftar.uploadDokumenBatch');
+    Route::delete('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}', [AdminPendaftarController::class, 'destroyDokumen'])->name('pendaftar.dokumen.destroy');
+    Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [AdminPendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
+    Route::patch('/pendaftar/{pendaftar}/dokumen/update-all-status', [AdminPendaftarController::class, 'updateAllStatusDokumen'])->name('pendaftar.dokumen.updateAllStatus');
+    
     Route::get('/perusahaan', [AdminCompanyController::class, 'index'])->name('perusahaan.index');
     Route::get('/perusahaan/create', [AdminCompanyController::class, 'create'])->name('perusahaan.create');
     Route::post('/perusahaan', [AdminCompanyController::class, 'store'])->name('perusahaan.store');
@@ -67,7 +75,9 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     })->name('dashboard');
     // Route untuk melihat daftar mahasiswa bimbingan
     Route::get('/mahasiswa-bimbingan', [MahasiswaBimbinganController::class, 'index'])->name('data_mahasiswabim');
-    // Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
+    Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
+    Route::get('/log-bimbingan', [LogBimbingan::class, 'index'])->name('data_log');
+    Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
 });
 
 
