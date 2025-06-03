@@ -16,6 +16,7 @@ use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dash
 use App\Http\Controllers\Mahasiswa\MahasiswaController;
 use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileController;
 use App\Http\Controllers\Mahasiswa\LowonganController as MahasiswaLowonganController;
+use App\Http\Controllers\Mahasiswa\PendaftarController;
 use App\Models\Company;
 
 // Mengarahkan halaman utama ('/') ke halaman login
@@ -66,7 +67,11 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/dashboard', function () {
         return view('dosen.dashboard');
     })->name('dashboard');
-    // Tambahkan route dosen lainnya di sini
+    // Route untuk melihat daftar mahasiswa bimbingan
+    Route::get('/mahasiswa-bimbingan', [MahasiswaBimbinganController::class, 'index'])->name('data_mahasiswabim');
+    Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
+    Route::get('/log-bimbingan', [LogBimbingan::class, 'index'])->name('data_log');
+    Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
 });
 
 
@@ -100,6 +105,14 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 
     // ✅ Lowongan (dengan resource controller)
     Route::resource('lowongan', MahasiswaLowonganController::class);
+
+    // Pendaftar
+    Route::middleware(['auth', 'authorize:mahasiswa'])->group(function () {
+        Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])
+            ->name('pendaftar'); // <-- fixed name
+        Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])
+            ->name('pendaftar.submit');
+    });
 });
 
 
