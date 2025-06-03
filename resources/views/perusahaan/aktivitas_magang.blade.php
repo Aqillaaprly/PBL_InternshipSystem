@@ -14,7 +14,7 @@
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-semibold text-blue-800">Manajemen Pendaftar Magang</h1>
                 <div class="flex space-x-3">
-                    <form method="GET" action="{{ route('perusahaan.pendaftar') }}" class="flex space-x-2">
+                    <form method="GET" action="{{ route('perusahaan.aktivitas_magang') }}" class="flex space-x-2">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari..." class="border border-gray-300 rounded px-4 py-2 text-sm">
                         <button type="submit" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded text-sm">Cari</button>
                     </form>

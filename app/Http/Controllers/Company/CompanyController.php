@@ -7,33 +7,42 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
-use App\Models\Company;
-use App\Models\KualifikasiLowongan;
+use App\Models\Company; // Pastikan model Company di-import
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 class CompanyController extends Controller
 {
+    /**
+     * Menampilkan dasbor perusahaan.
+     */
     public function dashboard()
     {
         $user = Auth::user();
-        $company = $user->company;
+        $company = $user->company; // Mengambil data perusahaan terkait pengguna yang login
 
         if (!$company) {
+            // Jika pengguna perusahaan tidak memiliki entitas perusahaan terkait,
+            // redirect atau tampilkan error.
+            // Ini seharusnya tidak terjadi jika data di-seed dengan benar.
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
+        // Ambil statistik dasar untuk dasbor perusahaan
         $jumlahLowonganAktif = Lowongan::where('company_id', $company->id)
-            ->where('status', 'Aktif')
-            ->count();
+                               ->where('status', 'Aktif') // Hanya lowongan dengan status 'Aktif'
+                               ->count();
+$jumlahTotalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
+                                    $query->where('company_id', $company->id); // Pendaftar untuk lowongan milik perusahaan ini
+                                })->count();
 
-        $jumlahTotalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
-            $query->where('company_id', $company->id);
-        })->count();
-
+        // Mengubah nama view yang dipanggil
         return view('perusahaan.dashboard', compact('company', 'jumlahLowonganAktif', 'jumlahTotalPendaftar'));
     }
 
+    /**
+     * Menampilkan daftar lowongan milik perusahaan.
+     */
     public function lowongan()
     {
         $user = Auth::user();
@@ -44,17 +53,28 @@ class CompanyController extends Controller
         }
 
         $lowongans = Lowongan::where('company_id', $company->id)
-            ->latest()
-            ->paginate(10);
+                             ->latest()
+                             ->paginate(10); // Menggunakan paginasi
 
+        // Pastikan view ini juga konsisten jika Anda mengubah struktur folder
+        // Jika view lowongan ada di resources/views/perusahaan/lowongan.blade.php
+        // maka panggilannya menjadi view('perusahaan.lowongan', ...)
         return view('perusahaan.lowongan', compact('company', 'lowongans'));
     }
 
+    /**
+     * Menampilkan form untuk menambah lowongan baru.
+     */
     public function createLowongan()
     {
+        // Pastikan view ini juga konsisten
+        // Jika view tambah lowongan ada di resources/views/perusahaan/tambah_lowongan.blade.php
         return view('perusahaan.tambah_lowongan');
     }
 
+    /**
+     * Menyimpan lowongan baru yang dibuat oleh perusahaan.
+     */
     public function storeLowongan(Request $request)
     {
         $user = Auth::user();
@@ -77,14 +97,15 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('perusahaan.tambah_lowongan')
-                ->withErrors($validator)
-                ->withInput();
+                        ->withErrors($validator)
+                        ->withInput();
         }
 
-        $lowongan = Lowongan::create([
+        Lowongan::create([
             'company_id' => $company->id,
             'judul' => $request->judul,
             'deskripsi' => $request->deskripsi,
+            'kualifikasi' => $request->kualifikasi,
             'tipe' => $request->tipe,
             'lokasi' => $request->lokasi,
             'gaji_min' => $request->gaji_min,
@@ -94,20 +115,12 @@ class CompanyController extends Controller
             'status' => 'Aktif',
         ]);
 
-        // Simpan kualifikasi satu per satu
-        $kualifikasis = preg_split('/\r\n|\r|\n/', $request->kualifikasi);
-        foreach ($kualifikasis as $kualifikasi) {
-            if (trim($kualifikasi) !== '') {
-                KualifikasiLowongan::create([
-                    'lowongan_id' => $lowongan->id,
-                    'keterangan' => $kualifikasi,
-                ]);
-            }
-        }
-
         return redirect()->route('perusahaan.lowongan')->with('success', 'Lowongan berhasil ditambahkan.');
     }
 
+    /**
+     * Menampilkan daftar pendaftar untuk lowongan perusahaan.
+     */
     public function pendaftar(Request $request)
     {
         $user = Auth::user();
@@ -120,17 +133,15 @@ class CompanyController extends Controller
         $lowonganIds = Lowongan::where('company_id', $company->id)->pluck('id');
 
         $query = Pendaftar::with(['user', 'lowongan'])
-            ->whereIn('lowongan_id', $lowonganIds);
+                           ->whereIn('lowongan_id', $lowonganIds);
 
         if ($request->filled('search')) {
             $searchTerm = $request->search;
-            $query->where(function ($q) use ($searchTerm) {
-                $q->whereHas('user', function ($subQ) use ($searchTerm) {
-                    $subQ->where('name', 'like', "%{$searchTerm}%")
-                        ->orWhere('username', 'like', "%{$searchTerm}%");
-                })->orWhereHas('lowongan', function ($subQ) use ($searchTerm) {
-                    $subQ->where('judul', 'like', "%{$searchTerm}%");
-                });
+            $query->whereHas('user', function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('username', 'like', "%{$searchTerm}%");
+            })->orWhereHas('lowongan', function ($q) use ($searchTerm) {
+                $q->where('judul', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -141,9 +152,14 @@ class CompanyController extends Controller
         $pendaftars = $query->latest('tanggal_daftar')->paginate(10);
         $lowonganPerusahaan = Lowongan::where('company_id', $company->id)->orderBy('judul')->get();
 
+        // Pastikan view ini juga konsisten
+        // Jika view pendaftar ada di resources/views/perusahaan/pendaftar.blade.php
         return view('perusahaan.pendaftar', compact('company', 'pendaftars', 'lowonganPerusahaan'));
     }
 
+    /**
+     * Memperbarui status pendaftar (Contoh).
+     */
     public function updateStatusPendaftar(Request $request, Pendaftar $pendaftar)
     {
         $user = Auth::user();
@@ -160,13 +176,14 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
+                        ->withErrors($validator)
+                        ->withInput();
         }
 
         $pendaftar->status_lamaran = $request->status_lamaran;
-        // Uncomment this line when you want to store the note
-        // $pendaftar->catatan_perusahaan = $request->catatan_perusahaan;
+        if ($request->filled('catatan_perusahaan')) {
+            // $pendaftar->catatan_perusahaan = $request->catatan_perusahaan;
+        }
         $pendaftar->save();
 
         return redirect()->route('perusahaan.pendaftar')->with('success', 'Status pendaftar berhasil diperbarui.');

@@ -21,7 +21,7 @@
             </div>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full text-sm text-left">
+            <table class="min-w-full text-sm text-center">
                 <thead class="bg-gray-100">
                 <tr>
                     <th class="px-5 py-3">No</th>
@@ -43,16 +43,18 @@
                         <td class="px-5 py-3">{{ $lowongan->tipe }}</td>
                         <td class="px-5 py-3">{{ $lowongan->lokasi }}</td>
                         <td class="px-5 py-3">{{ \Carbon\Carbon::parse($lowongan->tanggal_tutup)->format('d M Y') }}</td>
-                        <td class="px-5 py-3">
-                            <span class="text-xs font-medium px-2 py-1 rounded-full
-                                @if($lowongan->status == 'Aktif') bg-green-100 text-green-600 @else bg-red-100 text-red-500 @endif">
+                        <td class="px-5 py-3 text-center align-middle">
+                            <span class="text-xs font-medium w-20 block mx-auto py-2 px-2 py-1 rounded-full
+                                @if($lowongan->status == 'Aktif') bg-green-100 text-green-600
+                                @elseif($lowongan->status == 'Non-Aktif') bg-red-100 text-red-700 
+                                @else bg-gray-100 text-gray-600 @endif">
                                 {{ $lowongan->status }}
                             </span>
                         </td>
+
                        <td class="px-5 py-3">
                          <div class="flex space-x-1">
-                            <a href="route('perusahaan.lowongan.show')" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
-                            <a href="route('perusahaan.lowongan.edit')" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
+                            <a href="route('perusahaan.show')" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
                             <form action="route('perusahaan.lowongan.destroy')" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
                                 @csrf
                                 @method('DELETE')

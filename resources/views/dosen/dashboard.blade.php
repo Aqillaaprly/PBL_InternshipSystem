@@ -16,7 +16,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Perusahaan - SIMMAGANG</title>
+    <title>Dashboard Pembimbing - STRIDEUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -49,17 +49,13 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            <div class="grid grid-cols-1 lg:grid-cols-1">
                 <div class="bg-white p-6 rounded-xl shadow hover:bg-blue-50 transition">
                     <h2 class="font-semibold text-gray-700 mb-4">Statistik Program Studi</h2>
                     {{-- Konten statistik prodi --}}
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow hover:bg-blue-50 transition">
-                    <h2 class="font-semibold text-gray-700 mb-4">Laporan Mahasiwa Terakhir</h2>
-                    {{-- Konten pengguna aktif --}}
-                </div>
             </div>
-            @include('dosen.Job')
+        @include('dosen.Job')
 
 {{--Tabel mahasiswa bimbingan--}}
       <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
@@ -118,6 +114,7 @@
                     </table>
                 </div>
             </div>
-        </body>
+        </main>
         @include('dosen.template.footer')
+        </body>
 </html>
