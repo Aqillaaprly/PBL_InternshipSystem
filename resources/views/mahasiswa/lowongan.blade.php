@@ -16,7 +16,6 @@
             <div class="flex space-x-3">
                 <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
                 <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
-                <a href="{{ route('mahasiswa.lowongan.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -50,13 +49,7 @@
                     </td>
                     <td class="px-5 py-3">
                         <div class="flex space-x-1">
-                            <a href="{{ route('mahasiswa.lowongan.show', $lowongan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
-                            <a href="{{ route('mahasiswa.lowongan.edit', $lowongan->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
-                            <form action="{{ route('mahasiswa.lowongan.destroy', $lowongan->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">Delete</button>
-                            </form>
+                            <a href="{{ route('mahasiswa.lowongan.show', $lowongan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Apply</a>
                         </div>
                     </td>
                 </tr>
