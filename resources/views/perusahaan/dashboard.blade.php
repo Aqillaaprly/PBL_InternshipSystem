@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
-    {{-- Pastikan path include navbar ini benar --}}
+    
     @include('perusahaan.template.navbar') 
 
     <main class="flex flex-col min-h-screen">
-        <div class="p-6 max-w-7xl mx-auto w-full mt-16"> {{-- Tambahkan margin top jika navbar fixed --}}
+        <div class="p-6 max-w-7xl mx-auto w-full mt-16"> 
             <div class="w-full mb-6">
                 <img src="https://www.pixelstalk.net/wp-content/uploads/2016/05/Images-New-York-City-Backgrounds.jpg"
                      alt="Header"
@@ -19,7 +19,7 @@
             </div>
 
             <div class="text-center mb-10">
-                <h1 class="text-3xl font-bold text-blue-900">Selamat Datang, {{ Auth::user()->company->nama_perusahaan ?? Auth::user()->username ?? 'Perusahaan' }}!</h1>
+                <h1 class="text-3xl font-bold text-blue-900">Selamat Datang, {{ $company->nama_perusahaan ?? Auth::user()->username ?? 'Perusahaan' }}!</h1>
                 <p class="text-sm text-gray-600">Dashboard Sistem Informasi Manajemen Magang Mahasiswa</p>
             </div>
 
@@ -36,10 +36,10 @@
                 </div>
             </div>
 
-            {{-- Tabel Pendaftar Magang (sebelumnya di pendaftar_table.blade.php) --}}
-            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6  border border-gray-200">
+            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6  border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang</h2>
+                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Terbaru</h2> {{-- Updated title --}}
+                    <a href="{{ route('perusahaan.pendaftar.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Pendaftar</a>
                 </div>
 
                 @if (session('success')) <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-md relative mb-4" role="alert"><span class="block sm:inline">{{ session('success') }}</span></div> @endif
@@ -59,9 +59,9 @@
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 divide-y divide-gray-200">
-                            @forelse ($pendaftars as $index => $pendaftar)
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-5 py-3 text-center align-middle">{{ $pendaftars->firstItem() + $index }}</td>
+                            @forelse ($recentPendaftars as $index => $pendaftar)
+                                <tr class="hover:bg-gray-50">   
+                                    <td class="px-5 py-3 text-center align-middle">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3 align-middle font-medium text-gray-900">{{ $pendaftar->user->name ?? ($pendaftar->user->username ?? 'N/A') }}</td>
                                     <td class="px-5 py-3 align-middle">{{ $pendaftar->lowongan->judul ?? 'N/A' }}</td>
                                     <td class="px-5 py-3 align-middle">{{ $pendaftar->lowongan->company->nama_perusahaan ?? 'N/A' }}</td>
@@ -81,17 +81,16 @@
                                         <div class="flex item-center justify-center space-x-1 sm:space-x-2">
                                             <a href="{{ route('perusahaan.pendaftar.show', $pendaftar->id) }}"
                                                class="text-xs bg-sky-100 text-sky-600 hover:bg-sky-200 px-3 py-1.5 rounded-md font-medium">Detail</a>
-                                            {{-- Add edit/delete buttons if needed --}}
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="7" class="px-5 py-4 text-center text-gray-500">
-                                        @if(request('search'))
+                                         @if(request('search'))
                                             Tidak ada pendaftar ditemukan untuk pencarian "{{ request('search') }}".
                                         @else
-                                            Belum ada data pendaftar.
+                                            Belum ada data pendaftar terbaru untuk perusahaan Anda.
                                         @endif
                                     </td>
                                 </tr>
@@ -102,7 +101,6 @@
             </div>
         </div>
     </main>
-    {{-- Pastikan path include footer ini benar --}}
     @include('perusahaan.template.footer') 
 </body>
 </html>

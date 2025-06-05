@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Company\PendaftarController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\UserController; // Untuk manajemen user data
+
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController; // Di-alias sebagai AdminCompanyController
 use App\Http\Controllers\Admin\LowonganController as AdminLowonganController;
@@ -14,7 +14,11 @@ use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Admin\MahasiswaAktivitasAbsensiController;
+
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
+use App\Http\Controllers\Company\PendaftarController;
+use App\Http\Controllers\Company\DashboardController;
+
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
 use App\Http\Controllers\Dosen\AbsensiMahasiswaController; //dosen
 use App\Http\Controllers\Dosen\LogBimbingan; //dosen
@@ -101,7 +105,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
-    Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
+     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile Management
     Route::get('/profil', [CompanyController::class, 'show'])->name('profil');

@@ -16,6 +16,9 @@ use Illuminate\Validation\Rule;
 class PendaftarController extends Controller
 {
     private $dokumenWajibNames = [
+        'Surat Lamaran',
+        'CV',
+        'Portofolio',
         'Daftar Riwayat Hidup',
         'KHS atau Transkrip Nilai',
         'KTP',
