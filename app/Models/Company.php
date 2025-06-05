@@ -33,8 +33,8 @@ class Company extends Model
     /**
      * Get the vacancies offered by the company.
      */
-    public function lowongan() // Menggunakan nama method 'lowongan' agar konsisten
+    public function lowongan() // Perubahan nama relasi menjadi plural
     {
-        return $this->hasMany(Lowongan::class); // Pastikan Lowongan model sudah ada dan benar
+         return $this->hasMany(Lowongan::class);
     }
 }

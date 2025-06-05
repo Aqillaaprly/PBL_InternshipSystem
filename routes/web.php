@@ -32,7 +32,8 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('lowongan', AdminLowonganController::class);
-    Route::resource('pendaftar', AdminPendaftarController::class); Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
+    Route::resource('pendaftar', AdminPendaftarController::class);
+    Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
@@ -42,18 +43,9 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::delete('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}', [AdminPendaftarController::class, 'destroyDokumen'])->name('pendaftar.dokumen.destroy');
     Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [AdminPendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
     Route::patch('/pendaftar/{pendaftar}/dokumen/update-all-status', [AdminPendaftarController::class, 'updateAllStatusDokumen'])->name('pendaftar.dokumen.updateAllStatus');
-    
-    // Manajemen Perusahaan
-     Route::resource('perusahaan', AdminCompanyController::class)->parameters(['perusahaan' => 'company']);
 
-     // Manajemen Lowongan (oleh Admin)
-    Route::get('/lowongan', [AdminLowonganController::class, 'index'])->name('admin.lowongan.index');
-    Route::get('/lowongan/create', [AdminLowonganController::class, 'create'])->name('admin.lowongan.create');
-    Route::post('/lowongan', [AdminLowonganController::class, 'store'])->name('admin.lowongan.store');
-    Route::get('/lowongan/{lowongan}/edit', [AdminLowonganController::class, 'edit'])->name('admin.lowongan.edit');
-    Route::put('/lowongan/{lowongan}', [AdminLowonganController::class, 'update'])->name('admin.lowongan.update');
-    Route::delete('/lowongan/{lowongan}', [AdminLowonganController::class, 'destroy'])->name('admin.lowongan.destroy');
-    Route::get('/lowongan/{lowongan}/show', [AdminLowonganController::class, 'show'])->name('admin.lowongan.show');
+    // Manajemen Perusahaan
+    Route::resource('perusahaan', AdminCompanyController::class)->parameters(['perusahaan' => 'company']);
 
     //Manejemen Data Mahasiswa
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
@@ -64,13 +56,12 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::put('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'update'])->name('mahasiswa.update');
     Route::delete('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'destroy'])->name('mahasiswa.destroy');
 
-   // Manajemen Penugasan Pembimbing (oleh Admin)
-   Route::resource('pembimbings', AdminPembimbingController::class);
+    // Manajemen Penugasan Pembimbing (oleh Admin)
+    Route::resource('pembimbings', AdminPembimbingController::class);
 
     // Aktivitas & Absensi Mahasiswa (Admin View Only)
-    Route::get('/aktivitas-absensi', [MahasiswaAktivitasAbsensiController::class, 'index'])->name('admin.aktivitas-absensi.index');
-    Route::get('/aktivitas-absensi/{aktivitas}', [MahasiswaAktivitasAbsensiController::class, 'show'])->name('admin.aktivitas-absensi.show'); // Opsional: halaman detail aktivitas
-
+    Route::get('/aktivitas-absensi', [MahasiswaAktivitasAbsensiController::class, 'index'])->name('aktivitas-absensi.index');
+    Route::get('/aktivitas-absensi/{aktivitas}', [MahasiswaAktivitasAbsensiController::class, 'show'])->name('aktivitas-absensi.show');
 });
 
 // DOSEN GROUP
@@ -110,24 +101,24 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
-    // Dashboard
     Route::get('/dashboard', [CompanyController::class, 'dashboard'])->name('dashboard');
-    
+
     // Profile Management
     Route::get('/profil', [CompanyController::class, 'show'])->name('profil');
     Route::get('/profil/edit', [CompanyController::class, 'edit'])->name('profil.edit');
     Route::put('/profil', [CompanyController::class, 'update'])->name('profil.update');
-    
+
     // Lowongan Management
     Route::get('/lowongan', [CompanyController::class, 'lowongan'])->name('lowongan');
     Route::get('/lowongan/tambah', [CompanyController::class, 'createLowongan'])->name('tambah_lowongan');
     Route::post('/lowongan', [CompanyController::class, 'storeLowongan'])->name('lowongan.store');
-    
+
     // Pendaftar Management
-    Route::get('/pendaftar', [CompanyController::class, 'pendaftar'])->name('pendaftar');
+    Route::get('/pendaftar', [PendaftarController::class, 'index'])->name('pendaftar.index');
+    Route::get('/pendaftar/dokumen/{dokumen}', [PendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
+    Route::post('/pendaftar/{pendaftar}/update-status', [PendaftarController::class, 'updateStatus'])->name('pendaftar.updateStatus');
     Route::get('/pendaftar/{pendaftar}', [PendaftarController::class, 'show'])->name('pendaftar.show');
-    Route::put('/pendaftar/{pendaftar}/status', [CompanyController::class, 'updateStatusPendaftar'])->name('pendaftar.update_status');
-    
+
     // Activities
     Route::get('/aktivitas_magang', [CompanyController::class, 'aktivitas_magang'])->name('aktivitas_magang');
 });

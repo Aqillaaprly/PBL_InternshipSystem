@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage; // This line was added to resolve the 'Undefined type Storage' error.
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
-use App\Models\Company;
+use App\Models\Company; // Pastikan ini di-import
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
@@ -17,7 +17,7 @@ class CompanyController extends Controller
     /**
      * Menampilkan dasbor perusahaan.
      */
-    public function dashboard(Request $request) // Add Request $request to get search and filter params
+    public function dashboard(Request $request)
     {
         $user = Auth::user();
         $company = $user->company;
@@ -32,44 +32,55 @@ class CompanyController extends Controller
                                 ->count();
 
         $jumlahLowonganTidakAktif = Lowongan::where('company_id', $company->id)
-        ->where('status', 'Non-Aktif')
-        ->count();
+                                ->where('status', 'Non-Aktif')
+                                ->count();
 
-        // Fetch pendaftar data with search and pagination for the table
-        $lowonganIds = Lowongan::where('company_id', $company->id)->pluck('id');
-        $queryPendaftars = Pendaftar::with(['user', 'lowongan.company']) // Eager load company for lowongan
-                                   ->whereIn('lowongan_id', $lowonganIds);
+        // Mengakses relasi lowongans (plural) dari Company model.
+        // Ini akan mengembalikan Koleksi (bahkan jika kosong), jadi pluck() tidak akan pada null.
+        $lowonganIds = $company->lowongans->pluck('id')->toArray();
 
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $queryPendaftars->where(function ($q) use ($searchTerm) {
-                $q->whereHas('user', function ($uq) use ($searchTerm) {
-                    $uq->where('name', 'like', "%{$searchTerm}%")
-                       ->orWhere('username', 'like', "%{$searchTerm}%");
-                })
-                ->orWhereHas('lowongan', function ($lq) use ($searchTerm) {
-                    $lq->where('judul', 'like', "%{$searchTerm}%");
+        // Jika tidak ada lowongan yang ditemukan untuk perusahaan ini,
+        // maka tidak akan ada pendaftar yang diambil.
+        if (empty($lowonganIds)) {
+            $pendaftars = Pendaftar::whereRaw('1 = 0')->paginate(5);
+            $jumlahTotalPendaftar = 0;
+        } else {
+            $queryPendaftars = Pendaftar::with(['mahasiswa.user', 'lowongan.company']) // Eager load company for lowongan
+                                       ->whereIn('lowongan_id', $lowonganIds);
+
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $queryPendaftars->where(function ($q) use ($searchTerm) {
+                    $q->whereHas('mahasiswa.user', function ($uq) use ($searchTerm) {
+                        $uq->where('name', 'like', "%{$searchTerm}%")
+                           ->orWhere('username', 'like', "%{$searchTerm}%");
+                    })
+                    ->orWhereHas('lowongan', function ($lq) use ($searchTerm) {
+                        $lq->where('judul', 'like', "%{$searchTerm}%");
+                    });
                 });
-            });
-        }
-        $pendaftars = $queryPendaftars->latest('tanggal_daftar')->paginate(5)->withQueryString(); // Paginate and pass search query
+            }
+            $pendaftars = $queryPendaftars->latest('tanggal_daftar')->paginate(5)->withQueryString();
 
-        // Total pendaftar (without pagination for the total count display)
-        $jumlahTotalPendaftar = Pendaftar::whereIn('lowongan_id', $lowonganIds)->count();
+            $jumlahTotalPendaftar = Pendaftar::whereIn('lowongan_id', $lowonganIds)->count();
+        }
+
+        $pendaftarBulanIni = Pendaftar::whereIn('lowongan_id', $lowonganIds)
+                                    ->whereMonth('tanggal_daftar', now()->month)
+                                    ->whereYear('tanggal_daftar', now()->year)
+                                    ->count();
 
         return view('perusahaan.dashboard', compact(
             'company',
             'jumlahLowonganAktif',
             'jumlahTotalPendaftar',
             'jumlahLowonganTidakAktif',
-            'pendaftars' // Pass the paginated pendaftar data to the view
+            'pendaftars'
         ));
     }
 
-    /**
-     * Menampilkan profil detail perusahaan.
-     */
-    public function show()
+    // Metode untuk menampilkan daftar lowongan perusahaan
+    public function lowongan(Request $request)
     {
         $user = Auth::user();
         $company = $user->company;
@@ -78,227 +89,126 @@ class CompanyController extends Controller
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
-        return view('perusahaan.detail', compact('company'));
-    }
+        $query = Lowongan::where('company_id', $company->id);
 
-    /**
-     * Menampilkan form edit profil perusahaan.
-     */
-    public function edit()
-    {
-        $user = Auth::user();
-        $company = $user->company;
-
-        if (!$company) {
-            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where('judul', 'like', "%{$searchTerm}%")
+                  ->orWhere('deskripsi', 'like', "%{$searchTerm}%");
         }
 
-        return view('perusahaan.edit', compact('company'));
-    }
-
-    /**
-     * Update profil perusahaan.
-     */
-    public function update(Request $request)
-    {
-        $user = Auth::user();
-        $company = $user->company;
-
-        if (!$company) {
-            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
-        }
-
-        $validator = Validator::make($request->all(), [
-            'nama_perusahaan' => 'required|string|max:255',
-            'email_perusahaan' => 'required|email|max:255',
-            'telepon' => 'nullable|string|max:20',
-            'website' => 'nullable|url|max:255',
-            'alamat' => 'nullable|string',
-            'kota' => 'nullable|string|max:100',
-            'provinsi' => 'nullable|string|max:100',
-            'kode_pos' => 'nullable|string|max:10',
-            'deskripsi' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput();
-        }
-
-        // Handle logo upload
-        if ($request->hasFile('logo')) {
-            // Delete old logo if exists
-            if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
-                Storage::disk('public')->delete($company->logo_path);
-            }
-            
-            $logoPath = $request->file('logo')->store('company_logos', 'public');
-            $company->logo_path = $logoPath;
-        }
-
-        // Update company data
-        $company->update([
-            'nama_perusahaan' => $request->nama_perusahaan,
-            'email_perusahaan' => $request->email_perusahaan,
-            'telepon' => $request->telepon,
-            'website' => $request->website,
-            'alamat' => $request->alamat,
-            'kota' => $request->kota,
-            'provinsi' => $request->provinsi,
-            'kode_pos' => $request->kode_pos,
-            'deskripsi' => $request->deskripsi,
-        ]);
-
-        if (isset($logoPath)) {
-            $company->logo_path = $logoPath;
-            $company->save();
-        }
-
-        return redirect()->route('perusahaan.profil')->with('success', 'Profil perusahaan berhasil diperbarui.');
-    }
-
-    /**
-     * Menampilkan daftar lowongan milik perusahaan.
-     */
-    public function lowongan()
-    {
-        $user = Auth::user();
-        $company = $user->company;
-
-        if (!$company) {
-            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
-        }
-
-        $lowongans = Lowongan::where('company_id', $company->id)
-                             ->latest()
-                             ->paginate(10);
+        $lowongans = $query->latest()->paginate(10); // Menggunakan relasi lowongans (plural)
 
         return view('perusahaan.lowongan', compact('company', 'lowongans'));
     }
 
-    /**
-     * Menampilkan form untuk menambah lowongan baru.
-     */
-    public function createLowongan()
+    // Metode lain dalam CompanyController...
+    public function show()
     {
-        return view('perusahaan.tambah_lowongan');
+        $user = Auth::user();
+        $company = $user->company; // Assuming company is retrieved here too
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+        return view('perusahaan.profil', compact('company')); // Adjust view name if needed
     }
 
-    /**
-     * Menyimpan lowongan baru yang dibuat oleh perusahaan.
-     */
+    public function edit()
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+        return view('perusahaan.edit_profil', compact('company')); // Adjust view name if needed
+    }
+
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+
+        $validatedData = $request->validate([
+            'nama_perusahaan' => 'required|string|max:255',
+            'alamat' => 'nullable|string|max:255',
+            'nomor_telepon' => 'nullable|string|max:20',
+            'email_perusahaan' => 'nullable|email|max:255',
+            'deskripsi' => 'nullable|string',
+            'industri' => 'nullable|string|max:255',
+            'website' => 'nullable|url|max:255',
+            'logo_perusahaan' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        if ($request->hasFile('logo_perusahaan')) {
+            // Delete old logo if exists
+            if ($company->logo_perusahaan && Storage::disk('public')->exists($company->logo_perusahaan)) {
+                Storage::disk('public')->delete($company->logo_perusahaan);
+            }
+            $validatedData['logo_perusahaan'] = $request->file('logo_perusahaan')->store('logos', 'public');
+        }
+
+        $company->update($validatedData);
+
+        return redirect()->route('perusahaan.profil')->with('success', 'Profil perusahaan berhasil diperbarui.'); // Adjust route name if needed
+    }
+
+    public function createLowongan()
+    {
+        $user = Auth::user();
+        $company = $user->company;
+        if (!$company) {
+            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+        return view('perusahaan.tambah_lowongan', compact('company')); // Adjust view name if needed
+    }
+
     public function storeLowongan(Request $request)
     {
         $user = Auth::user();
         $company = $user->company;
-
         if (!$company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
-        $validator = Validator::make($request->all(), [
+        $validatedData = $request->validate([
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'kualifikasi' => 'required|string',
-            'tipe' => 'required|in:Penuh Waktu,Paruh Waktu,Kontrak,Internship',
-            'lokasi' => 'required|string|max:255',
-            'gaji_min' => 'nullable|numeric|min:0',
-            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
+            'persyaratan' => 'nullable|string',
+            'lokasi' => 'nullable|string|max:255',
+            'tipe_pekerjaan' => 'required|string|in:Full-time,Part-time,Magang,Kontrak',
+            'gaji_min' => 'nullable|numeric',
+            'gaji_max' => 'nullable|numeric',
             'tanggal_tutup' => 'required|date|after_or_equal:today',
+            'status' => 'required|string|in:Aktif,Non-Aktif',
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->route('perusahaan.tambah_lowongan')
-                        ->withErrors($validator)
-                        ->withInput();
-        }
-
-        Lowongan::create([
-            'company_id' => $company->id,
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
-            'kualifikasi' => $request->kualifikasi,
-            'tipe' => $request->tipe,
-            'lokasi' => $request->lokasi,
-            'gaji_min' => $request->gaji_min,
-            'gaji_max' => $request->gaji_max,
-            'tanggal_buka' => Carbon::now()->toDateString(),
-            'tanggal_tutup' => $request->tanggal_tutup,
-            'status' => 'Aktif',
-        ]);
+        $company->lowongans()->create($validatedData); // Create lowongan associated with the company
 
         return redirect()->route('perusahaan.lowongan')->with('success', 'Lowongan berhasil ditambahkan.');
     }
 
-    /**
-     * Menampilkan daftar pendaftar untuk lowongan perusahaan.
-     */
-    public function pendaftar(Request $request)
+    public function aktivitas_magang()
     {
         $user = Auth::user();
         $company = $user->company;
-
         if (!$company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
-        $lowonganIds = Lowongan::where('company_id', $company->id)->pluck('id');
+        // Ambil lowongan IDs yang dimiliki oleh perusahaan ini
+        $lowonganIds = $company->lowongans->pluck('id');
 
-        $query = Pendaftar::with(['user', 'lowongan'])
-                            ->whereIn('lowongan_id', $lowonganIds);
+        // Ambil bimbingan magang (aktivitas) untuk mahasiswa yang terdaftar di lowongan perusahaan ini
+        $aktivitasMagang = \App\Models\BimbinganMagang::whereHas('mahasiswa.pendaftars', function ($query) use ($lowonganIds) {
+            $query->whereIn('lowongan_id', $lowonganIds);
+        })
+        ->with(['mahasiswa.user', 'pembimbing'])
+        ->latest('tanggal')
+        ->paginate(10);
 
-        if ($request->filled('search')) {
-            $searchTerm = $request->search;
-            $query->whereHas('user', function ($q) use ($searchTerm) {
-                $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('username', 'like', "%{$searchTerm}%");
-            })->orWhereHas('lowongan', function ($q) use ($searchTerm) {
-                $q->where('judul', 'like', "%{$searchTerm}%");
-            });
-        }
-        
-        if ($request->filled('filter_lowongan_id')) {
-            $query->where('lowongan_id', $request->filter_lowongan_id);
-        }
-
-        $pendaftars = $query->latest('tanggal_daftar')->paginate(10);
-        $lowonganPerusahaan = Lowongan::where('company_id', $company->id)->orderBy('judul')->get();
-
-        return view('perusahaan.pendaftar', compact('company', 'pendaftars', 'lowonganPerusahaan'));
-    }
-
-    /**
-     * Memperbarui status pendaftar.
-     */
-    public function updateStatusPendaftar(Request $request, Pendaftar $pendaftar)
-    {
-        $user = Auth::user();
-        $company = $user->company;
-
-        if (!$company || $pendaftar->lowongan->company_id !== $company->id) {
-            return redirect()->route('perusahaan.pendaftar')->with('error', 'Aksi tidak diizinkan.');
-        }
-
-        $validator = Validator::make($request->all(), [
-            'status_lamaran' => 'required|in:Pending,Ditinjau,Wawancara,Diterima,Ditolak',
-            'catatan_perusahaan' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput();
-        }
-
-        $pendaftar->status_lamaran = $request->status_lamaran;
-        if ($request->filled('catatan_perusahaan')) {
-            // Uncomment if you have catatan_perusahaan field
-            // $pendaftar->catatan_perusahaan = $request->catatan_perusahaan;
-        }
-        $pendaftar->save();
-
-        return redirect()->route('perusahaan.pendaftar')->with('success', 'Status pendaftar berhasil diperbarui.');
+        return view('perusahaan.aktivitas_magang', compact('company', 'aktivitasMagang'));
     }
 }
