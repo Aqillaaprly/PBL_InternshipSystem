@@ -22,6 +22,7 @@
                  <a href="{{ route('admin.pembimbings.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.pembimbings.index') || request()->is('admin/pembimbings*') ? 'border-blue-600 text-blue-600' : '' }}">Pembimbing</a>
                  <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') || request()->is('admin/perusahaan*') ? 'border-blue-600 text-blue-600' : '' }}">Data Perusahaan</a>
                  <a href="{{ route('admin.users.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.users.index') || request()->is('admin/users*') ? 'border-blue-600 text-blue-600' : '' }}">Manajemen Users</a>
+                 <a href="{{ route('admin.aktivitas-absensi.index') }}" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">Aktivitas & Absensi</a>
             </nav>
 
             <div class="flex items-center space-x-4">

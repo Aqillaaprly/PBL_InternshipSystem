@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
+use App\Http\Controllers\Admin\MahasiswaAktivitasAbsensiController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
 use App\Http\Controllers\Dosen\AbsensiMahasiswaController; //dosen
@@ -31,17 +32,30 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('users', UserController::class)->except(['show']);
     Route::resource('lowongan', AdminLowonganController::class);
-    Route::resource('pendaftar', AdminPendaftarController::class);
+    Route::resource('pendaftar', AdminPendaftarController::class); Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
+    //Manejemen Pendaftar Lowongan
     Route::get('/pendaftar/{pendaftar}/dokumen', [AdminPendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
     Route::post('/pendaftar/{pendaftar}/upload-dokumen-batch', [AdminPendaftarController::class, 'uploadDokumenBatch'])->name('pendaftar.uploadDokumenBatch');
     Route::delete('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}', [AdminPendaftarController::class, 'destroyDokumen'])->name('pendaftar.dokumen.destroy');
     Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [AdminPendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
     Route::patch('/pendaftar/{pendaftar}/dokumen/update-all-status', [AdminPendaftarController::class, 'updateAllStatusDokumen'])->name('pendaftar.dokumen.updateAllStatus');
     
-    // Menggunakan 'company' sebagai parameter untuk AdminCompanyController agar sesuai dengan Route Model Binding
-    Route::resource('perusahaan', AdminCompanyController::class)->parameters(['perusahaan' => 'company']);
+    // Manajemen Perusahaan
+     Route::resource('perusahaan', AdminCompanyController::class)->parameters(['perusahaan' => 'company']);
 
+     // Manajemen Lowongan (oleh Admin)
+    Route::get('/lowongan', [AdminLowonganController::class, 'index'])->name('admin.lowongan.index');
+    Route::get('/lowongan/create', [AdminLowonganController::class, 'create'])->name('admin.lowongan.create');
+    Route::post('/lowongan', [AdminLowonganController::class, 'store'])->name('admin.lowongan.store');
+    Route::get('/lowongan/{lowongan}/edit', [AdminLowonganController::class, 'edit'])->name('admin.lowongan.edit');
+    Route::put('/lowongan/{lowongan}', [AdminLowonganController::class, 'update'])->name('admin.lowongan.update');
+    Route::delete('/lowongan/{lowongan}', [AdminLowonganController::class, 'destroy'])->name('admin.lowongan.destroy');
+    Route::get('/lowongan/{lowongan}/show', [AdminLowonganController::class, 'show'])->name('admin.lowongan.show');
+
+    //Manejemen Data Mahasiswa
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
     Route::get('/data-mahasiswa/create', [AdminMahasiswaController::class, 'create'])->name('mahasiswa.create');
     Route::post('/data-mahasiswa', [AdminMahasiswaController::class, 'store'])->name('mahasiswa.store');
@@ -50,15 +64,13 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::put('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'update'])->name('mahasiswa.update');
     Route::delete('/data-mahasiswa/{mahasiswa}', [AdminMahasiswaController::class, 'destroy'])->name('mahasiswa.destroy');
 
-    // CRUD untuk Pembimbing
-    Route::resource('pembimbings', AdminPembimbingController::class);
+   // Manajemen Penugasan Pembimbing (oleh Admin)
+   Route::resource('pembimbings', AdminPembimbingController::class);
 
-    Route::get('/laporan', [AdminLaporanController::class, 'index'])->name('laporan');
-    Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
-    Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
-    Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
+    // Aktivitas & Absensi Mahasiswa (Admin View Only)
+    Route::get('/aktivitas-absensi', [MahasiswaAktivitasAbsensiController::class, 'index'])->name('admin.aktivitas-absensi.index');
+    Route::get('/aktivitas-absensi/{aktivitas}', [MahasiswaAktivitasAbsensiController::class, 'show'])->name('admin.aktivitas-absensi.show'); // Opsional: halaman detail aktivitas
 
-    Route::resource('penugasan-pembimbing', PenugasanPembimbingController::class);
 });
 
 // DOSEN GROUP
