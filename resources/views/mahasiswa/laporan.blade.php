@@ -11,23 +11,24 @@
 
 <body class="bg-blue-50 text-gray-800">
 
-<!-- Header/Navbar -->
 @include('mahasiswa.template.navbar')
-<!-- Main Content -->
+
 <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6 space-y-10">
 
-    <!-- Tabel Data -->
+    <!-- Header & Actions -->
     <div class="bg-white p-8 rounded-xl shadow">
         <div class="flex justify-between items-center pb-4">
-            <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Pengisian Laporan Magang</h1>
+            <h1 class="text-2xl font-bold text-blue-800">Data Pengisian Laporan Magang</h1>
             <div class="flex space-x-3">
                 <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
-                <button class="border border-gray-300 px-4 py-2 rounded hover:bg-gray-200 transition">Filter</button>
-                <button id="openFormBtn" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">+ Tambah</button>
+                <button class="border border-gray-300 px-4 py-2 rounded hover:bg-gray-200">Filter</button>
+                <button id="openFormBtn" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">+ Tambah</button>
             </div>
         </div>
+
+        <!-- Table -->
         <div class="overflow-x-auto">
-            <table id="dataTable" class="min-w-full text-sm text-center">
+            <table class="min-w-full text-sm text-center">
                 <thead class="bg-gray-100">
                 <tr>
                     <th class="px-4 py-3">No</th>
@@ -39,21 +40,23 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach($bimbingans as $index => $bimbingan)
+                @foreach($aktivitas as $index => $item)
                 <tr class="border-b">
                     <td class="px-4 py-3">{{ $index + 1 }}</td>
-                    <td class="px-4 py-3">{{ $bimbingan->tanggal }}</td>
-                    <td class="px-4 py-3">{{ $bimbingan->jenis_bimbingan }}</td>
-                    <td class="px-4 py-3">{{ $bimbingan->catatan }}</td>
+                    <td class="px-4 py-3">{{ $item->tanggal }}</td>
+                    <td class="px-4 py-3">{{ $item->jenis_aktivitas }}</td>
+                    <td class="px-4 py-3">{{ $item->catatan }}</td>
                     <td class="px-4 py-3">
-                        @if($bimbingan->foto)
-                        <img src="{{ asset('storage/' . $bimbingan->foto->path) }}" class="w-16 h-16 mx-auto rounded" />
+                        @if($item->foto->isNotEmpty())
+                        @foreach($item->foto as $foto)
+                        <img src="{{ asset('storage/' . $foto->path) }}" class="w-16 h-16 mx-auto rounded object-cover" alt="Bukti Foto">
+                        @endforeach
                         @else
                         <span class="text-gray-400 italic">No image</span>
                         @endif
                     </td>
                     <td class="px-4 py-3">
-                        <form action="{{ route('mahasiswa.bimbingan.destroy', $bimbingan->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?');">
+                        <form action="{{ route('mahasiswa.aktivitas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?');">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs">Delete</button>
@@ -65,7 +68,7 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- Pagination (Static Example) -->
         <div class="flex justify-end mt-4">
             <nav class="inline-flex space-x-1">
                 <button class="px-3 py-1 border rounded hover:bg-gray-100">«</button>
@@ -79,20 +82,20 @@
 
     <!-- Modal Form -->
     <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div id="formContainer" class="bg-white p-6 rounded-lg w-full max-w-xl relative">
+        <div class="bg-white p-6 rounded-lg w-full max-w-xl relative">
             <h2 class="text-xl font-semibold mb-4">Tambah Data Laporan</h2>
-            <form action="{{ route('mahasiswa.bimbingan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <form action="{{ route('mahasiswa.aktivitas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <input type="hidden" name="mahasiswa_id" value="{{ auth()->user()->id }}">
-                <input type="hidden" name="pembimbing_id" value="1"> {{-- Replace with real ID --}}
+                <input type="hidden" name="pembimbing_id" value="1"> {{-- Replace with dynamic ID if needed --}}
 
                 <div>
                     <label class="block text-sm font-medium">Tanggal</label>
                     <input type="date" name="tanggal" required class="w-full border px-4 py-2 rounded">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Jenis Bimbingan</label>
-                    <input type="text" name="jenis_bimbingan" required class="w-full border px-4 py-2 rounded">
+                    <label class="block text-sm font-medium">Jenis Aktivitas</label>
+                    <input type="text" name="jenis_aktivitas" required class="w-full border px-4 py-2 rounded">
                 </div>
                 <div>
                     <label class="block text-sm font-medium">Catatan</label>
@@ -103,73 +106,27 @@
                     <input type="file" name="foto" accept="image/*" class="w-full border px-4 py-2 rounded">
                 </div>
                 <div class="flex justify-end space-x-2">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Simpan</button>
-                    <button type="button" id="cancelBtn" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition">Batal</button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan</button>
+                    <button type="button" id="cancelBtn" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Batal</button>
                 </div>
             </form>
         </div>
-    </div
-
+    </div>
 </main>
 
-<!-- Footer -->
 @include('mahasiswa.template.footer')
 
 <script>
-    document.getElementById('openFormBtn').addEventListener('click', () => {
-        document.getElementById('modal').classList.remove('hidden');
-    });
+    const modal = document.getElementById('modal');
+    const openBtn = document.getElementById('openFormBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
 
-    document.getElementById('cancelBtn').addEventListener('click', () => {
-        document.getElementById('modal').classList.add('hidden');
-    });
-
-    document.getElementById('modal').addEventListener('click', (e) => {
-        if (e.target.id === 'modal') {
-            document.getElementById('modal').classList.add('hidden');
-        }
-    });
-
-    document.getElementById('absensiForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-        const row = document.createElement('tr');
-        row.classList.add('border-b');
-        row.innerHTML = `
-            <td class="px-4 py-3">#</td>
-            <td class="px-4 py-3">${formData.get('email')}</td>
-            <td class="px-4 py-3">${formData.get('nama')}</td>
-            <td class="px-4 py-3">${formData.get('kelas')}</td>
-            <td class="px-4 py-3">${formData.get('perusahaan')}</td>
-            <td class="px-4 py-3">${formData.get('kegiatan')}</td>
-            <td class="px-4 py-3">
-                <img src="https://tp-fst.ut.ac.id/wp-content/uploads/2024/10/magang-di-tsn-prodi-tp-1.jpg" alt="Foto" class="mx-auto rounded w-16 h-16 object-fit" />
-            </td>
-            <td class="px-4 py-3 space-x-1">
-                <button class="editBtn bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200 transition">Edit</button>
-                <button class="deleteBtn bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200 transition">Delete</button>
-            </td>
-        `;
-        document.getElementById('tableBody').appendChild(row);
-        document.getElementById('modal').classList.add('hidden');
-        this.reset();
-    });
-
-    document.getElementById('tableBody').addEventListener('click', function(e) {
-        if (e.target.classList.contains('deleteBtn')) {
-            e.target.closest('tr').remove();
-        } else if (e.target.classList.contains('editBtn')) {
-            const cells = e.target.closest('tr').children;
-            document.querySelector('#absensiForm [name="email"]').value = cells[1].textContent;
-            document.querySelector('#absensiForm [name="nama"]').value = cells[2].textContent;
-            document.querySelector('#absensiForm [name="kelas"]').value = cells[3].textContent;
-            document.querySelector('#absensiForm [name="perusahaan"]').value = cells[4].textContent;
-            document.querySelector('#absensiForm [name="kegiatan"]').value = cells[5].textContent;
-            cells[0].parentNode.remove();
-            document.getElementById('modal').classList.remove('hidden');
-        }
+    openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+    cancelBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    modal.addEventListener('click', (e) => {
+        if (e.target.id === 'modal') modal.classList.add('hidden');
     });
 </script>
-</body>
 
+</body>
 </html>

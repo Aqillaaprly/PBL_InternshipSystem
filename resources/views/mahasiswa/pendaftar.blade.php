@@ -7,8 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 @include('mahasiswa.template.navbar')
-<body class="bg-gray-50 text-gray-800 pt-20">
 
+<body class="bg-gray-50 text-gray-800 pt-20">
 <div class="max-w-5xl mx-auto p-4">
     <div class="bg-white rounded-xl shadow-md p-6">
 
@@ -18,10 +18,26 @@
             <p class="text-sm text-gray-500">Lengkapi form berikut untuk mendaftar magang.</p>
         </div>
 
-        <!-- Flash Success Message -->
+        <!-- Flash Messages -->
         @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
             {{ session('success') }}
+        </div>
+        @endif
+        @if(session('error'))
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            {{ session('error') }}
+        </div>
+        @endif
+
+        <!-- Validation Errors -->
+        @if($errors->any())
+        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
         @endif
 
@@ -33,14 +49,17 @@
                 <!-- Lowongan -->
                 <div class="col-span-2">
                     <label class="block text-sm text-gray-600">Pilih Lowongan</label>
-                    <select name="lowongan_id" required class="w-full px-4 py-2 border rounded-md mt-1">
+                    <select name="lowongan_id" class="form-control">
                         @foreach($lowongans as $lowongan)
-                        <option value="{{ $lowongan->id }}">{{ $lowongan->judul }} - {{ $lowongan->company->nama }}</option>
+                        <option value="{{ $lowongan->id }}"
+                                @if(isset($prefilledLowongan) && $prefilledLowongan->id == $lowongan->id) selected @endif>
+                            {{ $lowongan->judul }} - {{ $lowongan->company->nama }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
 
-                <!-- Uploads -->
+                <!-- Upload Fields -->
                 @php
                 $files = [
                 'surat_lamaran' => 'Surat Lamaran',
@@ -54,7 +73,10 @@
                     <label class="block text-sm text-gray-600">{{ $label }}</label>
                     <input type="file" name="{{ $name }}" accept=".pdf,.doc,.docx"
                            {{ $name !== 'portofolio' ? 'required' : '' }}
-                    class="w-full mt-1"/>
+                    class="w-full mt-1 border rounded-md p-2"/>
+                    @error($name)
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
                 @endforeach
 
@@ -62,7 +84,7 @@
                 <div class="col-span-2">
                     <label class="block text-sm text-gray-600">Catatan Tambahan</label>
                     <textarea name="catatan_pendaftar" rows="3" class="w-full px-4 py-2 border rounded-md mt-1"
-                              placeholder="Tambahkan catatan tambahan jika ada..."></textarea>
+                              placeholder="Tambahkan catatan tambahan jika ada...">{{ old('catatan_pendaftar') }}</textarea>
                 </div>
             </div>
 
@@ -92,9 +114,16 @@
                 @foreach($pendaftarans as $pendaftar)
                 <tr class="border-t">
                     <td class="px-4 py-2">{{ $pendaftar->lowongan->judul ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $pendaftar->lowongan->company->nama ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $pendaftar->tanggal_daftar->format('d-m-Y') }}</td>
-                    <td class="px-4 py-2">{{ $pendaftar->status_lamaran }}</td>
+                    <td class="px-4 py-2">{{ $pendaftar->lowongan->company->nama_perusahaan ?? '-' }}</td>
+                    <td class="px-4 py-2">{{ \Carbon\Carbon::parse($pendaftar->tanggal_daftar)->format('d-m-Y') }}</td>
+                    <td class="px-4 py-2">
+                                <span class="text-xs font-medium px-2 py-1 rounded-full
+                                    @if($pendaftar->status_lamaran == 'Diterima') bg-green-100 text-green-600
+                                    @elseif($pendaftar->status_lamaran == 'Ditolak') bg-red-100 text-red-500
+                                    @else bg-yellow-100 text-yellow-600 @endif">
+                                    {{ $pendaftar->status_lamaran }}
+                                </span>
+                    </td>
                     <td class="px-4 py-2">{{ $pendaftar->catatan_admin ?? '-' }}</td>
                 </tr>
                 @endforeach

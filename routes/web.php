@@ -19,7 +19,7 @@ use App\Http\Controllers\Mahasiswa\LowonganController as MahasiswaLowonganContro
 use App\Http\Controllers\Mahasiswa\PendaftarController;
 use App\Http\Controllers\Mahasiswa\LaporanController as MahasiswaLaporanController;
 use App\Models\Company;
-use App\Models\BimbinganMagang;
+use App\Models\AktivitasAbsensi;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -106,21 +106,27 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/laporan', function () {
         $userId = Auth::id();
 
-        $bimbingans = BimbinganMagang::where('mahasiswa_id', $userId)
+        $aktivitas = AktivitasAbsensi::where('mahasiswa_id', $userId)
             ->with(['pembimbing.user', 'company', 'lowongan'])
             ->get();
 
-        return view('mahasiswa.laporan', compact('bimbingans'));
+        return view('mahasiswa.laporan', compact('aktivitas'));
     })->name('laporan');
 
     // Tambah dan Hapus Bimbingan Magang (Laporan)
-    Route::post('/bimbingan', [MahasiswaLaporanController::class, 'store'])->name('bimbingan.store');
-    Route::delete('/bimbingan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('bimbingan.destroy');
+    Route::post('/aktivitas', [MahasiswaLaporanController::class, 'store'])->name('aktivitas.store');
+    Route::delete('/aktivitas/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('aktivitas.destroy');
 
 
 
     // ✅ Lowongan (dengan resource controller)
     Route::resource('lowongan', MahasiswaLowonganController::class);
+    // Handle apply from perusahaan
+    Route::get('/pendaftar/apply/{lowonganId}', [PendaftarController::class, 'applyFromPerusahaan'])
+        ->name('apply.from.perusahaan');
+    // Handle apply from lowongan (auto-register)
+    Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])->name('mahasiswa.apply.from.lowongan');
+
 
 
     // ✅ Pendaftar routes (cleaned, no extra middleware)

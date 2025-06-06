@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Mahasiswa;
 
 use App\Http\Controllers\Controller;
-use App\Models\BimbinganMagang;
-use App\Models\BimbinganFoto;
+use App\Models\AktivitasAbsensi;
+use App\Models\AktivitasFoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,12 +12,12 @@ class LaporanController extends Controller
 {
     public function index()
     {
-        // Only fetch records for the authenticated mahasiswa
-        $bimbingans = BimbinganMagang::with('foto')
+        // Fetch only aktivitas_absensis for the authenticated mahasiswa
+        $aktivitas = AktivitasAbsensi::with('foto')
             ->where('mahasiswa_id', auth()->id())
             ->get();
 
-        return view('mahasiswa.laporan', compact('bimbingans'));
+        return view('mahasiswa.laporan', compact('aktivitas'));
     }
 
     public function store(Request $request)
@@ -25,23 +25,25 @@ class LaporanController extends Controller
         $request->validate([
             'pembimbing_id' => 'required',
             'tanggal' => 'required|date',
-            'jenis_bimbingan' => 'required|string',
+            'jenis_aktivitas' => 'required|string',
             'catatan' => 'required|string',
             'foto' => 'nullable|image|max:2048'
         ]);
 
         // Build the data and override mahasiswa_id with the authenticated user's ID
         $data = $request->only([
-            'pembimbing_id', 'tanggal', 'jenis_bimbingan', 'catatan'
+            'pembimbing_id', 'tanggal', 'jenis_aktivitas', 'catatan'
         ]);
-        $data['mahasiswa_id'] = auth()->id(); // Ensure mahasiswa_id is always set correctly
+        $data['mahasiswa_id'] = auth()->id();
 
-        $bimbingan = BimbinganMagang::create($data);
+        // Create new aktivitas_absensi record
+        $aktivitas = AktivitasAbsensi::create($data);
 
         if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('bimbingan_fotos', 'public');
-            BimbinganFoto::create([
-                'bimbingan_id' => $bimbingan->id,
+            $path = $request->file('foto')->store('aktivitas_fotos', 'public');
+
+            AktivitasFoto::create([
+                'aktivitas_absensi_id' => $aktivitas->id,
                 'path' => $path
             ]);
         }
@@ -51,7 +53,16 @@ class LaporanController extends Controller
 
     public function destroy($id)
     {
-        BimbinganMagang::findOrFail($id)->delete();
+        $aktivitas = AktivitasAbsensi::findOrFail($id);
+
+        // Optionally also delete associated foto file
+        if ($aktivitas->foto) {
+            Storage::disk('public')->delete($aktivitas->foto->path);
+            $aktivitas->foto()->delete();
+        }
+
+        $aktivitas->delete();
+
         return redirect()->back()->with('success', 'Data berhasil dihapus.');
     }
 }
