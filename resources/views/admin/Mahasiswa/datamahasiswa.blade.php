@@ -35,7 +35,7 @@
                 </div>
             @endif
 
-            <div class="overflow-x-auto">
+             <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="min-w-full text-sm text-center">
                     <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>

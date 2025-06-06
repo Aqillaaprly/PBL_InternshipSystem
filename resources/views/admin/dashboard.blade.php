@@ -41,7 +41,7 @@
             </div>
 
             <div class="text-center mb-10">
-                <h1 class="text-3xl font-bold text-blue-900">Selamat Datang, {{ Auth::user()->username ?? 'Admin' }}!</h1>
+                <h1 class="text-3xl font-bold text-blue-900 font-poppins">Selamat Datang {{ Auth::user()->username ?? 'Admin' }}</h1>
                 <p class="text-sm text-gray-600">Dashboard Sistem Informasi Manajemen Magang Mahasiswa</p>
             </div>
 
