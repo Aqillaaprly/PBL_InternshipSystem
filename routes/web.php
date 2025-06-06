@@ -105,6 +105,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
+    Route::get('/show', [CompanyController::class, 'show']);
      Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile Management

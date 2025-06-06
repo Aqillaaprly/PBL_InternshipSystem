@@ -33,7 +33,7 @@ class DashboardController extends Controller
         
         $recentPendaftars = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
                                 $query->where('company_id', $company->id);
-                            })
+                            })->where('status_lamaran','Diterima')
                             ->with(['user', 'lowongan']) 
                             ->latest() 
                             ->take(5) 

@@ -54,9 +54,9 @@
                             <label for="status_lamaran" class="block text-sm font-medium text-gray-700">Status Lamaran</label>
                             <select name="status_lamaran" id="status_lamaran" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
                                 <option value="">Semua Status</option>
-                                <option value="Pending" {{ ($selectedStatusLamaran == 'Pending') ? 'selected' : '' }}>Pending</option>
+                
                                 <option value="Ditinjau" {{ ($selectedStatusLamaran == 'Ditinjau') ? 'selected' : '' }}>Ditinjau</option>
-                                <option value="Wawancara" {{ ($selectedStatusLamaran == 'Wawancara') ? 'selected' : '' }}>Wawancara</option>
+                               
                                 <option value="Diterima" {{ ($selectedStatusLamaran == 'Diterima') ? 'selected' : '' }}>Diterima</option>
                                 <option value="Ditolak" {{ ($selectedStatusLamaran == 'Ditolak') ? 'selected' : '' }}>Ditolak</option>
                             </select>
@@ -124,7 +124,6 @@
                                                 @csrf
                                                 <select name="status_lamaran" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
                                                     <option value="Ditinjau" {{ $pendaftar->status_lamaran == 'Ditinjau' ? 'selected' : '' }}>Ditinjau</option>
-                                                    <option value="Wawancara" {{ $pendaftar->status_lamaran == 'Wawancara' ? 'selected' : '' }}>Wawancara</option>
                                                     <option value="Diterima" {{ $pendaftar->status_lamaran == 'Diterima' ? 'selected' : '' }}>Diterima</option>
                                                     <option value="Ditolak" {{ $pendaftar->status_lamaran == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                                                 </select>

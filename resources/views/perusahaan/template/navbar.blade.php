@@ -20,7 +20,7 @@
             <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
                 {{-- Menggunakan nama route yang sudah diperbaiki dan konsisten --}}
                 <a href="{{ route('perusahaan.lowongan') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('perusahaan.lowongan') ? 'border-blue-600 text-blue-600' : '' }}">Lowongan</a>
-                <a href="{{ route('perusahaan.pendaftar') }}" class="hover:text-blue-600 border-b-s2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('perusahaan.pendaftar') ? 'border-blue-600 text-blue-600' : '' }}">Total Pendaftar</a>
+                <a href="{{ route('perusahaan.pendaftar.index') }}" class="hover:text-blue-600 border-b-s2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('perusahaan.pendaftar') ? 'border-blue-600 text-blue-600' : '' }}">Total Pendaftar</a> 
                 <a href="{{ route('perusahaan.aktivitas_magang') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('perusahaan.aktivitas_magang') ? 'border-blue-600 text-blue-600' : '' }}">Aktivitas Magang</a>
             </nav>
 

@@ -54,7 +54,7 @@
 
                        <td class="px-5 py-3">
                          <div class="flex space-x-1">
-                            <a href="route('perusahaan.show')" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                            <a href="{{ url('/perusahaan/show') }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
                             <form action="route('perusahaan.lowongan.destroy')" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
                                 @csrf
                                 @method('DELETE')
