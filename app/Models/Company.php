@@ -10,7 +10,6 @@ class Company extends Model
     use HasFactory;
 
     protected $fillable = [
-        // ... atribut fillable lainnya ...
         'user_id',
         'nama_perusahaan',
         'alamat',
@@ -30,11 +29,10 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the vacancies offered by the company.
-     */
-    public function lowongans() // Perubahan nama relasi menjadi plural
+    public function lowongan()
     {
-         return $this->hasMany(Lowongan::class);
+        return $this->hasMany(Lowongan::class);
     }
+
+
 }

@@ -3,127 +3,102 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>SIMMAGANG Dashboard</title>
+    <title>Form Absensi</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 pt-20 relative">
+@include('mahasiswa.template.navbar')
+<body class="bg-gray-50 text-gray-800 pt-20">
 
-<?php include('template/navbar_mahasiswa.php'); ?>
-
-<div class="max-w-7xl mx-auto p-4">
-    <div class="bg-white rounded-xl shadow-md p-6 relative">
+<div class="max-w-5xl mx-auto p-4">
+    <div class="bg-white rounded-xl shadow-md p-6">
         <!-- Header -->
-        <div class="mb-6 flex items-center justify-between">
-            <div>
-                <h1 class="text-xl font-semibold">Data Absensi</h1>
-                <span class="text-sm text-gray-500">› Mahasiswa TI</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <input type="text" placeholder="Search" class="border rounded px-3 py-2 text-sm"/>
-                <button class="border rounded px-3 py-2 text-sm flex items-center gap-1">Filter ⚙️</button>
-                <button id="openModalBtn" class="bg-blue-900 text-white px-4 py-2 rounded text-sm font-medium">Add Absensi</button>
-            </div>
+        <div class="mb-6">
+            <h1 class="text-2xl font-semibold">Form Absensi</h1>
+            <p class="text-sm text-gray-500">Silakan isi form dan submit absensi.</p>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto">
-            <table id="absensiTable" class="min-w-full text-sm text-left">
-                <thead class="border-b text-gray-700">
-                <tr>
-                    <th class="py-2 px-4 font-semibold">No</th>
-                    <th class="py-2 px-4 font-semibold">Tanggal</th>
-                    <th class="py-2 px-4 font-semibold">Waktu</th>
-                    <th class="py-2 px-4 font-semibold">Deskripsi</th>
-                    <th class="py-2 px-4 font-semibold">Bukti Foto</th>
-                    <th class="py-2 px-4 font-semibold">Action</th>
-                </tr>
-                </thead>
-                <tbody id="tableBody">
-                <!-- Dummy rows will be appended here -->
-                </tbody>
-            </table>
-        </div>
+        <!-- Alert Box -->
+        <div id="alertBox" class="hidden mb-4 p-4 rounded-lg text-white font-semibold"></div>
 
-        <!-- Pagination -->
-        <div class="flex justify-end items-center mt-6 text-sm text-gray-600">
-            <button class="px-3 py-1 rounded bg-blue-900 text-white">1</button>
-            <button class="px-3 py-1 rounded hover:bg-gray-200">2</button>
-            <button class="px-3 py-1 rounded hover:bg-gray-200">3</button>
-        </div>
-    </div>
-</div>
+        <!-- Form -->
+        <form id="absensiForm" class="space-y-4 mb-6">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm text-gray-600">Email</label>
+                    <input type="email" name="email" class="w-full px-4 py-2 border rounded-md mt-1" />
+                </div>
 
-<!-- Modal -->
-<div id="modalOverlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div id="modalBox" class="bg-white p-6 rounded-xl w-[90%] max-w-md relative shadow-xl">
-        <h2 class="text-center text-lg font-semibold mb-4">ABSENSI</h2>
+                <div>
+                    <label class="block text-sm text-gray-600">Nama</label>
+                    <input type="text" name="nama" class="w-full px-4 py-2 border rounded-md mt-1" />
+                </div>
 
-        <form id="absensiForm" class="space-y-4">
-            <div>
-                <label class="text-sm text-gray-600">TUGAS HARI INI</label>
-                <input name="deskripsi" type="text" placeholder="Title for a new assignment" class="w-full px-4 py-2 border rounded-md mt-1"/>
-            </div>
+                <div>
+                    <label class="block text-sm text-gray-600">Kelas</label>
+                    <input type="text" name="kelas" class="w-full px-4 py-2 border rounded-md mt-1" />
+                </div>
 
-            <div>
-                <label class="text-sm text-gray-600">PICTURE</label>
-                <div class="border-dashed border-2 border-gray-300 rounded-md py-6 text-center text-sm text-gray-500 mt-1">
-                    Drag and drop or <span class="text-blue-600 cursor-pointer">browse files</span><br/>
-                    <input name="buktiFoto" type="file" class="hidden" />
-                    <p class="text-xs mt-1">Size limit: 25MB</p>
+                <div>
+                    <label class="block text-sm text-gray-600">Perusahaan</label>
+                    <input type="text" name="perusahaan" class="w-full px-4 py-2 border rounded-md mt-1" />
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm text-gray-600">Kegiatan</label>
+                    <input type="text" name="kegiatan" class="w-full px-4 py-2 border rounded-md mt-1" />
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm text-gray-600">Foto</label>
+                    <input type="file" name="foto" class="block mt-1" />
                 </div>
             </div>
 
-            <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-4 py-2 rounded-full">Save & Publish</button>
+            <button type="submit" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded">
+                Submit Absensi
+            </button>
         </form>
+
     </div>
 </div>
 
-<?php include('../footer.php'); ?>
+@include('mahasiswa.template.footer')
 
-<!-- Modal Script -->
+<!-- Script -->
 <script>
-    const openModalBtn = document.getElementById('openModalBtn');
-    const modalOverlay = document.getElementById('modalOverlay');
     const absensiForm = document.getElementById('absensiForm');
     const tableBody = document.getElementById('tableBody');
+    const alertBox = document.getElementById('alertBox');
 
-    let rowCount = 0;
-
-    openModalBtn.addEventListener('click', () => {
-        modalOverlay.classList.remove('hidden');
-    });
-
-    modalOverlay.addEventListener('click', (e) => {
-        if (e.target === modalOverlay) {
-            modalOverlay.classList.add('hidden');
-        }
-    });
+    function showAlert(message, type = 'success') {
+        alertBox.className = `mb-4 p-4 rounded-lg font-semibold ${
+            type === 'success' ? 'bg-green-500' : 'bg-red-500'
+        } text-white`;
+        alertBox.textContent = message;
+        alertBox.classList.remove('hidden');
+        setTimeout(() => alertBox.classList.add('hidden'), 3000);
+    }
 
     absensiForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(absensiForm);
-        const deskripsi = formData.get('deskripsi') || '-';
-        const buktiFoto = formData.get('buktiFoto') ? formData.get('buktiFoto').name : '-';
+        const email = formData.get('email');
+        const nama = formData.get('nama');
+        const kelas = formData.get('kelas');
+        const perusahaan = formData.get('perusahaan');
+        const kegiatan = formData.get('kegiatan');
+        const fotoInput = absensiForm.querySelector('input[name="foto"]');
+        const foto = fotoInput.files.length ? fotoInput.files[0].name : null;
 
-        rowCount++;
+        // Validation
+        if (!email || !nama || !kelas || !perusahaan || !kegiatan || !foto) {
+            showAlert('Semua field wajib diisi!', 'error');
+            return;
+        }
 
-        const now = new Date();
-        const tanggal = now.toLocaleDateString();
-        const waktu = now.toLocaleTimeString();
-
-        const row = `
-      <tr class="border-b hover:bg-gray-50">
-        <td class="py-2 px-4">${rowCount}</td>
-        <td class="py-2 px-4">${tanggal}</td>
-        <td class="py-2 px-4">${waktu}</td>
-        <td class="py-2 px-4">${deskripsi}</td>
-        <td class="py-2 px-4">${buktiFoto}</td>
-        <td class="py-2 px-4 text-center">⋯</td>
-      </tr>
-    `;
-        tableBody.insertAdjacentHTML('beforeend', row);
+        // Reset and show success
         absensiForm.reset();
-        modalOverlay.classList.add('hidden');
+        showAlert('Absensi berhasil disubmit!', 'success');
     });
 </script>
 
