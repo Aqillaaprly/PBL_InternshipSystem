@@ -111,25 +111,6 @@
         </div>
     </div>
 
-    <!-- Chart Section -->
-    <div class="bg-white p-6 rounded-xl shadow mb-6">
-        <h2 class="text-xl font-bold text-blue-800 mb-4">Statistik Mahasiswa</h2>
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            <div class="bg-gray-50 p-4 rounded-lg shadow w-full col-span-1">
-                <h3 class="text-lg font-semibold text-gray-700 mb-2 text-center">Distribusi Perusahaan</h3>
-                <canvas id="pieChart" class="w-full h-48"></canvas>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow w-full col-span-2">
-                <h3 class="text-lg font-semibold text-gray-700 mb-2 text-center">Lokasi Magang</h3>
-                <canvas id="activityChart" class="w-full h-64"></canvas>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow w-full col-span-1">
-                <h3 class="text-lg font-semibold text-gray-700 mb-2 text-center">Distribusi Absensi</h3>
-                <canvas id="pieChart2" class="w-full h-48"></canvas>
-            </div>
-        </div>
-    </div>
-
 </main>
 
 <!-- Footer -->

@@ -12,11 +12,10 @@ class Pendaftar extends Model
     protected $table = 'pendaftars';
 
     protected $fillable = [
-        'mahasiswa_id', // <-- Pastikan ini ada di tabel pendaftars Anda
+        'user_id', // ✅ Corrected
         'lowongan_id',
         'tanggal_daftar',
         'status_lamaran',
-        // Kolom di bawah ini mungkin tidak lagi dipakai langsung jika dokumen dikelola di DokumenPendaftar
         'surat_lamaran_path',
         'cv_path',
         'portofolio_path',
@@ -28,27 +27,21 @@ class Pendaftar extends Model
         'tanggal_daftar' => 'date',
     ];
 
-    // Relasi ke Mahasiswa (Pendaftar punya satu Mahasiswa)
-    public function mahasiswa()
+    // Relasi ke User
+    public function user()
     {
-        return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // Relasi ke Lowongan (Pendaftar melamar ke satu Lowongan)
+    // Relasi ke Lowongan
     public function lowongan()
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
 
-    // Relasi ke DokumenPendaftar (Pendaftar memiliki banyak DokumenPendaftar)
+    // Relasi ke DokumenPendaftar
     public function dokumenPendaftars()
     {
         return $this->hasMany(DokumenPendaftar::class, 'pendaftar_id');
-    }
-
-    //Jika Anda memiliki user_id di tabel pendaftar dan ingin tetap menggunakannya
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
     }
 }

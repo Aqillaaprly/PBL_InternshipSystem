@@ -106,13 +106,13 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     // ✅ Lowongan (dengan resource controller)
     Route::resource('lowongan', MahasiswaLowonganController::class);
 
-    // Pendaftar
-    Route::middleware(['auth', 'authorize:mahasiswa'])->group(function () {
-        Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])
-            ->name('pendaftar'); // <-- fixed name
-        Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])
-            ->name('pendaftar.submit');
-    });
+    // ✅ Pendaftar routes (cleaned, no extra middleware)
+    Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])
+        ->name('pendaftar');
+
+    Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])
+        ->name('pendaftar.submit');
+
 });
 
 

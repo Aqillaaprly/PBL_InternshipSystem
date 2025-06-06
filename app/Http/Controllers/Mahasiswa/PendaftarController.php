@@ -10,6 +10,8 @@ use App\Models\Lowongan;
 
 class PendaftarController extends Controller
 {
+    // No need for constructor middleware — already handled in web.php routes
+
     public function showPendaftaranForm()
     {
         $lowongans = Lowongan::with('company')->get();
@@ -32,13 +34,18 @@ class PendaftarController extends Controller
             'catatan_pendaftar' => 'nullable|string|max:1000',
         ]);
 
+        $userId = Auth::id();
+        if (!$userId) {
+            return redirect()->back()->withErrors('Anda harus login terlebih dahulu.');
+        }
+
         $data = [
-            'user_id' => Auth::id(),
+            'user_id' => $userId,
             'lowongan_id' => $request->lowongan_id,
             'tanggal_daftar' => now(),
             'status_lamaran' => 'Pending',
             'catatan_pendaftar' => $request->catatan_pendaftar,
-            'catatan_admin' => null
+            'catatan_admin' => null,
         ];
 
         // Handle file uploads
