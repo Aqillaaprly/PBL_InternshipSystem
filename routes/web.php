@@ -1,27 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\UserController; // Untuk manajemen user data
-
 use App\Http\Controllers\Admin\AdminDashboardController;
-use App\Http\Controllers\Admin\CompanyController as AdminCompanyController; // Di-alias sebagai AdminCompanyController
-use App\Http\Controllers\Admin\LowonganController as AdminLowonganController;
-use App\Http\Controllers\Admin\PendaftarController as AdminPendaftarController;
-use App\Http\Controllers\Admin\MahasiswaController as AdminMahasiswaController;
-use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController;
-use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
-use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
-use App\Http\Controllers\Admin\PenugasanPembimbingController;
+use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
+use App\Http\Controllers\Admin\LowonganController as AdminLowonganController; // Untuk manajemen user data
 use App\Http\Controllers\Admin\MahasiswaAktivitasAbsensiController;
-
-use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
-use App\Http\Controllers\Company\PendaftarController;
+use App\Http\Controllers\Admin\MahasiswaController as AdminMahasiswaController; // Di-alias sebagai AdminCompanyController
+use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController;
+use App\Http\Controllers\Admin\PendaftarController as AdminPendaftarController;
+use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
-
-use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
-use App\Http\Controllers\Dosen\AbsensiMahasiswaController; //dosen
-use App\Http\Controllers\Dosen\LogBimbingan; //dosen
+use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
+use App\Http\Controllers\Dosen\LogBimbingan;
+use App\Http\Controllers\Dosen\MahasiswaBimbinganController;
+use App\Http\Controllers\UserController; // dosen
+// dosen
+use Illuminate\Support\Facades\Route; // dosen
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -41,7 +36,7 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
 
-    //Manejemen Pendaftar Lowongan
+    // Manejemen Pendaftar Lowongan
     Route::get('/pendaftar/{pendaftar}/dokumen', [AdminPendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
     Route::post('/pendaftar/{pendaftar}/upload-dokumen-batch', [AdminPendaftarController::class, 'uploadDokumenBatch'])->name('pendaftar.uploadDokumenBatch');
     Route::delete('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}', [AdminPendaftarController::class, 'destroyDokumen'])->name('pendaftar.dokumen.destroy');
@@ -51,7 +46,7 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     // Manajemen Perusahaan
     Route::resource('perusahaan', AdminCompanyController::class)->parameters(['perusahaan' => 'company']);
 
-    //Manejemen Data Mahasiswa
+    // Manejemen Data Mahasiswa
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
     Route::get('/data-mahasiswa/create', [AdminMahasiswaController::class, 'create'])->name('mahasiswa.create');
     Route::post('/data-mahasiswa', [AdminMahasiswaController::class, 'store'])->name('mahasiswa.store');
@@ -80,8 +75,6 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
 });
 
-
-
 // MAHASISWA GROUP
 Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/dashboard', function () {
@@ -106,7 +99,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
     Route::get('/show', [CompanyController::class, 'show']);
-     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile Management
     Route::get('/profil', [CompanyController::class, 'show'])->name('profil');

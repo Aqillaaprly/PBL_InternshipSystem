@@ -2,12 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Mahasiswa;
-use App\Models\User;
 use App\Models\Role;
-use Faker\Factory as FakerFactory; // Import Faker
+use App\Models\User;
+use Faker\Factory as FakerFactory;
+use Illuminate\Database\Seeder; // Import Faker
 
 class MahasiswaSeeder extends Seeder
 {
@@ -19,8 +18,9 @@ class MahasiswaSeeder extends Seeder
         $faker = FakerFactory::create('id_ID'); // Menggunakan Faker untuk data Indonesia
         $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
 
-        if (!$mahasiswaRole) {
+        if (! $mahasiswaRole) {
             $this->command->error("Role 'mahasiswa' tidak ditemukan. MahasiswaSeeder tidak dapat berjalan.");
+
             return;
         }
 
@@ -43,7 +43,7 @@ class MahasiswaSeeder extends Seeder
                     'nama' => $user->name,
                     'email' => $user->email,
                     'kelas' => $faker->randomElement(['TI-2A', 'TI-4B', 'TI-2C', 'TI-2D', 'SIB-2A', 'SIB-2B', 'SIB-3A']),
-                    'program_studi' => $faker->randomElement(['Teknik Informatika','Sistem Informasi']),
+                    'program_studi' => $faker->randomElement(['Teknik Informatika', 'Sistem Informasi']),
                     'nomor_hp' => $faker->unique()->e164PhoneNumber(), // Format nomor HP internasional
                     'alamat' => $faker->address(),
                 ]
@@ -60,7 +60,7 @@ class MahasiswaSeeder extends Seeder
                 Mahasiswa::factory()->count($sisaMahasiswaDibutuhkan)->create();
                 $mahasiswaDibuatCount += $sisaMahasiswaDibutuhkan;
             } catch (\Exception $e) {
-                $this->command->error("Gagal membuat mahasiswa menggunakan factory: " . $e->getMessage());
+                $this->command->error('Gagal membuat mahasiswa menggunakan factory: '.$e->getMessage());
                 // Log errornya jika perlu
                 // Log::error("Factory error MahasiswaSeeder: " . $e->getMessage());
             }
@@ -69,7 +69,7 @@ class MahasiswaSeeder extends Seeder
         if ($mahasiswaDibuatCount > 0) {
             $this->command->info("Total {$mahasiswaDibuatCount} data detail mahasiswa telah di-seed atau dipastikan ada.");
         } else {
-            $this->command->warn("Tidak ada user mahasiswa baru yang perlu di-seed detailnya atau gagal membuat menggunakan factory.");
+            $this->command->warn('Tidak ada user mahasiswa baru yang perlu di-seed detailnya atau gagal membuat menggunakan factory.');
         }
     }
 }

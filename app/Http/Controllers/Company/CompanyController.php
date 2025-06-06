@@ -3,14 +3,15 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Company;
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
-use App\Models\Company;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Carbon\Carbon; // Pastikan ini di-import jika digunakan
+
+// Pastikan ini di-import jika digunakan
 
 class CompanyController extends Controller
 {
@@ -18,6 +19,7 @@ class CompanyController extends Controller
 
     /**
      * Menampilkan profil perusahaan.
+     *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function show()
@@ -25,14 +27,16 @@ class CompanyController extends Controller
         $user = Auth::user();
         $company = $user->company; // Ambil data perusahaan user
 
-        if (!$company) {
+        if (! $company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
+
         return view('perusahaan.show', compact('company')); // Tampilkan view profil perusahaan
     }
 
     /**
      * Menampilkan form untuk mengedit profil perusahaan.
+     *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit()
@@ -40,15 +44,16 @@ class CompanyController extends Controller
         $user = Auth::user();
         $company = $user->company; // Ambil data perusahaan user
 
-        if (!$company) {
+        if (! $company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
+
         return view('perusahaan.edit_profil', compact('company')); // Tampilkan view edit profil
     }
 
     /**
      * Memperbarui profil perusahaan.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)
@@ -56,7 +61,7 @@ class CompanyController extends Controller
         $user = Auth::user();
         $company = $user->company; // Ambil data perusahaan user
 
-        if (!$company) {
+        if (! $company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
@@ -74,8 +79,8 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $data = $request->except('logo');
@@ -95,7 +100,7 @@ class CompanyController extends Controller
 
     /**
      * Menampilkan daftar lowongan perusahaan.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function lowongan(Request $request)
@@ -103,7 +108,7 @@ class CompanyController extends Controller
         $user = Auth::user();
         $company = $user->company; // Ambil data perusahaan user
 
-        if (!$company) {
+        if (! $company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
@@ -112,7 +117,7 @@ class CompanyController extends Controller
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where('judul', 'like', "%{$searchTerm}%") // Cari berdasarkan judul
-                  ->orWhere('deskripsi', 'like', "%{$searchTerm}%"); // Cari berdasarkan deskripsi
+                ->orWhere('deskripsi', 'like', "%{$searchTerm}%"); // Cari berdasarkan deskripsi
         }
 
         $lowongans = $query->latest()->paginate(10); // Ambil lowongan terbaru dengan paginasi
@@ -122,6 +127,7 @@ class CompanyController extends Controller
 
     /**
      * Menampilkan form untuk menambah lowongan baru.
+     *
      * @return \Illuminate\View\View
      */
     public function createLowongan()
@@ -131,7 +137,7 @@ class CompanyController extends Controller
 
     /**
      * Menyimpan lowongan baru.
-     * @param  \Illuminate\Http\Request  $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function storeLowongan(Request $request)
@@ -139,7 +145,7 @@ class CompanyController extends Controller
         $user = Auth::user();
         $company = $user->company; // Ambil data perusahaan user
 
-        if (!$company) {
+        if (! $company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
@@ -157,8 +163,8 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->back()
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         Lowongan::create([
@@ -179,6 +185,7 @@ class CompanyController extends Controller
 
     /**
      * Menampilkan aktivitas magang.
+     *
      * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function aktivitas_magang()
@@ -186,7 +193,7 @@ class CompanyController extends Controller
         $user = Auth::user();
         $company = $user->company;
 
-        if (!$company) {
+        if (! $company) {
             return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
         }
 
@@ -199,9 +206,9 @@ class CompanyController extends Controller
         // Ambil pendaftar yang statusnya 'Diterima' untuk lowongan perusahaan ini
         // dan filter berdasarkan lowonganIds yang dimiliki oleh perusahaan ini.
         $pendaftars = Pendaftar::whereIn('lowongan_id', $lowonganIds)
-                                ->where('status_lamaran', 'Diterima')
-                                ->with('user')
-                                ->get();
+            ->where('status_lamaran', 'Diterima')
+            ->with('user')
+            ->get();
 
         return view('perusahaan.aktivitas_magang', compact('pendaftars', 'company'));
     }

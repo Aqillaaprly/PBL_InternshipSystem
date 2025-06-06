@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Company;
 use App\Models\Lowongan;
-use App\Models\Company; // Pastikan model Company di-import
-use Carbon\Carbon; // Untuk manipulasi tanggal
+use Carbon\Carbon; // Pastikan model Company di-import
+use Illuminate\Database\Seeder; // Untuk manipulasi tanggal
 
 class LowonganSeeder extends Seeder
 {
@@ -50,7 +49,7 @@ class LowonganSeeder extends Seeder
                 'status' => 'Aktif',
             ],
             [
-               'company_id' => $company2 ? $company2->id : null,
+                'company_id' => $company2 ? $company2->id : null,
                 'judul' => 'Backend Developer Intern',
                 'deskripsi' => 'Berpartisipasi dalam pengembangan backend aplikasi web menggunakan Laravel dan MySQL.',
                 'kualifikasi' => "- Mahasiswa aktif jurusan Teknik Informatika atau sejenis.\n- Memahami dasar-dasar PHP dan Laravel.\n- Familiar dengan database relasional (MySQL, PostgreSQL).\n- Mampu bekerja secara tim dan mandiri.",
@@ -140,7 +139,7 @@ class LowonganSeeder extends Seeder
                 'tanggal_tutup' => Carbon::now()->addDays(40)->toDateString(),
                 'status' => 'Aktif',
             ],
-             [
+            [
                 'company_id' => $company2 ? $company2->id : null,
                 'judul' => 'Finance & Accounting Intern',
                 'deskripsi' => 'Membantu departemen keuangan dan akuntansi dalam tugas sehari-hari, termasuk pembukuan dan pelaporan.',
@@ -151,7 +150,7 @@ class LowonganSeeder extends Seeder
                 'gaji_max' => 4500000,
                 'tanggal_buka' => Carbon::now()->subDays(20)->toDateString(),
                 'tanggal_tutup' => Carbon::now()->addDays(10)->toDateString(),
-                'status' => 'Aktif'
+                'status' => 'Aktif',
             ],
         ];
 
@@ -165,6 +164,6 @@ class LowonganSeeder extends Seeder
             }
         }
 
-        $this->command->info(count($lowongans) . ' lowongan telah ditambahkan (atau diskip jika perusahaan tidak ditemukan).');
+        $this->command->info(count($lowongans).' lowongan telah ditambahkan (atau diskip jika perusahaan tidak ditemukan).');
     }
 }

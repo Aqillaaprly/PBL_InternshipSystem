@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class CompanyController extends Controller
 {
@@ -24,16 +24,17 @@ class CompanyController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('nama_perusahaan', 'like', "%{$searchTerm}%")
-                  ->orWhere('email_perusahaan', 'like', "%{$searchTerm}%")
-                  ->orWhere('kota', 'like', "%{$searchTerm}%") 
-                  ->orWhere('provinsi', 'like', "%{$searchTerm}%") 
-                  ->orWhereHas('user', function($userQuery) use ($searchTerm) {
-                      $userQuery->where('username', 'like', "%{$searchTerm}%");
-                  });
+                    ->orWhere('email_perusahaan', 'like', "%{$searchTerm}%")
+                    ->orWhere('kota', 'like', "%{$searchTerm}%")
+                    ->orWhere('provinsi', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                        $userQuery->where('username', 'like', "%{$searchTerm}%");
+                    });
             });
         }
 
         $companies = $query->paginate(10)->withQueryString();
+
         return view('admin.Company.perusahaan', compact('companies'));
     }
 
@@ -63,8 +64,8 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.perusahaan.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $logoPath = null;
@@ -72,17 +73,17 @@ class CompanyController extends Controller
             $logoPath = $request->file('logo_path')->store('logos', 'public');
         } else {
             return redirect()->route('admin.perusahaan.create')
-                             ->with('error', 'Logo perusahaan wajib diunggah dan valid.')
-                             ->withInput();
+                ->with('error', 'Logo perusahaan wajib diunggah dan valid.')
+                ->withInput();
         }
 
         $perusahaanRole = Role::where('name', 'perusahaan')->firstOrFail();
-      
+
         DB::beginTransaction();
         try {
             $user = User::create([
-                'name' => $request->nama_perusahaan, 
-                'email' => $request->email_perusahaan, 
+                'name' => $request->nama_perusahaan,
+                'email' => $request->email_perusahaan,
                 'username' => $request->username,
                 'password' => Hash::make($request->password),
                 'role_id' => $perusahaanRole->id,
@@ -94,32 +95,36 @@ class CompanyController extends Controller
                 ['user_id' => $user->id, 'logo_path' => $logoPath]
             ));
             DB::commit();
+
             return redirect()->route('admin.perusahaan.index')->with('success', 'Perusahaan berhasil ditambahkan beserta akun loginnya.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error creating company: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+            Log::error('Error creating company: '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
             if ($logoPath && Storage::disk('public')->exists($logoPath)) {
                 Storage::disk('public')->delete($logoPath);
             }
+
             return redirect()->route('admin.perusahaan.create')
-                             ->with('error', 'Gagal menambahkan perusahaan. Silakan coba lagi. Error: ' . $e->getMessage())
-                             ->withInput();
+                ->with('error', 'Gagal menambahkan perusahaan. Silakan coba lagi. Error: '.$e->getMessage())
+                ->withInput();
         }
     }
 
-    public function show(Company $company) 
+    public function show(Company $company)
     {
         $company->load('user');
+
         return view('admin.Company.show', compact('company'));
     }
 
-    public function edit(Company $company) 
+    public function edit(Company $company)
     {
         $company->load('user');
+
         return view('admin.Company.edit', compact('company'));
     }
 
-    public function update(Request $request, Company $company) 
+    public function update(Request $request, Company $company)
     {
         $userIdToIgnore = $company->user ? $company->user->id : 0;
 
@@ -152,15 +157,15 @@ class CompanyController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.perusahaan.edit', $company->id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
-        
+
         DB::beginTransaction();
         try {
             $companyData = $request->only([
                 'nama_perusahaan', 'alamat', 'kota', 'provinsi', 'kode_pos',
-                'telepon', 'email_perusahaan', 'website', 'deskripsi', 'status_kerjasama'
+                'telepon', 'email_perusahaan', 'website', 'deskripsi', 'status_kerjasama',
             ]);
 
             if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {
@@ -173,12 +178,18 @@ class CompanyController extends Controller
             $company->update($companyData);
 
             if ($company->user) {
-                $userDataToUpdate = ['name' => $request->nama_perusahaan]; 
-                if ($request->filled('username')) $userDataToUpdate['username'] = $request->username;
-                if ($request->filled('user_email_login')) $userDataToUpdate['email'] = $request->user_email_login;
+                $userDataToUpdate = ['name' => $request->nama_perusahaan];
+                if ($request->filled('username')) {
+                    $userDataToUpdate['username'] = $request->username;
+                }
+                if ($request->filled('user_email_login')) {
+                    $userDataToUpdate['email'] = $request->user_email_login;
+                }
 
-                if ($request->filled('password')) $userDataToUpdate['password'] = Hash::make($request->password);
-                
+                if ($request->filled('password')) {
+                    $userDataToUpdate['password'] = Hash::make($request->password);
+                }
+
                 $company->user->update($userDataToUpdate);
 
             } elseif ($request->filled('new_username') && $request->filled('new_user_email') && $request->filled('new_password')) {
@@ -192,17 +203,19 @@ class CompanyController extends Controller
                     'email_verified_at' => now(),
                 ]);
                 $company->user_id = $newUser->id;
-                $company->save(); 
+                $company->save();
             }
             DB::commit();
+
             return redirect()->route('admin.perusahaan.index')->with('success', 'Data perusahaan berhasil diperbarui.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error updating company: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+            Log::error('Error updating company: '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine());
+
             return redirect()->route('admin.perusahaan.edit', $company->id)
-                             ->with('error', 'Gagal memperbarui perusahaan. Silakan coba lagi.')
-                             ->withInput();
+                ->with('error', 'Gagal memperbarui perusahaan. Silakan coba lagi.')
+                ->withInput();
         }
     }
 
@@ -213,17 +226,19 @@ class CompanyController extends Controller
             if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
                 Storage::disk('public')->delete($company->logo_path);
             }
-            
+
             if ($company->user) {
                 $company->user->delete();
             }
-            $company->delete(); 
-            
+            $company->delete();
+
             DB::commit();
+
             return redirect()->route('admin.perusahaan.index')->with('success', 'Perusahaan dan akun login terkait berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error("Error deleting company: " . $e->getMessage());
+            Log::error('Error deleting company: '.$e->getMessage());
+
             return redirect()->route('admin.perusahaan.index')->with('error', 'Gagal menghapus perusahaan. Pastikan tidak ada data terkait (lowongan/pendaftar) atau handle relasi tersebut.');
         }
     }

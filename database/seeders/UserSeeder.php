@@ -2,10 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
@@ -21,11 +20,11 @@ class UserSeeder extends Seeder
 
         if ($adminRole) {
             User::firstOrCreate(
-                ['username' => 'rey'], 
-                [ 
+                ['username' => 'rey'],
+                [
                     'name' => 'Administrator Sistem',
-                    'email' => 'admin@simmagang.test', 
-                    'password' => Hash::make('123456'), 
+                    'email' => 'admin@simmagang.test',
+                    'password' => Hash::make('123456'),
                     'role_id' => $adminRole->id,
                     'email_verified_at' => now(),
                 ]
@@ -34,58 +33,56 @@ class UserSeeder extends Seeder
             $this->command->error("Role 'admin' tidak ditemukan. User admin tidak di-seed.");
         }
 
-        
         if ($mahasiswaRole) {
             User::firstOrCreate(
-                ['username' => '2141720001'], 
+                ['username' => '2141720001'],
                 [
                     'name' => 'Budi Mahasiswa',
-                    'email' => 'budi.mahasiswa@simmagang.test', 
-                    'password' => Hash::make('password123'), 
+                    'email' => 'budi.mahasiswa@simmagang.test',
+                    'password' => Hash::make('password123'),
                     'role_id' => $mahasiswaRole->id,
                     'email_verified_at' => now(),
                 ]
             );
             User::firstOrCreate(
-                ['username' => '2141720002'], 
+                ['username' => '2141720002'],
                 [
                     'name' => 'Siti Pelajar',
-                    'email' => 'siti.pelajar@simmagang.test', 
+                    'email' => 'siti.pelajar@simmagang.test',
                     'password' => Hash::make('password123'),
                     'role_id' => $mahasiswaRole->id,
                     'email_verified_at' => now(),
                 ]
             );
             User::firstOrCreate(
-                ['username' => '2141720003'], 
+                ['username' => '2141720003'],
                 [
                     'name' => 'Ahmad Cendekia',
-                    'email' => 'ahmad.cendekia@simmagang.test', 
+                    'email' => 'ahmad.cendekia@simmagang.test',
                     'password' => Hash::make('password123'),
                     'role_id' => $mahasiswaRole->id,
                     'email_verified_at' => now(),
                 ]
             );
-            
-            $this->command->info(User::where('role_id', $mahasiswaRole->id)->count() . ' user mahasiswa telah di-seed/dipastikan ada.');
+
+            $this->command->info(User::where('role_id', $mahasiswaRole->id)->count().' user mahasiswa telah di-seed/dipastikan ada.');
 
         } else {
             $this->command->error("Role 'mahasiswa' tidak ditemukan. User mahasiswa tidak di-seed.");
         }
 
-        
         if ($dosenRole) {
             User::firstOrCreate(
-                ['username' => 'dosen001'], 
+                ['username' => 'dosen001'],
                 [
                     'name' => 'Dr. Retno Pembimbing',
-                    'email' => 'retno.pembimbing@simmagang.test', 
+                    'email' => 'retno.pembimbing@simmagang.test',
                     'password' => Hash::make('password'),
                     'role_id' => $dosenRole->id,
                     'email_verified_at' => now(),
                 ]
             );
-            $this->command->info(User::where('role_id', $dosenRole->id)->count() . ' user dosen telah di-seed/dipastikan ada.');
+            $this->command->info(User::where('role_id', $dosenRole->id)->count().' user dosen telah di-seed/dipastikan ada.');
 
         } else {
             $this->command->error("Role 'dosen' tidak ditemukan. User dosen tidak di-seed.");

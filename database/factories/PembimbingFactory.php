@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Pembimbing;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PembimbingFactory extends Factory
@@ -17,7 +17,7 @@ class PembimbingFactory extends Factory
         $dosenRole = Role::where('name', 'dosen')->first();
         $user = null;
         if ($dosenRole) {
-             // Cari user dosen yang belum punya detail pembimbing atau buat baru
+            // Cari user dosen yang belum punya detail pembimbing atau buat baru
             $user = User::factory()->create([
                 'role_id' => $dosenRole->id,
                 'username' => $this->faker->unique()->userName, // Atau NIP jika username adalah NIP
@@ -26,9 +26,8 @@ class PembimbingFactory extends Factory
             ]);
         }
 
-        $namaLengkap = $user ? $user->name : $this->faker->name . ', ' . $this->faker->randomElement(['S.Kom., M.Kom.', 'S.T., M.T.', 'Dr.']);
+        $namaLengkap = $user ? $user->name : $this->faker->name.', '.$this->faker->randomElement(['S.Kom., M.Kom.', 'S.T., M.T.', 'Dr.']);
         $emailInstitusi = $user ? $user->email : $this->faker->unique()->companyEmail;
-
 
         return [
             'user_id' => $user ? $user->id : null,

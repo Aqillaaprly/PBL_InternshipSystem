@@ -2,21 +2,21 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\Pendaftar;
-use App\Models\User;
 use App\Models\Lowongan;
-use App\Models\Role; // Pastikan Role di-import jika digunakan untuk mengambil mahasiswa
-use Carbon\Carbon;
+use App\Models\Pendaftar;
+use App\Models\Role;
+use App\Models\User;
+use Carbon\Carbon; // Pastikan Role di-import jika digunakan untuk mengambil mahasiswa
+use Illuminate\Database\Seeder;
 
 class PendaftarSeeder extends Seeder
 {
     public function run(): void
     {
         $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
-        if (!$mahasiswaRole) {
+        if (! $mahasiswaRole) {
             $this->command->error("Role 'mahasiswa' tidak ditemukan. PendaftarSeeder tidak dapat berjalan.");
+
             return;
         }
 
@@ -24,7 +24,8 @@ class PendaftarSeeder extends Seeder
         $lowongans = Lowongan::where('status', 'Aktif')->get();
 
         if ($mahasiswas->isEmpty() || $lowongans->isEmpty()) {
-            $this->command->warn("Tidak ada mahasiswa atau lowongan aktif yang ditemukan. PendaftarSeeder tidak membuat data.");
+            $this->command->warn('Tidak ada mahasiswa atau lowongan aktif yang ditemukan. PendaftarSeeder tidak membuat data.');
+
             return;
         }
 
@@ -32,16 +33,16 @@ class PendaftarSeeder extends Seeder
 
         foreach ($mahasiswas as $mahasiswa) {
             // Setiap mahasiswa mendaftar ke 1-2 lowongan acak
-            $jumlahLamaran = rand(1, min(2, $lowongans->count())); 
+            $jumlahLamaran = rand(1, min(2, $lowongans->count()));
             $lowongansDipilih = $lowongans->shuffle()->take($jumlahLamaran); // Ambil secara acak
 
             foreach ($lowongansDipilih as $lowongan) {
                 // Cek apakah pendaftar sudah ada untuk kombinasi user dan lowongan ini
                 $existingPendaftar = Pendaftar::where('user_id', $mahasiswa->id)
-                                            ->where('lowongan_id', $lowongan->id)
-                                            ->first();
+                    ->where('lowongan_id', $lowongan->id)
+                    ->first();
 
-                if (!$existingPendaftar) {
+                if (! $existingPendaftar) {
                     Pendaftar::create(
                         [
                             'user_id' => $mahasiswa->id,
@@ -63,7 +64,7 @@ class PendaftarSeeder extends Seeder
         // } else {
         //     $this->command->info('Tidak ada data pendaftar baru yang di-seed (mungkin semua kombinasi sudah ada).');
         // }
-        
+
         // $this->command->info('Memperbarui status lamaran pendaftar yang sudah ada menjadi "Ditinjau" (kecuali Ditolak)...');
         // $updatedCount = Pendaftar::whereNotIn('status_lamaran', ['Ditinjau', 'Ditolak'])
         //                          ->update(['status_lamaran' => 'Ditinjau']);

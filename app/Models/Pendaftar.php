@@ -46,7 +46,7 @@ class Pendaftar extends Model
         return $this->hasMany(DokumenPendaftar::class, 'pendaftar_id');
     }
 
-    //Jika Anda memiliki user_id di tabel pendaftar dan ingin tetap menggunakannya
+    // Jika Anda memiliki user_id di tabel pendaftar dan ingin tetap menggunakannya
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

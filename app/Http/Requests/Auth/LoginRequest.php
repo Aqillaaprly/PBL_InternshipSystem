@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
-use App\Models\Role;
-
 
 class LoginRequest extends FormRequest
 {
@@ -43,7 +41,7 @@ class LoginRequest extends FormRequest
     {
         $credentials = $this->only('username', 'password');
 
-        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'username' => __('auth.failed'),
             ]);
@@ -80,6 +78,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->input('username')) . '|' . $this->ip());
+        return Str::transliterate(Str::lower($this->input('username')).'|'.$this->ip());
     }
 }

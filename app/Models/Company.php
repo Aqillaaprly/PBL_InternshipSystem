@@ -35,6 +35,6 @@ class Company extends Model
      */
     public function lowongans() // Perubahan nama relasi menjadi plural
     {
-         return $this->hasMany(Lowongan::class);
+        return $this->hasMany(Lowongan::class);
     }
 }

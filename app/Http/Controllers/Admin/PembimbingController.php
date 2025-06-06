@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pembimbing;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log; // Pastikan ini ada
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule; // Pastikan ini ada
 
 class PembimbingController extends Controller
 {
@@ -23,15 +23,16 @@ class PembimbingController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('nip', 'like', "%{$searchTerm}%")
-                  ->orWhere('nama_lengkap', 'like', "%{$searchTerm}%")
-                  ->orWhere('email_institusi', 'like', "%{$searchTerm}%")
-                  ->orWhereHas('user', function($userQuery) use ($searchTerm) {
-                      $userQuery->where('username', 'like', "%{$searchTerm}%")
-                                ->orWhere('email', 'like', "%{$searchTerm}%");
-                  });
+                    ->orWhere('nama_lengkap', 'like', "%{$searchTerm}%")
+                    ->orWhere('email_institusi', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                        $userQuery->where('username', 'like', "%{$searchTerm}%")
+                            ->orWhere('email', 'like', "%{$searchTerm}%");
+                    });
             });
         }
         $pembimbings = $query->paginate(10)->withQueryString();
+
         return view('admin.Pembimbing.index', compact('pembimbings'));
     }
 
@@ -59,8 +60,8 @@ class PembimbingController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.pembimbings.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         DB::beginTransaction();
@@ -91,26 +92,30 @@ class PembimbingController extends Controller
             ]);
 
             DB::commit();
+
             return redirect()->route('admin.pembimbings.index')->with('success', 'Pembimbing berhasil ditambahkan.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error creating pembimbing: ' . $e->getMessage());
+            Log::error('Error creating pembimbing: '.$e->getMessage());
+
             return redirect()->route('admin.pembimbings.create')
-                        ->with('error', 'Gagal menambahkan pembimbing: ' . $e->getMessage())
-                        ->withInput();
+                ->with('error', 'Gagal menambahkan pembimbing: '.$e->getMessage())
+                ->withInput();
         }
     }
 
     public function show(Pembimbing $pembimbing)
     {
         $pembimbing->load('user');
+
         return view('admin.Pembimbing.show', compact('pembimbing'));
     }
 
     public function edit(Pembimbing $pembimbing)
     {
         $pembimbing->load('user');
+
         return view('admin.Pembimbing.edit', compact('pembimbing'));
     }
 
@@ -132,11 +137,11 @@ class PembimbingController extends Controller
             'maks_kuota_bimbingan' => 'required|integer|min:0',
             'status_aktif' => 'required|boolean',
         ]);
-        
+
         if ($validator->fails()) {
             return redirect()->route('admin.pembimbings.edit', $pembimbing->id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         DB::beginTransaction();
@@ -166,26 +171,28 @@ class PembimbingController extends Controller
             }
 
             $pembimbingDataToUpdate = $request->only([
-                'nip', 'nama_lengkap', 'email_institusi', 'nomor_telepon', 
-                'jabatan_fungsional', 'program_studi_homebase', 
-                'bidang_keahlian_utama', 'maks_kuota_bimbingan', 'status_aktif'
+                'nip', 'nama_lengkap', 'email_institusi', 'nomor_telepon',
+                'jabatan_fungsional', 'program_studi_homebase',
+                'bidang_keahlian_utama', 'maks_kuota_bimbingan', 'status_aktif',
             ]);
             // Pastikan user_id juga diupdate jika baru dibuat di atas
-            if (!$pembimbing->user_id && $user) {
-                 $pembimbingDataToUpdate['user_id'] = $user->id;
+            if (! $pembimbing->user_id && $user) {
+                $pembimbingDataToUpdate['user_id'] = $user->id;
             }
 
             $pembimbing->update($pembimbingDataToUpdate);
 
             DB::commit();
+
             return redirect()->route('admin.pembimbings.index')->with('success', 'Data pembimbing berhasil diperbarui.');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error updating pembimbing: ' . $e->getMessage());
+            Log::error('Error updating pembimbing: '.$e->getMessage());
+
             return redirect()->route('admin.pembimbings.edit', $pembimbing->id)
-                        ->with('error', 'Gagal memperbarui pembimbing: ' . $e->getMessage())
-                        ->withInput();
+                ->with('error', 'Gagal memperbarui pembimbing: '.$e->getMessage())
+                ->withInput();
         }
     }
 
@@ -198,7 +205,7 @@ class PembimbingController extends Controller
             }
 
             $user = $pembimbing->user;
-            $pembimbing->delete(); 
+            $pembimbing->delete();
 
             if ($user) {
                 // Periksa apakah user ini hanya memiliki peran sebagai dosen pembimbing yang dihapus
@@ -207,10 +214,12 @@ class PembimbingController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('admin.pembimbings.index')->with('success', 'Pembimbing dan akun login terkait berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error deleting pembimbing: ' . $e->getMessage());
+            Log::error('Error deleting pembimbing: '.$e->getMessage());
+
             return redirect()->route('admin.pembimbings.index')->with('error', 'Gagal menghapus pembimbing.');
         }
     }

@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\BimbinganMagang;
 use App\Models\Mahasiswa;
 use App\Models\Pembimbing;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class BimbinganMagangSeeder extends Seeder
 {
@@ -22,6 +22,7 @@ class BimbinganMagangSeeder extends Seeder
 
         if ($mahasiswas->isEmpty() || $pembimbings->isEmpty()) {
             $this->command->info('Tidak ada mahasiswa atau pembimbing. Jalankan `php artisan db:seed --class=MahasiswaSeeder` dan `php artisan db:seed --class=PembimbingSeeder` terlebih dahulu.');
+
             return;
         }
 

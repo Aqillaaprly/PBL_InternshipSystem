@@ -2,15 +2,14 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\Company;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
+use Faker\Factory as Faker;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-use Faker\Factory as Faker; // Import the Faker factory
+use Illuminate\Support\Str; // Import the Faker factory
 
 class CompanySeeder extends Seeder
 {
@@ -22,9 +21,10 @@ class CompanySeeder extends Seeder
         $faker = Faker::create('id_ID'); // Menggunakan Faker untuk data Indonesia
         $perusahaanRole = Role::where('name', 'perusahaan')->first();
 
-        if (!$perusahaanRole) {
+        if (! $perusahaanRole) {
             $this->command->error("Role 'perusahaan' tidak ditemukan. Pastikan RoleSeeder sudah dijalankan dan role 'perusahaan' ada.");
             Log::error("Role 'perusahaan' tidak ditemukan saat menjalankan CompanySeeder.");
+
             return;
         }
 
@@ -99,7 +99,7 @@ class CompanySeeder extends Seeder
                 'kode_pos' => $faker->postcode,
                 'telepon' => $faker->unique()->phoneNumber,
             ],
-             [
+            [
                 'nama_perusahaan' => 'PT. ABC Jaya',
                 'username' => 'pt_abc_jaya',
                 'user_email_prefix' => 'user_ptabc',
@@ -111,7 +111,7 @@ class CompanySeeder extends Seeder
                 'kota' => 'Bandung',
                 'provinsi' => 'Jawa Barat',
                 'kode_pos' => '40111',
-                'telepon' => '022-1234567'
+                'telepon' => '022-1234567',
             ],
             [
                 'nama_perusahaan' => 'CV. Sinar Maju Bersama',
@@ -125,7 +125,7 @@ class CompanySeeder extends Seeder
                 'kota' => 'Surabaya',
                 'provinsi' => 'Jawa Timur',
                 'kode_pos' => '60111',
-                'telepon' => '031-7654321'
+                'telepon' => '031-7654321',
             ],
             // Tambahkan data perusahaan lain jika perlu
         ];
@@ -135,8 +135,8 @@ class CompanySeeder extends Seeder
             $user = User::firstOrCreate(
                 ['username' => $companyData['username']],
                 [
-                    'name' => $companyData['nama_perusahaan'] . ' Admin', // atau nama kontak jika ada
-                    'email' => $companyData['user_email_prefix'] . '@simmagang.test', // Pastikan email unik
+                    'name' => $companyData['nama_perusahaan'].' Admin', // atau nama kontak jika ada
+                    'email' => $companyData['user_email_prefix'].'@simmagang.test', // Pastikan email unik
                     'password' => Hash::make('password123'), // Ganti dengan password default yang aman
                     'role_id' => $perusahaanRole->id,
                     'email_verified_at' => now(),
@@ -173,8 +173,8 @@ class CompanySeeder extends Seeder
                 Company::factory()->count($numberOfFactoryCompanies)->create();
                 $this->command->info("{$numberOfFactoryCompanies} data perusahaan tambahan berhasil dibuat menggunakan factory.");
             } catch (\Exception $e) {
-                $this->command->error("Gagal membuat perusahaan menggunakan factory: " . $e->getMessage());
-                Log::error("CompanySeeder Factory Error: " . $e->getMessage());
+                $this->command->error('Gagal membuat perusahaan menggunakan factory: '.$e->getMessage());
+                Log::error('CompanySeeder Factory Error: '.$e->getMessage());
             }
         }
 

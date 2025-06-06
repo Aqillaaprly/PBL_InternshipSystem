@@ -58,7 +58,7 @@ class Pembimbing extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-       // Seorang pembimbing bisa membimbing banyak mahasiswa (melalui tabel BimbinganMagang)
+    // Seorang pembimbing bisa membimbing banyak mahasiswa (melalui tabel BimbinganMagang)
     public function bimbinganMagangs()
     {
         return $this->hasMany(BimbinganMagang::class, 'pembimbing_id');

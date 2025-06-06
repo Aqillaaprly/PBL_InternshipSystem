@@ -4,10 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\User; 
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
-use Illuminate\Http\Request;
+use App\Models\User;
 
 class AdminDashboardController extends Controller
 {
@@ -18,7 +17,7 @@ class AdminDashboardController extends Controller
      */
     public function index()
     {
-        
+
         $jumlahPerusahaan = Company::count();
         $jumlahLowongan = Lowongan::count();
         $jumlahPendaftar = Pendaftar::count();
@@ -28,7 +27,6 @@ class AdminDashboardController extends Controller
         $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
         $jumlahMahasiswa = $mahasiswaRole ? User::where('role_id', $mahasiswaRole->id)->count() : 0;
 
-
         $companies = Company::whereHas('lowongan') // Hanya perusahaan yang punya lowongan
             ->with('lowongan')     // Eager load lowongan agar efisien di view
             ->latest()
@@ -36,33 +34,34 @@ class AdminDashboardController extends Controller
             ->get();
 
         $acceptedPendaftars = Pendaftar::where('status_lamaran', 'Diterima')
-                                    ->with(['user.detailMahasiswa', 'user.role']) 
-                                    ->get();
+            ->with(['user.detailMahasiswa', 'user.role'])
+            ->get();
 
         $statsProdiDiterima = [
             'Teknik Informatika' => 0,
             'Sistem Informasi Bisnis' => 0,
-            'Lainnya' => 0, 
+            'Lainnya' => 0,
         ];
 
-        if ($mahasiswaRole) { 
+        if ($mahasiswaRole) {
             foreach ($acceptedPendaftars as $pendaftar) {
-                if ($pendaftar->user && 
-                    $pendaftar->user->role_id == $mahasiswaRole->id && 
+                if ($pendaftar->user &&
+                    $pendaftar->user->role_id == $mahasiswaRole->id &&
                     $pendaftar->user->detailMahasiswa &&
-                    !empty($pendaftar->user->detailMahasiswa->program_studi)
+                    ! empty($pendaftar->user->detailMahasiswa->program_studi)
                 ) {
                     $prodi = $pendaftar->user->detailMahasiswa->program_studi;
                     if (array_key_exists($prodi, $statsProdiDiterima)) {
                         $statsProdiDiterima[$prodi]++;
                     } else {
-                        $statsProdiDiterima['Lainnya']++; 
+                        $statsProdiDiterima['Lainnya']++;
                     }
-                } elseif($pendaftar->user && $pendaftar->user->role_id == $mahasiswaRole->id) {
-                     $statsProdiDiterima['Lainnya']++;
+                } elseif ($pendaftar->user && $pendaftar->user->role_id == $mahasiswaRole->id) {
+                    $statsProdiDiterima['Lainnya']++;
                 }
             }
         }
+
         return view('admin.dashboard', compact(
             'jumlahPerusahaan',
             'jumlahLowongan',
