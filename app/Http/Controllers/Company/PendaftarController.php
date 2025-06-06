@@ -146,9 +146,9 @@ class PendaftarController extends Controller
             abort(403, 'Aksi tidak diizinkan. Pendaftar ini bukan untuk lowongan perusahaan Anda.');
         }
 
-        $pendaftar->load(['user', 'lowongan.company', 'dokumenPendaftars']);
+        $pendaftar->load(['user', 'user.detailMahasiswa', 'lowongan.company', 'dokumenPendaftars']);
 
-        return view('perusahaan.pendaftar.show', compact('pendaftar'));
+        return view('perusahaan.pendaftar.detail', compact('pendaftar'));
     }
 
     /**
@@ -166,7 +166,7 @@ class PendaftarController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'status_lamaran' => 'required|in:Pending,Ditinjau,Wawancara,Diterima,Ditolak',
+            'status_lamaran' => 'required|in:Ditinjau,Diterima,Ditolak',
         ]);
 
         if ($validator->fails()) {
@@ -300,15 +300,15 @@ class PendaftarController extends Controller
         $currentStatus = $pendaftar->status_lamaran;
 
         if ($semuaDokumenWajibValid) {
-            if ($currentStatus === 'Pending') {
+            if ($currentStatus === 'Ditinjau') {
                 $pendaftar->status_lamaran = 'Ditinjau';
                 $pendaftar->save();
                 session()->flash('info', 'Semua dokumen wajib '.$userNama.' telah valid. Status lamaran diubah menjadi "Ditinjau".');
             }
         } else {
-            if (! in_array($currentStatus, ['Pending', 'Ditolak'])) {
+            if (! in_array($currentStatus, ['Ditinjau', 'Ditolak'])) {
                 $oldStatusForMsg = $pendaftar->status_lamaran;
-                $pendaftar->status_lamaran = 'Pending';
+                $pendaftar->status_lamaran = 'Ditinjau';
                 $pendaftar->save();
                 session()->flash('warning', 'Dokumen pendaftar '.$userNama.' belum lengkap/valid ('.implode(', ', $pesanDetail).'). Status lamaran ('.$oldStatusForMsg.') dikembalikan ke "Pending".');
             }

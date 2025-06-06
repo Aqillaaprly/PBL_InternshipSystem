@@ -77,7 +77,7 @@
                                     </td>
                                     <td class="px-5 py-3 text-center align-middle">
                                         <div class="flex item-center justify-center space-x-1 sm:space-x-2">
-                                            <a href="{{ route('perusahaan.pendaftar.show', $pendaftar->id) }}"
+                                            <a href="{{ route('perusahaan.pendaftar.detail', $pendaftar->id) }}"
                                                class="text-xs bg-sky-100 text-sky-600 hover:bg-sky-200 px-3 py-1.5 rounded-md font-medium">Detail</a>
                                         </div>
                                     </td>
