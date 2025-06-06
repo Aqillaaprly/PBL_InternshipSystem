@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Dosen;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\BimbinganMagang;
+use App\Models\LogBimbinganMagang;
 
 class LogBimbingan extends Controller
 {

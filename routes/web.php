@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\PenugasanPembimbingController;
 use App\Http\Controllers\Company\CompanyController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
-use App\Http\Controllers\Dosen\AbsensiMahasiswaController; //dosen
+use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; //dosen
 use App\Http\Controllers\Dosen\LogBimbingan; //dosen
 
 // Mengarahkan halaman utama ('/') ke halaman login
@@ -70,6 +70,8 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
     Route::get('/log-bimbingan', [LogBimbingan::class, 'index'])->name('data_log');
     Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
+    Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
+    Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
 });
 
 
