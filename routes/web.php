@@ -17,7 +17,9 @@ use App\Http\Controllers\Mahasiswa\MahasiswaController;
 use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileController;
 use App\Http\Controllers\Mahasiswa\LowonganController as MahasiswaLowonganController;
 use App\Http\Controllers\Mahasiswa\PendaftarController;
+use App\Http\Controllers\Mahasiswa\LaporanController as MahasiswaLaporanController;
 use App\Models\Company;
+use App\Models\BimbinganMagang;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -101,10 +103,25 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     })->name('perusahaan');
 
     // Laporan
-    Route::get('/laporan', fn() => view('mahasiswa.laporan'))->name('laporan');
+    Route::get('/laporan', function () {
+        $userId = Auth::id();
+
+        $bimbingans = BimbinganMagang::where('mahasiswa_id', $userId)
+            ->with(['pembimbing.user', 'company', 'lowongan'])
+            ->get();
+
+        return view('mahasiswa.laporan', compact('bimbingans'));
+    })->name('laporan');
+
+    // Tambah dan Hapus Bimbingan Magang (Laporan)
+    Route::post('/bimbingan', [MahasiswaLaporanController::class, 'store'])->name('bimbingan.store');
+    Route::delete('/bimbingan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('bimbingan.destroy');
+
+
 
     // ✅ Lowongan (dengan resource controller)
     Route::resource('lowongan', MahasiswaLowonganController::class);
+
 
     // ✅ Pendaftar routes (cleaned, no extra middleware)
     Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])

@@ -38,4 +38,16 @@ class MahasiswaController extends Controller
 
         return view('mahasiswa.dosen_pembimbing', compact('bimbinganAktif'));
     }
+
+    // ✅ Menampilkan daftar bimbingan untuk laporan view
+    public function laporan()
+    {
+        $userId = Auth::id();
+
+        $bimbingans = BimbinganMagang::where('mahasiswa_user_id', $userId)
+            ->with(['pembimbing.user', 'company', 'lowongan']) // eager load if needed
+            ->get();
+
+        return view('mahasiswa.laporan', compact('bimbingans'));
+    }
 }

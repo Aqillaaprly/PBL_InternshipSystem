@@ -31,33 +31,36 @@
                 <thead class="bg-gray-100">
                 <tr>
                     <th class="px-4 py-3">No</th>
-                    <th class="px-4 py-3">Email</th>
-                    <th class="px-4 py-3">Nama</th>
-                    <th class="px-4 py-3">Kelas</th>
-                    <th class="px-4 py-3">Perusahaan</th>
+                    <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Keterangan</th>
                     <th class="px-4 py-3">Kegiatan</th>
                     <th class="px-4 py-3">Foto</th>
                     <th class="px-4 py-3">Aksi</th>
                 </tr>
                 </thead>
-                <tbody id="tableBody">
-                <?php for ($i = 1; $i <= 5; $i++): ?>
-                    <tr class="border-b">
-                        <td class="px-4 py-3"><?= $i ?></td>
-                        <td class="px-4 py-3">mhs<?= $i ?>@email.com</td>
-                        <td class="px-4 py-3">Mahasiswa <?= $i ?></td>
-                        <td class="px-4 py-3">TI-<?= $i ?>A</td>
-                        <td class="px-4 py-3">Perusahaan <?= $i ?></td>
-                        <td class="px-4 py-3">Mengerjakan proyek <?= $i ?></td>
-                        <td class="px-4 py-3">
-                            <img src="https://tp-fst.ut.ac.id/wp-content/uploads/2024/10/magang-di-tsn-prodi-tp-1.jpg" alt="Foto" class="mx-auto rounded w-16 h-16 object-fit" />
-                        </td>
-                        <td class="px-4 py-3 space-x-1">
-                            <button class="editBtn bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200 transition">Edit</button>
-                            <button class="deleteBtn bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200 transition">Delete</button>
-                        </td>
-                    </tr>
-                <?php endfor; ?>
+                <tbody>
+                @foreach($bimbingans as $index => $bimbingan)
+                <tr class="border-b">
+                    <td class="px-4 py-3">{{ $index + 1 }}</td>
+                    <td class="px-4 py-3">{{ $bimbingan->tanggal }}</td>
+                    <td class="px-4 py-3">{{ $bimbingan->jenis_bimbingan }}</td>
+                    <td class="px-4 py-3">{{ $bimbingan->catatan }}</td>
+                    <td class="px-4 py-3">
+                        @if($bimbingan->foto)
+                        <img src="{{ asset('storage/' . $bimbingan->foto->path) }}" class="w-16 h-16 mx-auto rounded" />
+                        @else
+                        <span class="text-gray-400 italic">No image</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-3">
+                        <form action="{{ route('mahasiswa.bimbingan.destroy', $bimbingan->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
                 </tbody>
             </table>
         </div>
@@ -78,30 +81,26 @@
     <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div id="formContainer" class="bg-white p-6 rounded-lg w-full max-w-xl relative">
             <h2 class="text-xl font-semibold mb-4">Tambah Data Laporan</h2>
-            <form id="absensiForm" class="space-y-4">
+            <form action="{{ route('mahasiswa.bimbingan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <input type="hidden" name="mahasiswa_id" value="{{ auth()->user()->id }}">
+                <input type="hidden" name="pembimbing_id" value="1"> {{-- Replace with real ID --}}
+
                 <div>
-                    <label class="block text-sm font-medium">Email</label>
-                    <input type="email" name="email" required class="w-full border border-gray-300 rounded px-4 py-2" />
+                    <label class="block text-sm font-medium">Tanggal</label>
+                    <input type="date" name="tanggal" required class="w-full border px-4 py-2 rounded">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Nama</label>
-                    <input type="text" name="nama" required class="w-full border border-gray-300 rounded px-4 py-2" />
+                    <label class="block text-sm font-medium">Jenis Bimbingan</label>
+                    <input type="text" name="jenis_bimbingan" required class="w-full border px-4 py-2 rounded">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Kelas</label>
-                    <input type="text" name="kelas" required class="w-full border border-gray-300 rounded px-4 py-2" />
+                    <label class="block text-sm font-medium">Catatan</label>
+                    <textarea name="catatan" required class="w-full border px-4 py-2 rounded"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Perusahaan</label>
-                    <input type="text" name="perusahaan" required class="w-full border border-gray-300 rounded px-4 py-2" />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Kegiatan</label>
-                    <input type="text" name="kegiatan" required class="w-full border border-gray-300 rounded px-4 py-2" />
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Foto</label>
-                    <input type="file" name="foto" accept="image/*" class="w-full border border-gray-300 rounded px-4 py-2" />
+                    <label class="block text-sm font-medium">Foto Bukti</label>
+                    <input type="file" name="foto" accept="image/*" class="w-full border px-4 py-2 rounded">
                 </div>
                 <div class="flex justify-end space-x-2">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Simpan</button>
@@ -109,7 +108,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div
 
 </main>
 

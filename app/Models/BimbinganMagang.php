@@ -21,6 +21,11 @@ class BimbinganMagang extends Model
         'tanggal_selesai',
         'status_bimbingan',
         'catatan_koordinator',
+        'mahasiswa_id',
+        'pembimbing_id',
+        'tanggal',
+        'jenis_bimbingan',
+        'catatan'
     ];
 
     protected $casts = [
@@ -48,5 +53,11 @@ class BimbinganMagang extends Model
     public function lowongan()
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
+    }
+
+    // ✅ New relation to BimbinganFoto
+    public function foto()
+    {
+        return $this->hasOne(BimbinganFoto::class, 'bimbingan_id');
     }
 }
