@@ -13,7 +13,7 @@
         <div class="bg-white p-8 rounded-xl shadow-md">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-2xl font-bold text-blue-800">Detail Absensi Per Bulan</h1>
-                <a href="{{ route('absensi.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Rekap Akumulasi</a>
+                <a href="{{ route('dosen.absensi.index') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Rekap Akumulasi</a>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">

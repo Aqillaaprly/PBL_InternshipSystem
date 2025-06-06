@@ -37,8 +37,7 @@
                             <td class="px-5 py-4">{{ $item->periode_magang }}</td>
                             <td class="px-5 py-4">{{ $item->total_hadir }}</td>
                             <td class="px-5 py-4">
-                                <a href="{{ route('absensi.show', $item->id) }}" class="text-blue-600 hover:underline mr-2">Detail Absensi</a>
-                                <a href="{{ route('data_log', $item->id) }}" class="text-green-600 hover:underline">Log Bimbingan</a>
+                                <a href="{{ route('dosen.absensi.show', $item->id) }}" class="text-blue-600 hover:underline mr-2">Detail Absensi</a>
                             </td>
                         </tr>
                         @empty

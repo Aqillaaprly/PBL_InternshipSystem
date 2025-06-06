@@ -11,22 +11,20 @@ use App\Models\LogBimbinganMagang;
 class LogBimbingan extends Controller
 {
     public function index(Request $request)
-    {
-        $query = User::whereHas('role', fn($q) => $q->where('name', 'mahasiswa'));
+{
+    $search = $request->input('search');
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
+    $bimbingans = BimbinganMagang::with(['mahasiswa', 'pembimbing', 'company'])
+        ->when($search, function ($query, $search) {
+            $query->whereHas('mahasiswa', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                   ->orWhere('username', 'like', "%{$search}%");
             });
-        }
+        })
+        ->paginate(10);
 
-        $mahasiswas = $query->with('detailMahasiswa')->paginate(10);
-
-        // This view needs to exist at: resources/views/dosen/data_mahasiswabim.blade.php
-        return view('dosen.data_log', compact('mahasiswas'));
-    }
-
+    return view('dosen.data_log', compact('bimbingans'));
+}
     public function show($id)
     {
         $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);

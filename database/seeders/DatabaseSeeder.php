@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
         LowonganSeeder::class,
         PendaftarSeeder::class,
         DokumenPendaftarSeeder::class,
+        BimbinganMagangSeeder::class,
+        AbsensiMahasiswaSeeder::class,
         ]);
     }
 }

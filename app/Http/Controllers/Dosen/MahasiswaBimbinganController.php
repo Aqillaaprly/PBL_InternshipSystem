@@ -4,28 +4,26 @@ namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// ... other necessary imports ...
 use App\Models\User; // Used in the index method
+use App\Models\BimbinganMagang;
 
 class MahasiswaBimbinganController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = User::whereHas('role', fn($q) => $q->where('name', 'mahasiswa'));
+{
+    $search = $request->input('search');
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%");
+    $bimbingans = BimbinganMagang::with(['mahasiswa.detailMahasiswa'])
+        ->when($search, function ($query, $search) {
+            $query->whereHas('mahasiswa.detailMahasiswa', function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nim', 'like', "%{$search}%");
             });
-        }
+        })
+        ->paginate(10);
 
-        $mahasiswas = $query->with('detailMahasiswa')->paginate(10);
-
-        // This view needs to exist at: resources/views/dosen/data_mahasiswabim.blade.php
-        return view('dosen.data_mahasiswabim', compact('mahasiswas'));
-    }
-
+    return view('dosen.data_mahasiswabim', compact('bimbingans'));
+}
     public function show($id)
     {
         $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
