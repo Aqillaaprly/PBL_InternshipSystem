@@ -12,11 +12,10 @@ class Pendaftar extends Model
     protected $table = 'pendaftars';
 
     protected $fillable = [
-        'mahasiswa_id', // <-- Pastikan ini ada di tabel pendaftars Anda
+        'mahasiswa_id', 
         'lowongan_id',
         'tanggal_daftar',
         'status_lamaran',
-        // Kolom di bawah ini mungkin tidak lagi dipakai langsung jika dokumen dikelola di DokumenPendaftar
         'surat_lamaran_path',
         'cv_path',
         'portofolio_path',

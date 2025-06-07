@@ -63,4 +63,8 @@ class Pembimbing extends Model
     {
         return $this->hasMany(BimbinganMagang::class, 'pembimbing_id');
     }
+    public function aktivitasMagangs()
+    {
+        return $this->hasMany(AktivitasMagang::class, 'pembimbing_id');
+    }
 }

@@ -75,4 +75,14 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
             'id'                    // Local key di tabel pembimbings
         );
     }
+    public function pendaftars() // <-- Nama relasi diubah ke plural dari model Pendaftar
+    {
+        return $this->hasMany(Pendaftar::class, 'user_id');
+    }
+
+    // Relasi ke Pembimbing (jika user adalah pembimbing)
+    public function detailPembimbing()
+    {
+        return $this->hasOne(Pembimbing::class, 'user_id', 'id');
+    }
 }

@@ -1,17 +1,21 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\LowonganController as AdminLowonganController; // Untuk manajemen user data
-use App\Http\Controllers\Admin\MahasiswaAktivitasAbsensiController;
+use App\Http\Controllers\Admin\AktivitasController;
 use App\Http\Controllers\Admin\MahasiswaController as AdminMahasiswaController; // Di-alias sebagai AdminCompanyController
 use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController;
 use App\Http\Controllers\Admin\PendaftarController as AdminPendaftarController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\AktivitasMagangController;
+
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
+
 use App\Http\Controllers\Dosen\LogBimbingan;
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController;
 use App\Http\Controllers\UserController; // dosen
@@ -59,8 +63,11 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::resource('pembimbings', AdminPembimbingController::class);
 
     // Aktivitas & Absensi Mahasiswa (Admin View Only)
-    Route::get('/aktivitas-absensi', [MahasiswaAktivitasAbsensiController::class, 'index'])->name('aktivitas-absensi.index');
-    Route::get('/aktivitas-absensi/{aktivitas}', [MahasiswaAktivitasAbsensiController::class, 'show'])->name('aktivitas-absensi.show');
+    Route::get('/aktivitas-mahasiswa', [AktivitasController::class, 'index'])->name('aktivitas-mahasiswa.index'); // Tabel utama mahasiswa
+    Route::get('/aktivitas-mahasiswa/{mahasiswa_id}', [AktivitasController::class, 'show'])->name('aktivitas-mahasiswa.show'); // Halaman detail kegiatan
+    Route::post('/aktivitas-mahasiswa/{id}/verify', [AktivitasController::class, 'verify'])->name('aktivitas-mahasiswa.verify'); // Untuk verifikasi aktivitas
+
+
 });
 
 // DOSEN GROUP
