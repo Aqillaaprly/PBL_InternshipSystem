@@ -62,15 +62,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label for="document_status_filter" class="block text-sm font-medium text-gray-700">Status Dokumen</label>
-                            <select name="document_status_filter" id="document_status_filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                <option value="">Semua Status Dokumen</option>
-                                <option value="Valid" {{ ($selectedDocumentStatusFilter == 'Valid') ? 'selected' : '' }}>Valid</option>
-                            </select>
-                        </div>
-                    </div>
                 </div>
                 <div class="mt-4 text-right">
                     <button type="submit" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">Filter</button>
@@ -88,7 +79,6 @@
                             {{-- Hapus kolom Perusahaan --}}
                             <th class="px-5 py-3">Tgl Daftar</th>
                             <th class="px-5 py-3 text-center">Status Lamaran</th>
-                            <th class="px-5 py-3 text-center">Status Dokumen Wajib</th>
                             <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -112,26 +102,21 @@
                                     </span>
                                 </td>
                                 <td class="px-5 py-4 text-center align-middle">
-                                    <span class="status-badge-sm
-                                        @if ($pendaftar->status_kelengkapan_dokumen == 'Validate') status-dokumen-overall-validate
-                                        @else status-dokumen-overall-invalidate @endif">
-                                        {{ $pendaftar->status_kelengkapan_dokumen }}
-                                    </span>
-                                </td>
-                                <td class="px-5 py-4 text-center align-middle">
-                                    <div class="flex item-center justify-center space-x-1 sm:space-x-2">
-                                        <form action="{{ route('perusahaan.pendaftar.updateStatus', $pendaftar->id) }}" method="POST">
-                                                @csrf
-                                                <select name="status_lamaran" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
-                                                    <option value="Ditinjau" {{ $pendaftar->status_lamaran == 'Ditinjau' ? 'selected' : '' }}>Ditinjau</option>
-                                                    <option value="Diterima" {{ $pendaftar->status_lamaran == 'Diterima' ? 'selected' : '' }}>Diterima</option>
-                                                    <option value="Ditolak" {{ $pendaftar->status_lamaran == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                                </select>
-                                            </form>  
-                                        <a href="{{ route('perusahaan.pendaftar.showDokumen', $pendaftar->id) }}" class="text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1.5 rounded-md font-medium">Dokumen</a>
-        
-                                    </div>
-                                </td>
+    <div class="flex item-center justify-center space-x-1 sm:space-x-2">
+        {{-- THIS IS THE FORM FOR UPDATING STATUS LAMARAN --}}
+        <form action="{{ route('perusahaan.pendaftar.updateStatusLamaran', $pendaftar->id) }}" method="POST">
+    @csrf
+    @method('PATCH') {{-- This line is critical for PATCH requests from HTML forms --}}
+    <select name="status_lamaran" onchange="this.form.submit()" class="border border-gray-300 rounded-md px-2 py-1 text-xs focus:ring-blue-500 focus:border-blue-500">
+        <option value="Ditinjau" {{ $pendaftar->status_lamaran == 'Ditinjau' ? 'selected' : '' }}>Ditinjau</option>
+        <option value="Diterima" {{ $pendaftar->status_lamaran == 'Diterima' ? 'selected' : '' }}>Diterima</option>
+        <option value="Ditolak" {{ $pendaftar->status_lamaran == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
+    </select>
+</form>
+        {{-- Link to view documents --}}
+        <a href="{{ route('perusahaan.pendaftar.showDokumen', $pendaftar->id) }}" class="text-xs bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1.5 rounded-md font-medium">Dokumen</a>
+    </div>
+</td>
                             </tr>
                         @empty
                             <tr>

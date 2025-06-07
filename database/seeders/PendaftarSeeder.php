@@ -34,7 +34,7 @@ class PendaftarSeeder extends Seeder
         foreach ($mahasiswas as $mahasiswa) {
             // Setiap mahasiswa mendaftar ke 1-2 lowongan acak
             $jumlahLamaran = rand(1, min(2, $lowongans->count()));
-            $lowongansDipilih = $lowongans->shuffle()->take($jumlahLamaran); // Ambil secara acak
+           $lowongansDipilih = $lowongans->random($jumlahLamaran);
 
             foreach ($lowongansDipilih as $lowongan) {
                 // Cek apakah pendaftar sudah ada untuk kombinasi user dan lowongan ini
@@ -42,13 +42,17 @@ class PendaftarSeeder extends Seeder
                     ->where('lowongan_id', $lowongan->id)
                     ->first();
 
-                if (! $existingPendaftar) {
+                 $existingPendaftar = Pendaftar::where('user_id', $mahasiswa->id)
+                                            ->where('lowongan_id', $lowongan->id)
+                                            ->first();
+
+                if (!$existingPendaftar) {
                     Pendaftar::create(
                         [
                             'user_id' => $mahasiswa->id,
                             'lowongan_id' => $lowongan->id,
                             'tanggal_daftar' => Carbon::now()->subDays(rand(1, 30))->toDateString(),
-                            'status_lamaran' => fake()->randomElement(['Diterima', 'Ditinjau', 'Ditolak']),
+                            'status_lamaran' => 'Pending', // <-- PERUBAHAN DI SINI: Set default ke Pending
                             'surat_lamaran_path' => 'dokumen_pendaftar_dummies/surat_lamaran_contoh.pdf',
                             'cv_path' => 'dokumen_pendaftar_dummies/cv_contoh.pdf',
                             'catatan_pendaftar' => 'Saya sangat tertarik dengan posisi ini.',
@@ -57,21 +61,20 @@ class PendaftarSeeder extends Seeder
                     $jumlahPendaftarDibuat++;
                 }
             }
+        }  
+        if ($jumlahPendaftarDibuat > 0) {
+            $this->command->info($jumlahPendaftarDibuat . ' data pendaftar baru telah di-seed dengan status lamaran "Pending".');
+        } else {
+            $this->command->info('Tidak ada data pendaftar baru yang di-seed (mungkin semua kombinasi sudah ada).');
         }
-
-        // if ($jumlahPendaftarDibuat > 0) {
-        //     $this->command->info($jumlahPendaftarDibuat . ' data pendaftar baru telah di-seed dengan status lamaran "Ditinjau".');
-        // } else {
-        //     $this->command->info('Tidak ada data pendaftar baru yang di-seed (mungkin semua kombinasi sudah ada).');
-        // }
-
-        // $this->command->info('Memperbarui status lamaran pendaftar yang sudah ada menjadi "Ditinjau" (kecuali Ditolak)...');
-        // $updatedCount = Pendaftar::whereNotIn('status_lamaran', ['Ditinjau', 'Ditolak'])
-        //                          ->update(['status_lamaran' => 'Ditinjau']);
-        // if ($updatedCount > 0) {
-        //     $this->command->info($updatedCount . ' status pendaftar yang sudah ada telah diubah menjadi "Ditinjau".');
-        // } else {
-        //     $this->command->info('Tidak ada status pendaftar yang perlu diubah (semua sudah Ditinjau atau Ditolak).');
-        // }
+        
+        $this->command->info('Memperbarui status lamaran pendaftar yang sudah ada menjadi "Pending" (kecuali Ditolak)...');
+        $updatedCount = Pendaftar::whereNotIn('status_lamaran', ['Pending', 'Ditolak'])
+                                 ->update(['status_lamaran' => 'Pending']);
+        if ($updatedCount > 0) {
+            $this->command->info($updatedCount . ' status pendaftar yang sudah ada telah diubah menjadi "Pending".');
+        } else {
+            $this->command->info('Tidak ada status pendaftar yang perlu diubah (semua sudah Pending atau Ditolak).');
+        } 
     }
 }
