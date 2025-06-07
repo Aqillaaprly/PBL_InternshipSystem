@@ -119,10 +119,12 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::post('/lowongan', [CompanyController::class, 'storeLowongan'])->name('lowongan.store');
 
     // Pendaftar Management
+    
+     Route::patch('/pendaftar/{pendaftar}/update-status-lamaran', [PendaftarController::class, 'updateStatusLamaran'])->name('pendaftar.updateStatusLamaran');
     Route::get('/pendaftar', [PendaftarController::class, 'index'])->name('pendaftar.index');
-    Route::get('/pendaftar/dokumen/{dokumen}', [PendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
-    Route::post('/pendaftar/{pendaftar}/update-status', [PendaftarController::class, 'updateStatus'])->name('pendaftar.updateStatus');
     Route::get('/pendaftar/{pendaftar}', [PendaftarController::class, 'show'])->name('pendaftar.detail');
+    Route::get('/pendaftar/{pendaftar}/dokumen', [PendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
+    Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [PendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
 
     // Activities
     Route::get('/aktivitas_magang', [CompanyController::class, 'aktivitas_magang'])->name('aktivitas_magang');

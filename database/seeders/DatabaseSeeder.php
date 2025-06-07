@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
             PendaftarSeeder::class,
             DokumenPendaftarSeeder::class,
             BimbinganMagangSeeder::class,
-            AktivitasMagangSeeder::class,
+            // AktivitasMagangSeeder::class,
         ]);
     }
 }
