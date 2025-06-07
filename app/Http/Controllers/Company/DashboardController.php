@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $recentPendaftars = Pendaftar::whereHas('lowongan', function($query) use ($companyId) {
                 $query->where('company_id', $companyId);
             })
-            ->where('status_lamaran', 'Ditinjau') // <--- Add this condition
+            ->where('status_lamaran', 'Diterima') // <--- Add this condition
             ->latest('tanggal_daftar') // Order by latest application date
             ->take(5) // Limit to a few recent ones for the dashboard
             ->get();
