@@ -21,16 +21,13 @@ class AdminDashboardController extends Controller
         $jumlahPerusahaan = Company::count();
         $jumlahLowongan = Lowongan::count();
         $jumlahPendaftar = Pendaftar::count();
-
-        // Contoh menghitung jumlah mahasiswa (user dengan role_id tertentu)
-        // Pastikan model Role dan relasinya dengan User sudah benar
         $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
         $jumlahMahasiswa = $mahasiswaRole ? User::where('role_id', $mahasiswaRole->id)->count() : 0;
 
-        $companies = Company::whereHas('lowongan') // Hanya perusahaan yang punya lowongan
-            ->with('lowongan')     // Eager load lowongan agar efisien di view
+        $companies = Company::whereHas('lowongans') 
+            ->with('lowongans')   
             ->latest()
-            ->take(3) // Mengambil 3 perusahaan
+            ->take(3) 
             ->get();
 
         $acceptedPendaftars = Pendaftar::where('status_lamaran', 'Diterima')

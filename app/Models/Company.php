@@ -30,10 +30,7 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the vacancies offered by the company.
-     */
-    public function lowongans() // Perubahan nama relasi menjadi plural
+    public function lowongans() 
     {
         return $this->hasMany(Lowongan::class);
     }
