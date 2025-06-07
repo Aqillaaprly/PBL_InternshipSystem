@@ -17,7 +17,7 @@
                 <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
                 <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
                 {{-- Link ke route perusahaan.lowongan.create jika ada --}}
-                <a href="{{-- route('perusahaan.lowongan.create') --}}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
+                <a href="{{route('perusahaan.tambah_lowongan')  }}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
             </div>
         </div>
         <div class="overflow-x-auto">

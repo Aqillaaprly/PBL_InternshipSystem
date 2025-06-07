@@ -56,7 +56,6 @@
                                 <option value="">Semua Status</option>
                 
                                 <option value="Ditinjau" {{ ($selectedStatusLamaran == 'Ditinjau') ? 'selected' : '' }}>Ditinjau</option>
-                               
                                 <option value="Diterima" {{ ($selectedStatusLamaran == 'Diterima') ? 'selected' : '' }}>Diterima</option>
                                 <option value="Ditolak" {{ ($selectedStatusLamaran == 'Ditolak') ? 'selected' : '' }}>Ditolak</option>
                             </select>
