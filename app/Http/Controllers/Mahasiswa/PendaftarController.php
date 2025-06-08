@@ -11,7 +11,7 @@ use App\Models\Lowongan;
 class PendaftarController extends Controller
 {
     // Show form and list of user's applications
-    public function showPendaftaranForm()
+    public function showPendaftaranForm(Request $request)
     {
         $lowongans = Lowongan::with('company')->get();
 
@@ -20,7 +20,9 @@ class PendaftarController extends Controller
             ->latest()
             ->get();
 
-        return view('mahasiswa.pendaftar', compact('lowongans', 'pendaftarans'));
+        $prefilledLowonganId = $request->query('lowongan_id');
+
+        return view('mahasiswa.pendaftar', compact('lowongans', 'pendaftarans', 'prefilledLowonganId'));
     }
 
     // Manual form-based submission
@@ -65,7 +67,7 @@ class PendaftarController extends Controller
         return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim.');
     }
 
-    // 🆕 New method for quick apply from lowongan list
+    // 🆕 Updated method for "Apply" from lowongan — redirect with pre-filled lowongan_id
     public function applyFromLowongan($lowonganId)
     {
         $userId = Auth::id();
@@ -83,19 +85,7 @@ class PendaftarController extends Controller
             return redirect()->route('mahasiswa.pendaftar')->with('error', 'Anda sudah mendaftar untuk lowongan ini.');
         }
 
-        // Create pendaftaran with placeholder file paths
-        Pendaftar::create([
-            'user_id' => $userId,
-            'lowongan_id' => $lowonganId,
-            'tanggal_daftar' => now(),
-            'status_lamaran' => 'Pending',
-            'catatan_pendaftar' => null,
-            'catatan_admin' => null,
-            'surat_lamaran_path' => 'dokumen/surat_lamaran/default.pdf',
-            'cv_path' => 'dokumen/cv/default.pdf',
-            'portofolio_path' => null,
-        ]);
-
-        return redirect()->route('mahasiswa.pendaftar')->with('success', 'Berhasil mendaftar ke lowongan.');
+        // Redirect to the pendaftar form page with lowongan_id pre-filled
+        return redirect()->route('mahasiswa.pendaftar', ['lowongan_id' => $lowonganId]);
     }
 }

@@ -54,7 +54,7 @@
                 </div>
             </a>
 
-            <a href="#" onclick="alert('Pendaftar route coming soon!')" class="block">
+            <a href="{{ route('mahasiswa.pendaftar') }}">
                 <div class="bg-white p-6 rounded shadow text-center hover:bg-blue-50 transition cursor-pointer">
                     <p class="text-2xl font-bold text-blue-600">{{ $jumlahPendaftar ?? 0 }}</p>
                     <p class="text-sm text-gray-700 mt-1">Pendaftar</p>

@@ -50,13 +50,14 @@
                 <div class="col-span-2">
                     <label class="block text-sm text-gray-600">Pilih Lowongan</label>
                     <select name="lowongan_id" class="form-control">
-                        @foreach($lowongans as $lowongan)
+                        @foreach ($lowongans as $lowongan)
                         <option value="{{ $lowongan->id }}"
-                                @if(isset($prefilledLowongan) && $prefilledLowongan->id == $lowongan->id) selected @endif>
+                                {{ isset($selectedLowonganId) && $selectedLowonganId == $lowongan->id ? 'selected' : '' }}>
                             {{ $lowongan->judul }} - {{ $lowongan->company->nama }}
                         </option>
                         @endforeach
                     </select>
+
                 </div>
 
                 <!-- Upload Fields -->
