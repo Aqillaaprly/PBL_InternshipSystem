@@ -107,8 +107,16 @@ class PembimbingController extends Controller
 
     public function show(Pembimbing $pembimbing)
     {
-        $pembimbing->load('user');
-
+        // Eager load 'user' for the pembimbing itself,
+        // and 'bimbinganMagangs' with nested 'mahasiswa' (which is a User model)
+        // and 'detailMahasiswa' (the Mahasiswa profile data), and 'company'
+        $pembimbing->load([
+            'user',
+            'bimbinganMagangs' => function ($query) {
+                $query->with(['mahasiswa.detailMahasiswa', 'company']);
+            }
+        ]);
+// dd($pembimbing->bimbinganMagangs);
         return view('admin.Pembimbing.show', compact('pembimbing'));
     }
 

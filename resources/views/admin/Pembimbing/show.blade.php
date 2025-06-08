@@ -8,7 +8,7 @@
     <style>
         body { background-color: #f7f8fc; }
         .profile-header {
-            background: linear-gradient(to right, #687EEA, #3B5998); 
+            background: linear-gradient(to right, #687EEA, #3B5998);
             color: white;
             padding: 1rem 1rem;
             border-radius: 1rem 1rem 0 0;
@@ -126,6 +126,51 @@
                         </div>
                     @else
                         <p class="text-gray-500">Pembimbing ini belum memiliki akun login sistem.</p>
+                    @endif
+                </div>
+
+                {{-- NEW SECTION: Mahasiswa Bimbingan --}}
+                <div class="border-t border-gray-200 pt-6 mt-6 text-sm">
+                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Mahasiswa Bimbingan</h2>
+                    @if($pembimbing->bimbinganMagangs->isNotEmpty())
+                        <div class="overflow-x-auto rounded-lg border border-gray-200">
+                            <table class="min-w-full text-sm text-left">
+                                <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                                    <tr>
+                                        <th class="px-4 py-2">No</th>
+                                        <th class="px-4 py-2">NIM</th>
+                                        <th class="px-4 py-2">Nama Mahasiswa</th>
+                                        <th class="px-4 py-2">Program Studi</th>
+                                        <th class="px-4 py-2">Perusahaan</th>
+                                        <th class="px-4 py-2 text-center">Status Bimbingan</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-600">
+                                    @foreach($pembimbing->bimbinganMagangs as $index => $bimbingan)
+                                        <tr class="border-b hover:bg-gray-50">
+                                            <td class="px-4 py-2">{{ $index + 1 }}</td>
+                                            {{-- Access student data --}}
+                                            <td class="px-4 py-2">{{ $bimbingan->mahasiswa->username ?? '-' }}</td>
+                                            <td class="px-4 py-2">{{ $bimbingan->mahasiswa->name ?? '-' }}</td>
+                                            <td class="px-4 py-2">{{ $bimbingan->mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
+                                            {{-- Access company data --}}
+                                            <td class="px-4 py-2">{{ $bimbingan->company->nama_perusahaan ?? '-' }}</td>
+                                            {{-- Access status bimbingan --}}
+                                            <td class="px-4 py-2 text-center">
+                                                <span class="badge
+                                                    @if($bimbingan->status_bimbingan == 'Aktif') bg-green-100 text-green-700
+                                                    @elseif($bimbingan->status_bimbingan == 'Selesai') bg-blue-100 text-blue-700
+                                                    @else bg-red-100 text-red-700 @endif">
+                                                    {{ $bimbingan->status_bimbingan }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-gray-500">Pembimbing ini belum memiliki mahasiswa bimbingan.</p>
                     @endif
                 </div>
 
