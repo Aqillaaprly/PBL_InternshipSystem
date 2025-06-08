@@ -102,6 +102,13 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
         return view('mahasiswa.perusahaan', compact('companies'));
     })->name('perusahaan');
 
+// 🔽 Tambahan ini!
+    Route::get('/perusahaan/{perusahaanId}', function ($perusahaanId) {
+        $company = \App\Models\Company::with('lowongan')->findOrFail($perusahaanId);
+        return view('mahasiswa.detail_perusahaan', compact('company'));
+    })->name('perusahaan.detail');
+
+
     // Laporan
     Route::get('/laporan', function () {
         $userId = Auth::id();
@@ -125,7 +132,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/pendaftar/apply/{lowonganId}', [PendaftarController::class, 'applyFromPerusahaan'])
         ->name('apply.from.perusahaan');
     // Handle apply from lowongan (auto-register)
-    Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])->name('mahasiswa.apply.from.lowongan');
+    Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])->name('apply.from.lowongan');
 
 
 

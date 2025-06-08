@@ -18,7 +18,7 @@
                 </button>
 
                 <a href="{{ route('mahasiswa.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
-                    SIMMAGANG
+                    STRIDEUP
                 </a>
             </div>
             <!-- Center: Navigation Menu -->

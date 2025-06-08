@@ -15,14 +15,18 @@ class PendaftarController extends Controller
     {
         $lowongans = Lowongan::with('company')->get();
 
-        $pendaftarans = Pendaftar::with('lowongan')
+        $pendaftarans = Pendaftar::with('lowongan.company')
             ->where('user_id', Auth::id())
             ->latest()
             ->get();
 
         $prefilledLowonganId = $request->query('lowongan_id');
 
-        return view('mahasiswa.pendaftar', compact('lowongans', 'pendaftarans', 'prefilledLowonganId'));
+        return view('mahasiswa.pendaftar', [
+            'lowongans' => $lowongans,
+            'pendaftarans' => $pendaftarans,
+            'selectedLowonganId' => $prefilledLowonganId
+        ]);
     }
 
     // Manual form-based submission

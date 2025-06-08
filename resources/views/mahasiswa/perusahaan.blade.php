@@ -44,7 +44,7 @@
                     <th class="px-5 py-3">Email</th>
                     <th class="px-5 py-3">Telepon</th>
                     <th class="px-5 py-3">Status</th>
-                    <th class="px-5 py-3 text-center">Aksi</th>
+                    <th class="px-5 py-3 text-center">Apply For</th>
                 </tr>
                 </thead>
                 <tbody class="text-gray-600">
@@ -54,20 +54,27 @@
                     <td class="px-5 py-3">{{ $company->email_perusahaan }}</td>
                     <td class="px-5 py-3">{{ $company->telepon ?? '-' }}</td>
                     <td class="px-5 py-3">
-                                    <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs
-                                        @if($company->status_kerjasama == 'Aktif') bg-green-100 text-green-700
-                                        @elseif($company->status_kerjasama == 'Non-Aktif') bg-red-100 text-red-700
-                                        @else bg-yellow-100 text-yellow-700 @endif">
-                                        {{ $company->status_kerjasama }}
-                                    </span>
+                        <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs
+                            @if($company->status_kerjasama == 'Aktif') bg-green-100 text-green-700
+                            @elseif($company->status_kerjasama == 'Non-Aktif') bg-red-100 text-red-700
+                            @else bg-yellow-100 text-yellow-700 @endif">
+                            {{ $company->status_kerjasama }}
+                        </span>
                     </td>
                     <td class="px-5 py-3 text-center">
-                        <div class="flex justify-center space-x-1">
-                            <button
-                                onclick="handleApply('{{ $company->id }}')"
-                                class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium px-3 py-1 rounded shadow transition">
-                                Apply
-                            </button>
+                        <div class="flex flex-col space-y-2">
+                            @if($company->lowongan->isNotEmpty())
+                            @foreach ($company->lowongan as $lowongan)
+                            @if($lowongan->status == 'Aktif')
+                            <a href="{{ route('mahasiswa.pendaftar', ['lowongan_id' => $lowongan->id]) }}"
+                               class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1 rounded transition duration-200">
+                                 {{ $lowongan->judul }}
+                            </a>
+                            @endif
+                            @endforeach
+                            @else
+                            <span class="text-gray-400 text-xs italic">No Active Lowongan</span>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -86,18 +93,11 @@
             </table>
         </div>
 
+
     </div>
 </main>
 
 {{-- Footer --}}
 @include('mahasiswa.template.footer')
-
-{{-- Apply Button Script --}}
-<script>
-    function handleApply(companyId) {
-        alert('Apply button clicked for company ID: ' + companyId);
-        // You can change this to a modal or a POST form
-    }
-</script>
 </body>
 </html>
