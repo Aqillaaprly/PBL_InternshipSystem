@@ -3,20 +3,24 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Pembimbing;
-use App\Models\Role;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule; // Pastikan ini ada
+use App\Models\Pembimbing; // Import model Pembimbing
+use App\Models\Role; // Import model Role
+use App\Models\User; // Import model User
+use Illuminate\Http\Request; // Import kelas Request
+use Illuminate\Support\Facades\Hash; // Import facade Hash untuk hashing password
+use Illuminate\Support\Facades\Validator; // Import facade Validator untuk validasi data
+use Illuminate\Validation\Rule; // Import kelas Rule untuk aturan validasi lanjutan
+use Illuminate\Support\Facades\DB; // Tambahkan import untuk facade DB
+use Illuminate\Support\Facades\Log; // Tambahkan import untuk facade Log
 
 class PembimbingController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     * Menampilkan daftar sumber daya (pembimbing).
+     */
     public function index(Request $request)
-    {
+   {
         $query = Pembimbing::with('user')->orderBy('nama_lengkap', 'asc');
 
         if ($request->filled('search')) {
@@ -36,20 +40,30 @@ class PembimbingController extends Controller
         return view('admin.Pembimbing.index', compact('pembimbings'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     * Menampilkan formulir untuk membuat sumber daya baru (pembimbing).
+     */
     public function create()
     {
+        // Mengembalikan tampilan (view) untuk membuat pembimbing baru.
+        // Asumsi file create.blade.php berada di resources/views/admin/Pembimbing/create.blade.php
         return view('admin.Pembimbing.create');
     }
 
+    /**
+     * Store a newly created resource in storage.
+     * Menyimpan sumber daya (pembimbing) yang baru dibuat ke dalam penyimpanan (database).
+     */
     public function store(Request $request)
     {
+        // Validasi data permintaan yang masuk.
         $validator = Validator::make($request->all(), [
-            'username_login' => 'required|string|max:255|unique:users,username',
-            'email_login' => 'required|string|email|max:255|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
-            'nip' => 'required|string|max:255|unique:pembimbings,nip',
             'nama_lengkap' => 'required|string|max:255',
-            'email_institusi' => 'required|string|email|max:255|unique:pembimbings,email_institusi',
+            'nip' => 'required|string|max:255|unique:users,username|unique:pembimbings,nip', // NIP digunakan sebagai username untuk User dan harus unik di tabel Pembimbing
+            'email_login' => 'required|string|email|max:255|unique:users,email', // Email untuk login User
+            'email_institusi' => 'required|string|email|max:255|unique:pembimbings,email_institusi', // Email institusi untuk Pembimbing
+            'password' => 'required|string|min:6|confirmed',
             'nomor_telepon' => 'nullable|string|max:20',
             'jabatan_fungsional' => 'nullable|string|max:255',
             'program_studi_homebase' => 'nullable|string|max:255',
@@ -58,25 +72,33 @@ class PembimbingController extends Controller
             'status_aktif' => 'required|boolean',
         ]);
 
+        // Jika validasi gagal, arahkan kembali dengan kesalahan dan input sebelumnya.
         if ($validator->fails()) {
             return redirect()->route('admin.pembimbings.create')
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        DB::beginTransaction();
-        try {
-            $dosenRole = Role::where('name', 'dosen')->firstOrFail();
+        // Dapatkan peran 'dosen'. Jika tidak ditemukan, arahkan kembali dengan kesalahan.
+        $dosenRole = Role::where('name', 'dosen')->first();
+        if (!$dosenRole) {
+            return redirect()->route('admin.pembimbings.create')->with('error', 'Role dosen tidak ditemukan.')->withInput();
+        }
 
+        try {
+            DB::beginTransaction(); // Memulai transaksi database
+
+            // Buat catatan User baru untuk pembimbing.
             $user = User::create([
                 'name' => $request->nama_lengkap,
-                'username' => $request->username_login,
+                'username' => $request->nip, // NIP berfungsi sebagai username
                 'email' => $request->email_login,
                 'password' => Hash::make($request->password),
                 'role_id' => $dosenRole->id,
-                'email_verified_at' => now(),
+                'email_verified_at' => now(), // Set email_verified_at ke waktu saat ini
             ]);
 
+            // Buat catatan detail Pembimbing baru.
             Pembimbing::create([
                 'user_id' => $user->id,
                 'nip' => $request->nip,
@@ -88,24 +110,25 @@ class PembimbingController extends Controller
                 'bidang_keahlian_utama' => $request->bidang_keahlian_utama,
                 'maks_kuota_bimbingan' => $request->maks_kuota_bimbingan,
                 'status_aktif' => $request->status_aktif,
-                'kuota_bimbingan_aktif' => 0,
             ]);
 
-            DB::commit();
-
-            return redirect()->route('admin.pembimbings.index')->with('success', 'Pembimbing berhasil ditambahkan.');
+            DB::commit(); // Komit transaksi jika berhasil
+            // Arahkan ke halaman indeks dengan pesan sukses.
+            return redirect()->route('admin.pembimbings.index')->with('success', 'Data pembimbing berhasil ditambahkan.');
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error creating pembimbing: '.$e->getMessage());
-
-            return redirect()->route('admin.pembimbings.create')
-                ->with('error', 'Gagal menambahkan pembimbing: '.$e->getMessage())
-                ->withInput();
+            DB::rollBack(); // Rollback transaksi jika terjadi kesalahan
+            Log::error('Gagal menambahkan pembimbing: ' . $e->getMessage(), ['exception' => $e]); // Catat kesalahan
+            return redirect()->route('admin.pembimbings.create')->with('error', 'Terjadi kesalahan saat menambahkan pembimbing. Silakan coba lagi.')->withInput();
         }
     }
 
-    public function show(Pembimbing $pembimbing)
+    /**
+     * Display the specified resource.
+     * Menampilkan sumber daya yang ditentukan.
+     * Parameter $pembimbing adalah instance dari User (melalui Route Model Binding).
+     */
+   public function show(Pembimbing $pembimbing)
     {
         // Eager load 'user' for the pembimbing itself,
         // and 'bimbinganMagangs' with nested 'mahasiswa' (which is a User model)
@@ -127,8 +150,13 @@ class PembimbingController extends Controller
         return view('admin.Pembimbing.edit', compact('pembimbing'));
     }
 
-    public function update(Request $request, Pembimbing $pembimbing)
-    {
+    /**
+     * Update the specified resource in storage.
+     * Memperbarui sumber daya yang ditentukan di penyimpanan (database).
+     * Parameter $pembimbing adalah instance dari User (melalui Route Model Binding).
+     */
+    public function update(Request $request, User $pembimbing)
+     {
         $user = $pembimbing->user;
 
         $validator = Validator::make($request->all(), [
@@ -204,31 +232,32 @@ class PembimbingController extends Controller
         }
     }
 
-    public function destroy(Pembimbing $pembimbing)
+    /**
+     * Remove the specified resource from storage.
+     * Menghapus sumber daya yang ditentukan dari penyimpanan.
+     * Parameter $pembimbing adalah instance dari User (melalui Route Model Binding).
+     */
+    public function destroy(User $pembimbing)
     {
-        DB::beginTransaction();
-        try {
-            if ($pembimbing->bimbinganMagangs()->where('status_bimbingan', 'Aktif')->exists()) {
-                return redirect()->route('admin.pembimbings.index')->with('error', 'Tidak dapat menghapus pembimbing yang masih memiliki mahasiswa bimbingan aktif.');
-            }
+        // Cegah penghapusan user non-dosen melalui endpoint ini.
+        if (!$pembimbing->role || $pembimbing->role->name !== 'dosen') {
+            abort(403, 'Tidak diizinkan menghapus user yang bukan pembimbing melalui endpoint ini.');
+        }
 
-            $user = $pembimbing->user;
+        try {
+            DB::beginTransaction(); // Memulai transaksi database
+
+            // Hapus catatan User. Ini akan memicu penghapusan berjenjang untuk detail Pembimbing terkait jika dikonfigurasi.
             $pembimbing->delete();
 
-            if ($user) {
-                // Periksa apakah user ini hanya memiliki peran sebagai dosen pembimbing yang dihapus
-                // Ini adalah asumsi sederhana, jika user bisa punya banyak peran, logikanya perlu lebih kompleks
-                $user->delete();
-            }
+            DB::commit(); // Komit transaksi jika berhasil
+            // Arahkan ke halaman indeks dengan pesan sukses.
+            return redirect()->route('admin.pembimbings.index')->with('success', 'Pembimbing berhasil dihapus.');
 
-            DB::commit();
-
-            return redirect()->route('admin.pembimbings.index')->with('success', 'Pembimbing dan akun login terkait berhasil dihapus.');
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error deleting pembimbing: '.$e->getMessage());
-
-            return redirect()->route('admin.pembimbings.index')->with('error', 'Gagal menghapus pembimbing.');
+            DB::rollBack(); // Rollback transaksi jika terjadi kesalahan
+            Log::error('Gagal menghapus pembimbing: ' . $e->getMessage(), ['exception' => $e]); // Catat kesalahan
+            return redirect()->route('admin.pembimbings.index')->with('error', 'Terjadi kesalahan saat menghapus pembimbing. Silakan coba lagi.');
         }
     }
 }
