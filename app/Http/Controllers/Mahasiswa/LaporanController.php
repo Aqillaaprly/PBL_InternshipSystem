@@ -55,10 +55,11 @@ class LaporanController extends Controller
     {
         $aktivitas = AktivitasAbsensi::findOrFail($id);
 
-        // Optionally also delete associated foto file
-        if ($aktivitas->foto) {
-            Storage::disk('public')->delete($aktivitas->foto->path);
-            $aktivitas->foto()->delete();
+        // Delete the first associated foto file and record
+        if ($aktivitas->foto->isNotEmpty()) {
+            $firstFoto = $aktivitas->foto->first();
+            Storage::disk('public')->delete($firstFoto->path);
+            $firstFoto->delete();
         }
 
         $aktivitas->delete();
