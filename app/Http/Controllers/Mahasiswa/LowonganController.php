@@ -10,10 +10,38 @@ use Illuminate\Support\Facades\Validator;
 
 class LowonganController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $lowongans = Lowongan::with('company')->latest()->paginate(10);
+        $query = Lowongan::with('company')
+            ->whereHas('company', function($q) {
+                $q->where('status_kerjasama', 'Aktif');
+            });
+
+        // Search functionality
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', "%$search%")
+                    ->orWhere('lokasi', 'like', "%$search%")
+                    ->orWhereHas('company', function($q) use ($search) {
+                        $q->where('nama_perusahaan', 'like', "%$search%");
+                    });
+            });
+        }
+
+        // Filter by type
+        if ($request->has('tipe') && $request->tipe != '') {
+            $query->where('tipe', $request->tipe);
+        }
+
+        // Filter by status
+        if ($request->has('status') && $request->status != '') {
+            $query->where('status', $request->status);
+        }
+
+        $lowongans = $query->orderBy('created_at', 'desc')->paginate(10);
         $jumlahLowongan = Lowongan::count();
+
         return view('mahasiswa.lowongan', compact('lowongans', 'jumlahLowongan'));
     }
 

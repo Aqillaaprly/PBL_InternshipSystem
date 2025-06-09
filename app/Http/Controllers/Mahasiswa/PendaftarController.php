@@ -10,15 +10,29 @@ use App\Models\Lowongan;
 
 class PendaftarController extends Controller
 {
-    // Show form and list of user's applications
     public function showPendaftaranForm(Request $request)
     {
-        $lowongans = Lowongan::with('company')->get();
+        $query = Lowongan::with('company')
+            ->where('status', 'Aktif')
+            ->where('tanggal_tutup', '>=', now());
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('judul', 'like', "%$search%")
+                    ->orWhere('lokasi', 'like', "%$search%")
+                    ->orWhereHas('company', function($q) use ($search) {
+                        $q->where('nama_perusahaan', 'like', "%$search%");
+                    });
+            });
+        }
+
+        $lowongans = $query->paginate(10);
 
         $pendaftarans = Pendaftar::with('lowongan.company')
             ->where('user_id', Auth::id())
             ->latest()
-            ->get();
+            ->paginate(10);
 
         $prefilledLowonganId = $request->query('lowongan_id');
 
@@ -29,7 +43,6 @@ class PendaftarController extends Controller
         ]);
     }
 
-    // Manual form-based submission
     public function submitPendaftaran(Request $request)
     {
         $request->validate([
@@ -43,6 +56,15 @@ class PendaftarController extends Controller
         $userId = Auth::id();
         if (!$userId) {
             return redirect()->back()->withErrors('Anda harus login terlebih dahulu.');
+        }
+
+        // Check if already applied
+        $existing = Pendaftar::where('user_id', $userId)
+            ->where('lowongan_id', $request->lowongan_id)
+            ->first();
+
+        if ($existing) {
+            return redirect()->back()->with('error', 'Anda sudah mendaftar untuk lowongan ini.');
         }
 
         $data = [
@@ -71,7 +93,6 @@ class PendaftarController extends Controller
         return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim.');
     }
 
-    // 🆕 Updated method for "Apply" from lowongan — redirect with pre-filled lowongan_id
     public function applyFromLowongan($lowonganId)
     {
         $userId = Auth::id();
@@ -80,7 +101,6 @@ class PendaftarController extends Controller
             return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        // Check if already applied
         $existing = Pendaftar::where('user_id', $userId)
             ->where('lowongan_id', $lowonganId)
             ->first();
@@ -89,7 +109,6 @@ class PendaftarController extends Controller
             return redirect()->route('mahasiswa.pendaftar')->with('error', 'Anda sudah mendaftar untuk lowongan ini.');
         }
 
-        // Redirect to the pendaftar form page with lowongan_id pre-filled
         return redirect()->route('mahasiswa.pendaftar', ['lowongan_id' => $lowonganId]);
     }
 }

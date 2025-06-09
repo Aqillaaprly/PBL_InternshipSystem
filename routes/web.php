@@ -91,58 +91,37 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     // Job
     Route::get('/job', fn() => view('mahasiswa.job'))->name('job');
 
-    // ✅ Profile (Controller-based)
+    // Profile Routes
     Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
-    // Perusahaan
-    Route::get('/perusahaan', function () {
-        $companies = \App\Models\Company::with('lowongan')->get();
-        return view('mahasiswa.perusahaan', compact('companies'));
-    })->name('perusahaan');
-
-// 🔽 Tambahan ini!
+    // Perusahaan Routes with Search
+    Route::get('/perusahaan', [MahasiswaController::class, 'perusahaan'])->name('perusahaan');
     Route::get('/perusahaan/{perusahaanId}', function ($perusahaanId) {
         $company = \App\Models\Company::with('lowongan')->findOrFail($perusahaanId);
         return view('mahasiswa.detail_perusahaan', compact('company'));
     })->name('perusahaan.detail');
 
-
-    // Laporan
-    Route::get('/laporan', function () {
-        $userId = Auth::id();
-
-        $aktivitas = AktivitasAbsensi::where('mahasiswa_id', $userId)
-            ->with(['pembimbing.user', 'company', 'lowongan'])
-            ->get();
-
-        return view('mahasiswa.laporan', compact('aktivitas'));
-    })->name('laporan');
-
-    // Tambah dan Hapus Bimbingan Magang (Laporan)
+    // Laporan Routes with Search
+    Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
     Route::post('/aktivitas', [MahasiswaLaporanController::class, 'store'])->name('aktivitas.store');
     Route::delete('/aktivitas/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('aktivitas.destroy');
 
+    // Lowongan Routes with Search/Filter
+    Route::get('/lowongan', [MahasiswaLowonganController::class, 'index'])->name('lowongan.index');
+    Route::get('/lowongan/create', [MahasiswaLowonganController::class, 'create'])->name('lowongan.create');
+    Route::post('/lowongan', [MahasiswaLowonganController::class, 'store'])->name('lowongan.store');
+    Route::get('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'show'])->name('lowongan.show');
+    Route::get('/lowongan/{lowongan}/edit', [MahasiswaLowonganController::class, 'edit'])->name('lowongan.edit');
+    Route::put('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'update'])->name('lowongan.update');
+    Route::delete('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'destroy'])->name('lowongan.destroy');
 
-
-    // ✅ Lowongan (dengan resource controller)
-    Route::resource('lowongan', MahasiswaLowonganController::class);
-    // Handle apply from perusahaan
-    Route::get('/pendaftar/apply/{lowonganId}', [PendaftarController::class, 'applyFromPerusahaan'])
-        ->name('apply.from.perusahaan');
-    // Handle apply from lowongan (auto-register)
-    Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])->name('apply.from.lowongan');
-
-
-
-    // ✅ Pendaftar routes (cleaned, no extra middleware)
-    Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])
-        ->name('pendaftar');
-
-    Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])
-        ->name('pendaftar.submit');
-
+    // Pendaftar Routes
+    Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])->name('pendaftar');
+    Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])->name('pendaftar.submit');
+    Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])
+        ->name('apply.from.lowongan');
 });
 
 

@@ -10,12 +10,24 @@ use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch only aktivitas_absensis for the authenticated mahasiswa
-        $aktivitas = AktivitasAbsensi::with('foto')
-            ->where('mahasiswa_id', auth()->id())
-            ->get();
+        $query = AktivitasAbsensi::with('foto')
+            ->where('mahasiswa_id', auth()->id());
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('jenis_aktivitas', 'like', "%$search%")
+                    ->orWhere('catatan', 'like', "%$search%");
+            });
+        }
+
+        if ($request->has('filter_date')) {
+            $query->whereDate('tanggal', $request->filter_date);
+        }
+
+        $aktivitas = $query->orderBy('tanggal', 'desc')->paginate(10);
 
         return view('mahasiswa.laporan', compact('aktivitas'));
     }
@@ -30,13 +42,11 @@ class LaporanController extends Controller
             'foto' => 'nullable|image|max:2048'
         ]);
 
-        // Build the data and override mahasiswa_id with the authenticated user's ID
         $data = $request->only([
             'pembimbing_id', 'tanggal', 'jenis_aktivitas', 'catatan'
         ]);
         $data['mahasiswa_id'] = auth()->id();
 
-        // Create new aktivitas_absensi record
         $aktivitas = AktivitasAbsensi::create($data);
 
         if ($request->hasFile('foto')) {
@@ -55,7 +65,6 @@ class LaporanController extends Controller
     {
         $aktivitas = AktivitasAbsensi::findOrFail($id);
 
-        // Delete the first associated foto file and record
         if ($aktivitas->foto->isNotEmpty()) {
             $firstFoto = $aktivitas->foto->first();
             Storage::disk('public')->delete($firstFoto->path);

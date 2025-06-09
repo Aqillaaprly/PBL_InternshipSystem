@@ -12,12 +12,11 @@ use App\Models\Pendaftar;
 
 class MahasiswaController extends Controller
 {
-    // Menampilkan halaman dashboard mahasiswa dengan statistik
     public function dashboard()
     {
         $jumlahPerusahaan = Company::count();
-        $jumlahLowongan = Lowongan::count();
-        $jumlahPendaftar = Pendaftar::count();
+        $jumlahLowongan = Lowongan::where('status', 'Aktif')->count();
+        $jumlahPendaftar = Pendaftar::where('user_id', Auth::id())->count();
 
         return view('mahasiswa.dashboard', compact(
             'jumlahPerusahaan',
@@ -26,7 +25,6 @@ class MahasiswaController extends Controller
         ));
     }
 
-    // Menampilkan dosen pembimbing aktif bagi mahasiswa
     public function lihatPembimbing()
     {
         $userMahasiswa = Auth::user();
@@ -39,15 +37,44 @@ class MahasiswaController extends Controller
         return view('mahasiswa.dosen_pembimbing', compact('bimbinganAktif'));
     }
 
-    // ✅ Menampilkan daftar bimbingan untuk laporan view
-    public function laporan()
+    public function laporan(Request $request)
     {
         $userId = Auth::id();
 
-        $bimbingans = BimbinganMagang::where('mahasiswa_user_id', $userId)
-            ->with(['pembimbing.user', 'company', 'lowongan']) // eager load if needed
-            ->get();
+        $query = BimbinganMagang::where('mahasiswa_user_id', $userId)
+            ->with(['pembimbing.user', 'company', 'lowongan']);
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->whereHas('company', function($q) use ($search) {
+                    $q->where('nama_perusahaan', 'like', "%$search%");
+                })->orWhereHas('pembimbing.user', function($q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                });
+            });
+        }
+
+        $bimbingans = $query->paginate(10);
 
         return view('mahasiswa.laporan', compact('bimbingans'));
+    }
+
+    public function perusahaan(Request $request)
+    {
+        $query = Company::with('lowongan');
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_perusahaan', 'like', "%$search%")
+                    ->orWhere('email_perusahaan', 'like', "%$search%")
+                    ->orWhere('kota', 'like', "%$search%");
+            });
+        }
+
+        $companies = $query->orderBy('nama_perusahaan')->paginate(10);
+
+        return view('mahasiswa.perusahaan', compact('companies'));
     }
 }

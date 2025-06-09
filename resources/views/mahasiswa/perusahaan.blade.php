@@ -19,6 +19,9 @@
                 <form method="GET" action="{{ route('mahasiswa.perusahaan') }}" class="flex">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/email/kota..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
+                    @if(request('search'))
+                    <a href="{{ route('mahasiswa.perusahaan') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded text-sm ml-2">Reset</a>
+                    @endif
                 </form>
             </div>
         </div>
@@ -68,7 +71,7 @@
                             @if($lowongan->status == 'Aktif')
                             <a href="{{ route('mahasiswa.pendaftar', ['lowongan_id' => $lowongan->id]) }}"
                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1 rounded transition duration-200">
-                                 {{ $lowongan->judul }}
+                                {{ $lowongan->judul }}
                             </a>
                             @endif
                             @endforeach
@@ -93,7 +96,11 @@
             </table>
         </div>
 
-
+        @if($companies->hasPages())
+        <div class="mt-4">
+            {{ $companies->links() }}
+        </div>
+        @endif
     </div>
 </main>
 

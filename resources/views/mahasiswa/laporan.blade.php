@@ -20,8 +20,13 @@
         <div class="flex justify-between items-center pb-4">
             <h1 class="text-2xl font-bold text-blue-800">Data Pengisian Laporan Magang</h1>
             <div class="flex space-x-3">
-                <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
-                <button class="border border-gray-300 px-4 py-2 rounded hover:bg-gray-200">Filter</button>
+                <form method="GET" action="{{ route('mahasiswa.laporan') }}" class="flex">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Search</button>
+                    @if(request('search') || request('filter'))
+                    <a href="{{ route('mahasiswa.laporan') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">Reset</a>
+                    @endif
+                </form>
                 <button id="openFormBtn" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">+ Tambah</button>
             </div>
         </div>
@@ -68,16 +73,12 @@
             </table>
         </div>
 
-        <!-- Pagination (Static Example) -->
+        <!-- Pagination -->
+        @if($aktivitas->hasPages())
         <div class="flex justify-end mt-4">
-            <nav class="inline-flex space-x-1">
-                <button class="px-3 py-1 border rounded hover:bg-gray-100">«</button>
-                <button class="px-3 py-1 border rounded bg-blue-100 text-blue-700">1</button>
-                <button class="px-3 py-1 border rounded hover:bg-gray-100">2</button>
-                <button class="px-3 py-1 border rounded hover:bg-gray-100">3</button>
-                <button class="px-3 py-1 border rounded hover:bg-gray-100">»</button>
-            </nav>
+            {{ $aktivitas->links() }}
         </div>
+        @endif
     </div>
 
     <!-- Modal Form -->

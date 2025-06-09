@@ -26,21 +26,26 @@
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r">
                         <i class="fas fa-search"></i>
                     </button>
+                    @if(request('search') || request('tipe') || request('status'))
+                    <a href="{{ route('mahasiswa.lowongan.index') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded ml-2">
+                        Reset
+                    </a>
+                    @endif
                 </form>
-                <div class="flex gap-2">
-                    <select class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <form method="GET" action="{{ route('mahasiswa.lowongan.index') }}" class="flex gap-2">
+                    <select name="tipe" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
                         <option value="">Semua Tipe</option>
-                        <option value="Penuh Waktu">Penuh Waktu</option>
-                        <option value="Paruh Waktu">Paruh Waktu</option>
-                        <option value="Kontrak">Kontrak</option>
-                        <option value="Internship">Internship</option>
+                        <option value="Penuh Waktu" @if(request('tipe') == 'Penuh Waktu') selected @endif>Penuh Waktu</option>
+                        <option value="Paruh Waktu" @if(request('tipe') == 'Paruh Waktu') selected @endif>Paruh Waktu</option>
+                        <option value="Kontrak" @if(request('tipe') == 'Kontrak') selected @endif>Kontrak</option>
+                        <option value="Internship" @if(request('tipe') == 'Internship') selected @endif>Internship</option>
                     </select>
-                    <select class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select name="status" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
-                        <option value="Aktif">Aktif</option>
-                        <option value="Ditutup">Ditutup</option>
+                        <option value="Aktif" @if(request('status') == 'Aktif') selected @endif>Aktif</option>
+                        <option value="Ditutup" @if(request('status') == 'Ditutup') selected @endif>Ditutup</option>
                     </select>
-                </div>
+                </form>
             </div>
         </div>
 
@@ -106,8 +111,8 @@
                 @empty
                 <tr>
                     <td colspan="8" class="px-5 py-4 text-center text-gray-500">
-                        @if(request('search'))
-                        Tidak ada lowongan ditemukan untuk pencarian "{{ request('search') }}".
+                        @if(request('search') || request('tipe') || request('status'))
+                        Tidak ada lowongan ditemukan dengan filter yang dipilih.
                         @else
                         Belum ada data lowongan.
                         @endif
