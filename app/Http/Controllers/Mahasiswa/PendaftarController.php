@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pendaftar;
 use App\Models\Lowongan;
+use App\Models\DokumenPendaftar;
+use Illuminate\Support\Facades\Storage;
 
 class PendaftarController extends Controller
 {
@@ -29,7 +31,7 @@ class PendaftarController extends Controller
 
         $lowongans = $query->paginate(10);
 
-        $pendaftarans = Pendaftar::with('lowongan.company')
+        $pendaftarans = Pendaftar::with('lowongan.company', 'dokumenPendaftars')
             ->where('user_id', Auth::id())
             ->latest()
             ->paginate(10);
@@ -50,6 +52,13 @@ class PendaftarController extends Controller
             'surat_lamaran' => 'required|file|mimes:pdf,doc,docx|max:5000',
             'cv' => 'required|file|mimes:pdf,doc,docx|max:5000',
             'portofolio' => 'nullable|file|mimes:pdf,doc,docx|max:5000',
+            'khs_transkrip' => 'required|file|mimes:pdf,doc,docx|max:5000',
+            'ktp' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'ktm' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'surat_izin_ortu' => 'required|file|mimes:pdf,doc,docx|max:5000',
+            'pakta_integritas' => 'required|file|mimes:pdf,doc,docx|max:5000',
+            'sertifikat_kompetensi' => 'nullable|file|mimes:pdf,doc,docx|max:5000',
+            'sktm_kip' => 'nullable|file|mimes:pdf,doc,docx|max:5000',
             'catatan_pendaftar' => 'nullable|string|max:1000',
         ]);
 
@@ -67,30 +76,57 @@ class PendaftarController extends Controller
             return redirect()->back()->with('error', 'Anda sudah mendaftar untuk lowongan ini.');
         }
 
-        $data = [
+        // Create pendaftar record
+        $pendaftar = Pendaftar::create([
             'user_id' => $userId,
             'lowongan_id' => $request->lowongan_id,
             'tanggal_daftar' => now(),
             'status_lamaran' => 'Pending',
             'catatan_pendaftar' => $request->catatan_pendaftar,
             'catatan_admin' => null,
+        ]);
+
+        // Define document types and their field names
+        $documentTypes = [
+            'surat_lamaran' => 'Surat Lamaran',
+            'cv' => 'Daftar Riwayat Hidup (CV)',
+            'portofolio' => 'Portofolio',
+            'khs_transkrip' => 'KHS atau Transkrip Nilai',
+            'ktp' => 'KTP',
+            'ktm' => 'KTM',
+            'surat_izin_ortu' => 'Surat Izin Orang Tua',
+            'pakta_integritas' => 'Pakta Integritas',
+            'sertifikat_kompetensi' => 'Sertifikat Kompetensi',
+            'sktm_kip' => 'SKTM atau KIP Kuliah'
         ];
 
-        if ($request->hasFile('surat_lamaran')) {
-            $data['surat_lamaran_path'] = $request->file('surat_lamaran')->store('dokumen/surat_lamaran', 'public');
-        }
+        // Save each document
+        foreach ($documentTypes as $field => $name) {
+            if ($request->hasFile($field)) {
+                $file = $request->file($field);
+                $path = $file->store("dokumen_pendaftar/{$pendaftar->id}", 'public');
 
-        if ($request->hasFile('cv')) {
-            $data['cv_path'] = $request->file('cv')->store('dokumen/cv', 'public');
+                DokumenPendaftar::create([
+                    'pendaftar_id' => $pendaftar->id,
+                    'nama_dokumen' => $name,
+                    'file_path' => $path,
+                    'status_validasi' => 'Belum Diverifikasi',
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
         }
-
-        if ($request->hasFile('portofolio')) {
-            $data['portofolio_path'] = $request->file('portofolio')->store('dokumen/portofolio', 'public');
-        }
-
-        Pendaftar::create($data);
 
         return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim.');
+    }
+
+    public function showDocuments($pendaftarId)
+    {
+        $pendaftar = Pendaftar::with('dokumenPendaftars')
+            ->where('user_id', Auth::id())
+            ->findOrFail($pendaftarId);
+
+        return view('mahasiswa.dokumen_pendaftar', ['dokumen' => $pendaftar->dokumenPendaftars]);
     }
 
     public function applyFromLowongan($lowonganId)

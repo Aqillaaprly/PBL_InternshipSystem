@@ -122,6 +122,9 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])->name('pendaftar.submit');
     Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])
         ->name('apply.from.lowongan');
+    // Add this inside the mahasiswa group
+    Route::get('/pendaftar/dokumen/{pendaftarId}', [PendaftarController::class, 'showDocuments'])
+        ->name('pendaftar.dokumen');
 });
 
 
