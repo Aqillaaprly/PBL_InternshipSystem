@@ -38,7 +38,7 @@
 
             <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6  border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Terbaru</h2> {{-- Updated title --}}
+                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Diterima</h2> {{-- Updated title --}}
                     <a href="{{ route('perusahaan.pendaftar.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Pendaftar</a>
                 </div>
 
@@ -70,8 +70,6 @@
                                         <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs
                                             @if ($pendaftar->status_lamaran == 'Diterima') bg-green-100 text-green-700
                                             @elseif ($pendaftar->status_lamaran == 'Ditolak') bg-red-100 text-red-700
-                                            @elseif ($pendaftar->status_lamaran == 'Pending') bg-yellow-100 text-yellow-700
-                                            @elseif ($pendaftar->status_lamaran == 'Wawancara') bg-blue-100 text-blue-700
                                             @elseif ($pendaftar->status_lamaran == 'Ditinjau') bg-indigo-100 text-indigo-700
                                             @else bg-gray-200 text-gray-700 @endif">
                                             {{ $pendaftar->status_lamaran }}
@@ -79,7 +77,7 @@
                                     </td>
                                     <td class="px-5 py-3 text-center align-middle">
                                         <div class="flex item-center justify-center space-x-1 sm:space-x-2">
-                                            <a href="{{ route('perusahaan.pendaftar.show', $pendaftar->id) }}"
+                                            <a href="{{ route('perusahaan.pendaftar.detail', $pendaftar->id) }}"
                                                class="text-xs bg-sky-100 text-sky-600 hover:bg-sky-200 px-3 py-1.5 rounded-md font-medium">Detail</a>
                                         </div>
                                     </td>

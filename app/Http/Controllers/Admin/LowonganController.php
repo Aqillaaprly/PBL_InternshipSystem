@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Lowongan;
 use App\Models\Company;
+use App\Models\Lowongan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -17,6 +17,7 @@ class LowonganController extends Controller
     {
         // ... (logika query Anda) ...
         $lowongans = Lowongan::with('company')->latest()->paginate(10); // Contoh sederhana
+
         // Jika file index ada di admin/Company/lowongan/index.blade.php
         return view('admin.Company.lowongan.index', compact('lowongans'));
     }
@@ -27,6 +28,7 @@ class LowonganController extends Controller
     public function create()
     {
         $companies = Company::orderBy('nama_perusahaan')->get();
+
         // Jika file create ada di admin/Company/lowongan/create.blade.php
         return view('admin.Company.lowongan.create', compact('companies'));
     }
@@ -57,6 +59,7 @@ class LowonganController extends Controller
     public function show(Lowongan $lowongan)
     {
         $lowongan->load('company');
+
         // Path view disesuaikan dengan struktur folder Anda
         return view('admin.Company.lowongan.show', compact('lowongan'));
     }
@@ -67,6 +70,7 @@ class LowonganController extends Controller
     public function edit(Lowongan $lowongan)
     {
         $companies = Company::orderBy('nama_perusahaan')->get();
+
         // Path view disesuaikan dengan struktur folder Anda
         return view('admin.Company.lowongan.edit', compact('lowongan', 'companies'));
     }
@@ -90,6 +94,7 @@ class LowonganController extends Controller
 
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil diperbarui.');
     }
+
     /**
      * Remove the specified resource from storage.
      */

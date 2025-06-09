@@ -15,7 +15,6 @@ class CreateBimbinganMagangsTable extends Migration
     {
         Schema::create('bimbingan_magangs', function (Blueprint $table) {
             $table->id();
-            // Menambahkan foreign keys ke tabel mahasiswa dan pembimbing
             $table->foreignId('mahasiswa_id')->constrained('mahasiswas')->onDelete('cascade');
             $table->foreignId('pembimbing_id')->constrained('pembimbings')->onDelete('cascade');
             $table->date('tanggal');

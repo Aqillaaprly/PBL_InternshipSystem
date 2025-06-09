@@ -14,7 +14,7 @@ class Mahasiswa extends Model
      *
      * @var string
      */
-    protected $table = 'mahasiswas'; // Eksplisit mendefinisikan nama tabel
+    protected $table = 'mahasiswas';
 
     /**
      * The attributes that are mass assignable.
@@ -39,20 +39,17 @@ class Mahasiswa extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+    public function pendaftar() // Changed from pendaftarans to pendaftar (singular) to match the call in controller
+    {
+        return $this->hasMany(Pendaftar::class, 'mahasiswa_id'); // Foreign key in pendaftars table is 'mahasiswa_id'
+    }
 
-     // Mahasiswa (detail) memiliki satu atau lebih entri bimbingan magang
-    // melalui user_id yang terkait
     public function bimbinganMagangs()
     {
         return $this->hasMany(BimbinganMagang::class, 'mahasiswa_user_id', 'user_id');
     }
-
-
-    // Anda bisa menambahkan relasi lain di sini jika mahasiswa
-    // memiliki hubungan dengan tabel lain secara langsung
-    // Misalnya, jika pendaftar langsung dari Mahasiswa model:
-    // public function pendaftarans()
-    // {
-    //     return $this->hasMany(Pendaftar::class, 'mahasiswa_id'); // Jika FK di pendaftar adalah mahasiswa_id
-    // }
+    public function aktivitasMagangs()
+    {
+        return $this->hasMany(AktivitasMagang::class);
+    }
 }

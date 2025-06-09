@@ -17,7 +17,7 @@
                 <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
                 <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
                 {{-- Link ke route perusahaan.lowongan.create jika ada --}}
-                <a href="{{-- route('perusahaan.lowongan.create') --}}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
+                <a href="{{route('perusahaan.tambah_lowongan')  }}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -54,7 +54,7 @@
 
                        <td class="px-5 py-3">
                          <div class="flex space-x-1">
-                            <a href="route('perusahaan.show')" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                            <a href="{{ url('/perusahaan/show') }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
                             <form action="route('perusahaan.lowongan.destroy')" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
                                 @csrf
                                 @method('DELETE')

@@ -45,26 +45,26 @@
                     </div>
                 </div>
 
-                @if($company->lowongan && $company->lowongan->count() > 0)
+                @if($company->lowongans && $company->lowongans->count() > 0)
                   <div class="space-y-6 mt-4">
-                    @foreach($company->lowongan as $lowongan)
+                    @foreach($company->lowongans as $lowongans)
                       <div class="border border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow">
-                        <h3 class="text-lg font-semibold text-blue-700">{{ $lowongan->judul }}</h3>
-                        <p class="text-xs text-gray-500 mb-1">Lokasi: {{ $lowongan->lokasi }} | Tipe: {{ $lowongan->tipe }}</p>
-                        @if($lowongan->tanggal_tutup)
-                        <p class="text-xs text-gray-500 mb-2">Batas Akhir: {{ \Carbon\Carbon::parse($lowongan->tanggal_tutup)->isoFormat('D MMMM YYYY') }}</p>
+                        <h3 class="text-lg font-semibold text-blue-700">{{ $lowongans->judul }}</h3>
+                        <p class="text-xs text-gray-500 mb-1">Lokasi: {{ $lowongans->lokasi }} | Tipe: {{ $lowongans->tipe }}</p>
+                        @if($lowongans->tanggal_tutup)
+                        <p class="text-xs text-gray-500 mb-2">Batas Akhir: {{ \Carbon\Carbon::parse($lowongans->tanggal_tutup)->isoFormat('D MMMM YYYY') }}</p>
                         @endif
                         
                         <div class="mt-2 text-sm text-gray-700">
                             <strong class="block mb-1">Deskripsi Singkat:</strong>
-                            <p class="text-gray-600 text-xs leading-relaxed line-clamp-3">{{ Str::limit(strip_tags($lowongan->deskripsi), 200) }}</p>
+                            <p class="text-gray-600 text-xs leading-relaxed line-clamp-3">{{ Str::limit(strip_tags($lowongans->deskripsi), 200) }}</p>
                         </div>
 
                         <div class="mt-3 text-sm text-gray-700 kualifikasi-list">
                             <strong class="block mb-1">Kriteria/Kualifikasi yang Dicari:</strong>
-                            @if($lowongan->kualifikasi)
+                            @if($lowongans->kualifikasi)
                                 <ul class="text-xs text-gray-600">
-                                    @foreach(explode("\n", $lowongan->kualifikasi) as $kriteria)
+                                    @foreach(explode("\n", $lowongans->kualifikasi) as $kriteria)
                                         @if(trim($kriteria) !== '')
                                             <li>{{ trim(str_replace(['-', '*'], '', $kriteria)) }}</li>
                                         @endif

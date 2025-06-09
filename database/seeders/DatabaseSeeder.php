@@ -14,14 +14,15 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
-        UserSeeder::class,
-        MahasiswaSeeder::class, // Pastikan ini ada
-        PembimbingSeeder::class,
-        CompanySeeder::class,
-        LowonganSeeder::class,
-        PendaftarSeeder::class,
-        DokumenPendaftarSeeder::class,
-        BimbinganMagangSeeder::class,
+            UserSeeder::class,
+            MahasiswaSeeder::class, // Pastikan ini ada
+            PembimbingSeeder::class,
+            CompanySeeder::class,
+            LowonganSeeder::class,
+            PendaftarSeeder::class,
+            DokumenPendaftarSeeder::class,
+            BimbinganMagangSeeder::class,
+            // AktivitasMagangSeeder::class,
         ]);
     }
 }

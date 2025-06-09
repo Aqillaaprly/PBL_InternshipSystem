@@ -1,12 +1,12 @@
 <?php
 
 // app/Models/User.php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\DetailPembimbing;
 
 class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquent
 {
@@ -38,18 +38,22 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
     {
         return $this->belongsTo(Role::class);
     }
+
     public function detailMahasiswa()
     {
         return $this->hasOne(Mahasiswa::class, 'user_id', 'id');
     }
+
     public function pembimbingDetail() // atau nama lain yang Anda inginkan
     {
         return $this->hasOne(Pembimbing::class, 'user_id');
     }
+
     public function company()
     {
-    return $this->hasOne(\App\Models\Company::class, 'user_id');
+        return $this->hasOne(\App\Models\Company::class, 'user_id');
     }
+
     // Relasi untuk mahasiswa yang memiliki bimbingan
     public function bimbinganMagangSebagaiMahasiswa()
     {
@@ -60,7 +64,7 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
     // Ini mengasumsikan Pembimbing model memiliki user_id
     public function mahasiswaYangDibimbing()
     {
-        // Seorang user (dosen) punya satu detail pembimbing, 
+        // Seorang user (dosen) punya satu detail pembimbing,
         // dari detail pembimbing itu bisa punya banyak bimbingan magang
         return $this->hasManyThrough(
             BimbinganMagang::class, // Model tujuan akhir
@@ -71,6 +75,14 @@ class User extends Authenticatable // Ini memastikan $admin adalah objek Eloquen
             'id'                    // Local key di tabel pembimbings
         );
     }
+    public function pendaftars() // <-- Nama relasi diubah ke plural dari model Pendaftar
+    {
+        return $this->hasMany(Pendaftar::class, 'user_id');
+    }
+
+    // Relasi ke Pembimbing (jika user adalah pembimbing)
+    public function detailPembimbing()
+    {
+        return $this->hasOne(Pembimbing::class, 'user_id', 'id');
+    }
 }
-
-

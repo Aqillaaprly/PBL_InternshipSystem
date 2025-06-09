@@ -12,7 +12,7 @@ class Pendaftar extends Model
     protected $table = 'pendaftars';
 
     protected $fillable = [
-        'user_id',
+        'mahasiswa_id', 
         'lowongan_id',
         'tanggal_daftar',
         'status_lamaran',
@@ -27,40 +27,27 @@ class Pendaftar extends Model
         'tanggal_daftar' => 'date',
     ];
 
-    /**
-     * Relasi ke tabel users.
-     */
-    public function user()
+    // Relasi ke Mahasiswa (Pendaftar punya satu Mahasiswa)
+    public function mahasiswa()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Mahasiswa::class, 'mahasiswa_id');
     }
 
-    /**
-     * Relasi ke tabel lowongans.
-     */
+    // Relasi ke Lowongan (Pendaftar melamar ke satu Lowongan)
     public function lowongan()
     {
-        return $this->belongsTo(Lowongan::class)->with('company');
+        return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
 
-    /**
-     * [Opsional] Relasi ke tabel dokumen_pendaftars jika digunakan terpisah.
-     * Jika tidak ada tabel dokumen_pendaftars, hapus method ini.
-     */
+    // Relasi ke DokumenPendaftar (Pendaftar memiliki banyak DokumenPendaftar)
     public function dokumenPendaftars()
     {
         return $this->hasMany(DokumenPendaftar::class, 'pendaftar_id');
     }
 
-    public function applyFromPerusahaan($lowonganId)
+    // Jika Anda memiliki user_id di tabel pendaftar dan ingin tetap menggunakannya
+    public function user()
     {
-        $lowongan = Lowongan::with('company')->findOrFail($lowonganId);
-
-        return view('mahasiswa.pendaftar', [
-            'prefilledLowongan' => $lowongan,
-            'lowongans' => Lowongan::with('company')->get(),
-            'pendaftars' => Pendaftar::with('lowongan')->get()
-        ]);
+        return $this->belongsTo(User::class, 'user_id');
     }
-
 }

@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dokumen Pendaftar - {{ $pendaftar->user->name ?? ($pendaftar->user->username ?? 'Pendaftar Tidak Ditemukan') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optional: Add some smooth scroll behavior for better UX */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
     @include('admin.template.navbar')
@@ -16,13 +22,13 @@
                     Dokumen Pendaftar: {{ $pendaftar->user->name ?? $pendaftar->user->username }}
                 </h1>
                 <p class="text-sm mt-1">
-                    Melamar sebagai <strong>{{ $pendaftar->lowongan->judul ?? 'N/A' }}</strong> 
+                    Melamar sebagai <strong>{{ $pendaftar->lowongan->judul ?? 'N/A' }}</strong>
                     @if($pendaftar->lowongan && $pendaftar->lowongan->company)
                         di {{ $pendaftar->lowongan->company->nama_perusahaan ?? 'N/A' }}
                     @endif
                 </p>
                 <p class="text-sm mt-1">
-                    Status Lamaran: 
+                    Status Lamaran:
                     <span class="font-semibold
                         @if ($pendaftar->status_lamaran == 'Diterima') text-green-300
                         @elseif ($pendaftar->status_lamaran == 'Ditolak') text-red-300
@@ -30,7 +36,7 @@
                         @elseif ($pendaftar->status_lamaran == 'Wawancara') text-blue-300
                         @elseif ($pendaftar->status_lamaran == 'Ditinjau') text-indigo-300
                         @else text-gray-300 @endif">
-                        {{ $pendaftar->status_lamaran }}
+                            {{ $pendaftar->status_lamaran }}
                     </span>
                 </p>
             </div>
@@ -97,13 +103,14 @@
                                         </span>
                                     </td>
                                     <td class="px-4 py-3 text-center space-y-1">
-                                        {{-- Update --}}
-                                        <form action="{{ route('admin.pendaftar.dokumen.updateStatus', [$pendaftar->id, $dokumen->id]) }}" method="POST" class="inline-flex items-center space-x-2">
+                                        {{-- Update Form --}}
+                                        <form action="{{ route('admin.pendaftar.dokumen.updateStatus', [$pendaftar->id, $dokumen->id]) }}" method="POST" class="inline-flex items-center space-x-2 scroll-form">
                                             @csrf
                                             @method('PATCH')
                                             <select name="status_validasi" class="text-xs border-gray-300 rounded-md shadow-sm focus:ring-indigo-500">
                                                 <option value="Valid" {{ $dokumen->status_validasi == 'Valid' ? 'selected' : '' }}>Valid</option>
                                                 <option value="Tidak Valid" {{ $dokumen->status_validasi == 'Tidak Valid' ? 'selected' : '' }}>Tidak Valid</option>
+                                                <option value="Menunggu" {{ $dokumen->status_validasi == 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
                                             </select>
                                             <button type="submit" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-md">Update</button>
                                         </form>
@@ -121,5 +128,25 @@
     </main>
 
     @include('admin.template.footer')
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const forms = document.querySelectorAll('.scroll-form');
+
+            forms.forEach(form => {
+                form.addEventListener('submit', function() {
+                    // Store current scroll position before submission
+                    sessionStorage.setItem('scrollPosition', window.scrollY);
+                });
+            });
+
+            // Restore scroll position after page load
+            const savedScrollPosition = sessionStorage.getItem('scrollPosition');
+            if (savedScrollPosition) {
+                window.scrollTo(0, parseInt(savedScrollPosition));
+                sessionStorage.removeItem('scrollPosition'); // Clean up
+            }
+        });
+    </script>
 </body>
-</html>
+</html> 

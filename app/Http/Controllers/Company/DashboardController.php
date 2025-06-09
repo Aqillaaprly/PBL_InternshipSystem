@@ -4,41 +4,29 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Company;
-use App\Models\Lowongan;
 use App\Models\Pendaftar;
-use App\Models\User; 
+use Illuminate\Support\Facades\Auth;
+use App\Models\Company; // Assuming you have a Company model
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan dashboard perusahaan.
-     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
-     */
     public function index()
     {
-        $user = Auth::user();
-        $company = $user->company; 
+        // Get the authenticated company's ID
+        $companyId = Auth::user()->company->id; // Adjust based on how your company is linked to the user
 
-        if (!$company) {
-            return redirect()->route('login')->with('error', 'Profil perusahaan tidak ditemukan.');
-        }
-        
-        $totalPendaftar = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
-            $query->where('company_id', $company->id);
-        })->count();
-        
-        $lowonganAktifCount = Lowongan::where('company_id', $company->id)->where('status', 'aktif')->count();    
-        
-        $recentPendaftars = Pendaftar::whereHas('lowongan', function ($query) use ($company) {
-                                $query->where('company_id', $company->id);
-                            })
-                            ->with(['user', 'lowongan']) 
-                            ->latest() 
-                            ->take(5) 
-                            ->get();
-        
-        return view('perusahaan.dashboard', compact('company', 'totalPendaftar', 'lowonganAktifCount', 'recentPendaftars')); 
+        // Fetch only recent pendaftar with 'Ditinjau' status for the current company's lowongan
+        $recentPendaftars = Pendaftar::whereHas('lowongan', function($query) use ($companyId) {
+                $query->where('company_id', $companyId);
+            })
+            ->where('status_lamaran', 'Diterima') // <--- Add this condition
+            ->latest('tanggal_daftar') // Order by latest application date
+            ->take(5) // Limit to a few recent ones for the dashboard
+            ->get();
+
+        // Fetch the company details for the welcome message
+        $company = Auth::user()->company; // Assuming a direct relationship
+
+        return view('perusahaan.dashboard', compact('recentPendaftars', 'company'));
     }
-}
+}   

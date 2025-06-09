@@ -6,9 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password; // Pastikan ini di-import jika menggunakan Password::defaults()
-use Illuminate\Validation\ValidationException; // Untuk menangani validasi current_password secara manual
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage; // Pastikan ini di-import jika menggunakan Password::defaults()
+use Illuminate\Validation\Rules\Password; // Untuk menangani validasi current_password secara manual
+use Illuminate\Validation\ValidationException;
 
 class ProfileController extends Controller
 {
@@ -20,6 +20,7 @@ class ProfileController extends Controller
     {
         /** @var \App\Models\User $admin */
         $admin = Auth::user();
+
         // Pastikan view ini ada: resources/views/admin/adminProfile.blade.php
         return view('admin.Profile.adminProfile', compact('admin'));
     }
@@ -31,6 +32,7 @@ class ProfileController extends Controller
     {
         /** @var \App\Models\User $admin */
         $admin = Auth::user();
+
         // Pastikan view ini ada: resources/views/admin/profile-edit.blade.php
         return view('admin.Profile.edit', compact('admin'));
     }
@@ -38,15 +40,15 @@ class ProfileController extends Controller
     /**
      * Update the admin's profile.
      */
-   public function update(Request $request)
+    public function update(Request $request)
     {
         /** @var \App\Models\User $admin */
         $admin = Auth::user();
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username,' . $admin->id],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $admin->id],
+            'username' => ['required', 'string', 'max:255', 'unique:users,username,'.$admin->id],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$admin->id],
             'current_password' => ['nullable', 'string'],
             'new_password' => ['nullable', 'string', 'min:8', 'confirmed'],
             'profile_picture' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:2048'], // Validasi file gambar
@@ -56,7 +58,7 @@ class ProfileController extends Controller
 
         // Validasi current_password jika new_password diisi
         if ($request->filled('new_password')) {
-            if (!Hash::check($request->current_password, $admin->password)) {
+            if (! Hash::check($request->current_password, $admin->password)) {
                 throw ValidationException::withMessages([
                     'current_password' => __('auth.password'),
                 ]);
@@ -75,7 +77,7 @@ class ProfileController extends Controller
             }
 
             $file = $request->file('profile_picture');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            $filename = time().'_'.$file->getClientOriginalName();
             $path = $file->storeAs('profile_pictures', $filename, 'public'); // Simpan di storage/app/public/profile_pictures
             $admin->profile_picture = $path;
         }

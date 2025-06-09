@@ -16,11 +16,11 @@ return new class extends Migration
             // Jika 'tipe_file' tidak ada atau Anda ingin menambahkannya di akhir, hapus ->after('tipe_file').
             if (Schema::hasColumn('dokumen_pendaftars', 'tipe_file')) {
                 $table->enum('status_validasi', ['Belum Diverifikasi', 'Valid', 'Tidak Valid', 'Perlu Revisi'])
-                      ->default('Belum Diverifikasi')
-                      ->after('tipe_file');
+                    ->default('Belum Diverifikasi')
+                    ->after('tipe_file');
             } else {
                 $table->enum('status_validasi', ['Belum Diverifikasi', 'Valid', 'Tidak Valid', 'Perlu Revisi'])
-                      ->default('Belum Diverifikasi');
+                    ->default('Belum Diverifikasi');
             }
         });
     }

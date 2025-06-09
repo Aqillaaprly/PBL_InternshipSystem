@@ -24,7 +24,11 @@ class Lowongan extends Model
     public function company()
     {
 
-        return $this->belongsTo(Company::class, 'company_id');
+        return $this->belongsTo(Company::class);
     }
-
+     public function pendaftars()
+    {
+        return $this->hasMany(Pendaftar::class);
+    }
 }
+

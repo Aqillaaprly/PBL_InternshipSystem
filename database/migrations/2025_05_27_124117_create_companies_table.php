@@ -21,9 +21,9 @@ return new class extends Migration
             $table->string('kode_pos', 10)->nullable();
             $table->string('telepon', 20)->nullable()->unique();
             $table->string('email_perusahaan')->nullable()->unique();
-            $table->string('website'); 
+            $table->string('website');
             $table->text('deskripsi')->nullable();
-            $table->string('logo_path'); 
+            $table->string('logo_path');
             $table->enum('status_kerjasama', ['Aktif', 'Non-Aktif', 'Review'])->default('Review');
             $table->timestamps();
         });
