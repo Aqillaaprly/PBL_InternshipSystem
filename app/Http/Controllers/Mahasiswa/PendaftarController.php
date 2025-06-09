@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Mahasiswa;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use App\Models\Pendaftar;
 use App\Models\Lowongan;
 use App\Models\DokumenPendaftar;
@@ -47,6 +50,7 @@ class PendaftarController extends Controller
 
     public function submitPendaftaran(Request $request)
     {
+        // Validation rules
         $request->validate([
             'lowongan_id' => 'required|exists:lowongans,id',
             'surat_lamaran' => 'required|file|mimes:pdf,doc,docx|max:5000',
@@ -62,62 +66,87 @@ class PendaftarController extends Controller
             'catatan_pendaftar' => 'nullable|string|max:1000',
         ]);
 
-        $userId = Auth::id();
-        if (!$userId) {
-            return redirect()->back()->withErrors('Anda harus login terlebih dahulu.');
-        }
+        // Start database transaction
+        DB::beginTransaction();
 
-        // Check if already applied
-        $existing = Pendaftar::where('user_id', $userId)
-            ->where('lowongan_id', $request->lowongan_id)
-            ->first();
-
-        if ($existing) {
-            return redirect()->back()->with('error', 'Anda sudah mendaftar untuk lowongan ini.');
-        }
-
-        // Create pendaftar record
-        $pendaftar = Pendaftar::create([
-            'user_id' => $userId,
-            'lowongan_id' => $request->lowongan_id,
-            'tanggal_daftar' => now(),
-            'status_lamaran' => 'Pending',
-            'catatan_pendaftar' => $request->catatan_pendaftar,
-            'catatan_admin' => null,
-        ]);
-
-        // Define document types and their field names
-        $documentTypes = [
-            'surat_lamaran' => 'Surat Lamaran',
-            'cv' => 'Daftar Riwayat Hidup (CV)',
-            'portofolio' => 'Portofolio',
-            'khs_transkrip' => 'KHS atau Transkrip Nilai',
-            'ktp' => 'KTP',
-            'ktm' => 'KTM',
-            'surat_izin_ortu' => 'Surat Izin Orang Tua',
-            'pakta_integritas' => 'Pakta Integritas',
-            'sertifikat_kompetensi' => 'Sertifikat Kompetensi',
-            'sktm_kip' => 'SKTM atau KIP Kuliah'
-        ];
-
-        // Save each document
-        foreach ($documentTypes as $field => $name) {
-            if ($request->hasFile($field)) {
-                $file = $request->file($field);
-                $path = $file->store("dokumen_pendaftar/{$pendaftar->id}", 'public');
-
-                DokumenPendaftar::create([
-                    'pendaftar_id' => $pendaftar->id,
-                    'nama_dokumen' => $name,
-                    'file_path' => $path,
-                    'status_validasi' => 'Belum Diverifikasi',
-                    'created_at' => now(),
-                    'updated_at' => now()
-                ]);
+        try {
+            $userId = Auth::id();
+            if (!$userId) {
+                return redirect()->back()->withErrors('Anda harus login terlebih dahulu.');
             }
-        }
 
-        return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim.');
+            // Check for existing application
+            $existing = Pendaftar::where('user_id', $userId)
+                ->where('lowongan_id', $request->lowongan_id)
+                ->first();
+
+            if ($existing) {
+                return redirect()->back()->with('error', 'Anda sudah mendaftar untuk lowongan ini.');
+            }
+
+            // Create pendaftar record
+            $pendaftar = Pendaftar::create([
+                'user_id' => $userId,
+                'lowongan_id' => $request->lowongan_id,
+                'tanggal_daftar' => now(),
+                'status_lamaran' => 'Pending',
+                'catatan_pendaftar' => $request->catatan_pendaftar,
+                'catatan_admin' => null,
+            ]);
+
+            // Document types mapping
+            $documentTypes = [
+                'surat_lamaran' => 'Surat Lamaran',
+                'cv' => 'Daftar Riwayat Hidup (CV)',
+                'portofolio' => 'Portofolio',
+                'khs_transkrip' => 'KHS atau Transkrip Nilai',
+                'ktp' => 'KTP',
+                'ktm' => 'KTM',
+                'surat_izin_ortu' => 'Surat Izin Orang Tua',
+                'pakta_integritas' => 'Pakta Integritas',
+                'sertifikat_kompetensi' => 'Sertifikat Kompetensi',
+                'sktm_kip' => 'SKTM atau KIP Kuliah'
+            ];
+
+            // Process each document
+            foreach ($documentTypes as $field => $name) {
+                if ($request->hasFile($field)) {
+                    $file = $request->file($field);
+                    $extension = strtolower($file->getClientOriginalExtension());
+
+                    // Validate file type
+                    $allowedExtensions = in_array($field, ['ktp', 'ktm'])
+                        ? ['jpg', 'jpeg', 'png']
+                        : ['pdf', 'doc', 'docx'];
+
+                    if (!in_array($extension, $allowedExtensions)) {
+                        continue; // or handle error
+                    }
+
+                    $fileName = Str::slug($name).'_'.time().'.'.$extension;
+                    $path = $file->storeAs("dokumen_pendaftar/{$pendaftar->id}", $fileName, 'public');
+
+                    DokumenPendaftar::create([
+                        'pendaftar_id' => $pendaftar->id,
+                        'nama_dokumen' => $name,
+                        'file_path' => $path,
+                        'tipe_file' => $extension,
+                        'status_validasi' => 'Belum Diverifikasi'
+                    ]);
+                }
+            }
+
+            // Commit transaction
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Pendaftaran berhasil dikirim.');
+
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+            Log::error('Error submitting application: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengirim pendaftaran. Silakan coba lagi.');
+        }
     }
 
     public function showDocuments($pendaftarId)

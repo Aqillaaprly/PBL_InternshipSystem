@@ -12,15 +12,11 @@ class LaporanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = AktivitasAbsensi::with('foto')
-            ->where('mahasiswa_id', auth()->id());
+        $query = \App\Models\AktivitasMagang::where('mahasiswa_id', auth()->id());
 
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('jenis_aktivitas', 'like', "%$search%")
-                    ->orWhere('catatan', 'like', "%$search%");
-            });
+            $query->where('deskripsi_kegiatan', 'like', "%$search%");
         }
 
         if ($request->has('filter_date')) {
@@ -35,44 +31,34 @@ class LaporanController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'pembimbing_id' => 'required',
             'tanggal' => 'required|date',
-            'jenis_aktivitas' => 'required|string',
-            'catatan' => 'required|string',
-            'foto' => 'nullable|image|max:2048'
+            'deskripsi_kegiatan' => 'required|string',
+            'bukti_kegiatan' => 'nullable|image|max:2048'
         ]);
 
-        $data = $request->only([
-            'pembimbing_id', 'tanggal', 'jenis_aktivitas', 'catatan'
-        ]);
+        $data = $request->only(['tanggal', 'deskripsi_kegiatan']);
         $data['mahasiswa_id'] = auth()->id();
 
-        $aktivitas = AktivitasAbsensi::create($data);
-
-        if ($request->hasFile('foto')) {
-            $path = $request->file('foto')->store('aktivitas_fotos', 'public');
-
-            AktivitasFoto::create([
-                'aktivitas_absensi_id' => $aktivitas->id,
-                'path' => $path
-            ]);
+        if ($request->hasFile('bukti_kegiatan')) {
+            $path = $request->file('bukti_kegiatan')->store('aktifitas_magang', 'public');
+            $data['bukti_kegiatan'] = $path;
         }
 
-        return redirect()->back()->with('success', 'Data berhasil disimpan.');
+        \App\Models\AktivitasMagang::create($data);
+
+        return redirect()->back()->with('success', 'Aktivitas berhasil disimpan.');
     }
 
     public function destroy($id)
     {
-        $aktivitas = AktivitasAbsensi::findOrFail($id);
+        $aktivitas = \App\Models\AktivitasMagang::findOrFail($id);
 
-        if ($aktivitas->foto->isNotEmpty()) {
-            $firstFoto = $aktivitas->foto->first();
-            Storage::disk('public')->delete($firstFoto->path);
-            $firstFoto->delete();
+        if ($aktivitas->bukti_kegiatan) {
+            Storage::disk('public')->delete($aktivitas->bukti_kegiatan);
         }
 
         $aktivitas->delete();
 
-        return redirect()->back()->with('success', 'Data berhasil dihapus.');
+        return redirect()->back()->with('success', 'Aktivitas berhasil dihapus.');
     }
 }

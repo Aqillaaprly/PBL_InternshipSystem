@@ -102,11 +102,16 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
         $company = \App\Models\Company::with('lowongan')->findOrFail($perusahaanId);
         return view('mahasiswa.detail_perusahaan', compact('company'));
     })->name('perusahaan.detail');
+    Route::get('/perusahaan/{perusahaanId}/profile', function ($perusahaanId) {
+        $company = \App\Models\Company::findOrFail($perusahaanId);
+        return view('mahasiswa.company_profile', compact('company'));
+    })->name('perusahaan.profile');
 
     // Laporan Routes with Search
     Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
-    Route::post('/aktivitas', [MahasiswaLaporanController::class, 'store'])->name('aktivitas.store');
-    Route::delete('/aktivitas/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('aktivitas.destroy');
+    Route::post('/laporan', [MahasiswaLaporanController::class, 'store'])->name('laporan.store');
+    Route::delete('/laporan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('laporan.destroy');
+
 
     // Lowongan Routes with Search/Filter
     Route::get('/lowongan', [MahasiswaLowonganController::class, 'index'])->name('lowongan.index');

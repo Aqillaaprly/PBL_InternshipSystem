@@ -1,33 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Pengisian Laporan Magang - SIMMAGANG</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body class="bg-blue-50 text-gray-800">
-
 @include('mahasiswa.template.navbar')
 
 <main class="max-w-screen-xl mx-auto px-8 py-12 mt-6 space-y-10">
-
     <!-- Header & Actions -->
     <div class="bg-white p-8 rounded-xl shadow">
         <div class="flex justify-between items-center pb-4">
-            <h1 class="text-2xl font-bold text-blue-800">Data Pengisian Laporan Magang</h1>
+            <h1 class="text-2xl font-bold text-blue-800">Data Laporan Magang</h1>
             <div class="flex space-x-3">
                 <form method="GET" action="{{ route('mahasiswa.laporan') }}" class="flex">
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Search</button>
-                    @if(request('search') || request('filter'))
-                    <a href="{{ route('mahasiswa.laporan') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">Reset</a>
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Cari kegiatan..."
+                           class="border border-gray-300 rounded px-4 py-2" />
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Cari
+                    </button>
+                    @if(request('search'))
+                    <a href="{{ route('mahasiswa.laporan') }}"
+                       class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">
+                        Reset
+                    </a>
                     @endif
                 </form>
-                <button id="openFormBtn" class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">+ Tambah</button>
+                <button id="openFormBtn"
+                        class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+                    + Tambah Laporan
+                </button>
             </div>
         </div>
 
@@ -38,9 +44,8 @@
                 <tr>
                     <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">Tanggal</th>
-                    <th class="px-4 py-3">Keterangan</th>
-                    <th class="px-4 py-3">Kegiatan</th>
-                    <th class="px-4 py-3">Foto</th>
+                    <th class="px-4 py-3">Deskripsi Kegiatan</th>
+                    <th class="px-4 py-3">Bukti Kegiatan</th>
                     <th class="px-4 py-3">Aksi</th>
                 </tr>
                 </thead>
@@ -48,23 +53,27 @@
                 @foreach($aktivitas as $index => $item)
                 <tr class="border-b">
                     <td class="px-4 py-3">{{ $index + 1 }}</td>
-                    <td class="px-4 py-3">{{ $item->tanggal }}</td>
-                    <td class="px-4 py-3">{{ $item->jenis_aktivitas }}</td>
-                    <td class="px-4 py-3">{{ $item->catatan }}</td>
+                    <td class="px-4 py-3">{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
+                    <td class="px-4 py-3">{{ $item->deskripsi_kegiatan }}</td>
                     <td class="px-4 py-3">
-                        @if($item->foto->isNotEmpty())
-                        @foreach($item->foto as $foto)
-                        <img src="{{ asset('storage/' . $foto->path) }}" class="w-16 h-16 mx-auto rounded object-cover" alt="Bukti Foto">
-                        @endforeach
+                        @if($item->bukti_kegiatan)
+                        <img src="{{ asset('storage/' . $item->bukti_kegiatan) }}"
+                             class="w-16 h-16 mx-auto rounded object-cover"
+                             alt="Bukti Kegiatan">
                         @else
-                        <span class="text-gray-400 italic">No image</span>
+                        <span class="text-gray-400 italic">Tidak ada bukti</span>
                         @endif
                     </td>
                     <td class="px-4 py-3">
-                        <form action="{{ route('mahasiswa.aktivitas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin hapus?');">
+                        <form action="{{ route('mahasiswa.laporan.destroy', $item->id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Yakin ingin menghapus laporan ini?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs">Delete</button>
+                            <button type="submit"
+                                    class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs">
+                                Hapus
+                            </button>
                         </form>
                     </td>
                 </tr>
@@ -84,31 +93,33 @@
     <!-- Modal Form -->
     <div id="modal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white p-6 rounded-lg w-full max-w-xl relative">
-            <h2 class="text-xl font-semibold mb-4">Tambah Data Laporan</h2>
-            <form action="{{ route('mahasiswa.aktivitas.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <h2 class="text-xl font-semibold mb-4">Tambah Laporan Kegiatan</h2>
+            <form action="{{ route('mahasiswa.laporan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
-                <input type="hidden" name="mahasiswa_id" value="{{ auth()->user()->id }}">
-                <input type="hidden" name="pembimbing_id" value="1"> {{-- Replace with dynamic ID if needed --}}
-
                 <div>
                     <label class="block text-sm font-medium">Tanggal</label>
-                    <input type="date" name="tanggal" required class="w-full border px-4 py-2 rounded">
+                    <input type="date" name="tanggal" required
+                           class="w-full border px-4 py-2 rounded">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Jenis Aktivitas</label>
-                    <input type="text" name="jenis_aktivitas" required class="w-full border px-4 py-2 rounded">
+                    <label class="block text-sm font-medium">Deskripsi Kegiatan</label>
+                    <textarea name="deskripsi_kegiatan" required
+                              class="w-full border px-4 py-2 rounded"></textarea>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Catatan</label>
-                    <textarea name="catatan" required class="w-full border px-4 py-2 rounded"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Foto Bukti</label>
-                    <input type="file" name="foto" accept="image/*" class="w-full border px-4 py-2 rounded">
+                    <label class="block text-sm font-medium">Bukti Kegiatan (Foto)</label>
+                    <input type="file" name="bukti_kegiatan" accept="image/*"
+                           class="w-full border px-4 py-2 rounded">
                 </div>
                 <div class="flex justify-end space-x-2">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan</button>
-                    <button type="button" id="cancelBtn" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">Batal</button>
+                    <button type="submit"
+                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                        Simpan
+                    </button>
+                    <button type="button" id="cancelBtn"
+                            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
+                        Batal
+                    </button>
                 </div>
             </form>
         </div>
@@ -128,6 +139,5 @@
         if (e.target.id === 'modal') modal.classList.add('hidden');
     });
 </script>
-
 </body>
 </html>
