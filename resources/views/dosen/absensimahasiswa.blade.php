@@ -19,9 +19,9 @@
                     <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
                             <th class="px-5 py-3 border-b border-gray-300">No</th>
-                            <th class="px-5 py-3 border-b border-gray-300">Mahasiswa User ID</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Nama Mahasiswa</th>
                             <th class="px-5 py-3 border-b border-gray-300">Pembimbing</th>
-                            <th class="px-5 py-3 border-b border-gray-300">Perushaan</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Perusahaan</th>
                             <th class="px-5 py-3 border-b border-gray-300">Periode</th>
                             <th class="px-5 py-3 border-b border-gray-300">Total Hadir</th>
                             <th class="px-5 py-3 border-b border-gray-300">Aksi</th>
@@ -31,13 +31,14 @@
                         @forelse ($data as $item)
                         <tr class="border-b border-gray-200 hover:bg-gray-50">
                             <td class="px-5 py-4">{{ $loop->iteration }}</td>
-                            <td class="px-5 py-4">{{ $item->mahasiswa_user_id }}</td>
+                            <td class="px-5 py-4">{{ $item->mahasiswa->name ?? '-' }}</td>
                             <td class="px-5 py-4">{{ $item->pembimbing->nama ?? '-' }}</td>
                             <td class="px-5 py-4">{{ $item->company->nama ?? '-' }}</td>
                             <td class="px-5 py-4">{{ $item->periode_magang }}</td>
                             <td class="px-5 py-4">{{ $item->total_hadir }}</td>
                             <td class="px-5 py-4">
-                                <a href="{{ route('dosen.absensi.show', $item->id) }}" class="text-blue-600 hover:underline mr-2">Detail Absensi</a>
+                                <a href="{{ route('dosen.absensi.show', $item->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                            Show</a>
                             </td>
                         </tr>
                         @empty

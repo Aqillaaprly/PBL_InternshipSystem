@@ -70,6 +70,8 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
     Route::get('/log-bimbingan', [LogBimbingan::class, 'index'])->name('data_log');
     Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
+    Route::get('/log-bimbingan/add/{id}', [LogBimbingan::class, 'create'])->name('log_bimbingan.create');
+    Route::post('/log-bimbingan/store/{id}', [LogBimbingan::class, 'store'])->name('log_bimbingan.store');
     Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
     Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
 });

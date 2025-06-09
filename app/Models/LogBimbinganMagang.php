@@ -21,4 +21,10 @@ class LogBimbinganMagang extends Model
     {
         return $this->belongsTo(BimbinganMagang::class);
     }
+
+    public function mahasiswa()
+    {
+        return $this->belongsTo(User::class, 'mahasiswa_id');
+    }
+
 }

@@ -25,11 +25,51 @@ class LogBimbingan extends Controller
 
     return view('dosen.data_log', compact('bimbingans'));
 }
-    public function show($id)
+   public function show($id)
+{
+    $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
+
+    $bimbinganIds = BimbinganMagang::where('mahasiswa_user_id', $id)->pluck('id');
+
+    $logs = LogBimbinganMagang::whereIn('bimbingan_magang_id', $bimbinganIds)->get();
+
+    return view('dosen.showLog', compact('mahasiswa', 'logs'));
+}
+
+
+    public function create($bimbingan_id)
     {
-        $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
-        // This view needs to exist at: resources/views/dosen/mahasiswa_bimbingan/show.blade.php
-        return view('dosen.showLog', compact('mahasiswa'));
+        $bimbingan = BimbinganMagang::with('mahasiswa')->findOrFail($bimbingan_id);
+
+        return view('dosen.addLog', compact('bimbingan'));
+    }
+
+    public function store(Request $request, $bimbingan_id)
+    {
+        $request->validate([
+            'metode_bimbingan' => 'required|string|max:255',
+            'waktu_bimbingan' => 'required|date',
+            'topik_bimbingan' => 'required|string',
+            'deskripsi' => 'required|string',
+            'nilai' => 'required|numeric|min:0|max:100',
+            'komentar' => 'nullable|string',
+        ]);
+
+        $bimbingan = BimbinganMagang::findOrFail($bimbingan_id);
+
+        // Simpan log bimbingan
+        LogBimbinganMagang::create([
+            'bimbingan_magang_id' => $bimbingan->id,
+            'mahasiswa_id' => $bimbingan->mahasiswa_id,
+            'metode_bimbingan' => $request->metode_bimbingan,
+            'waktu_bimbingan' => $request->waktu_bimbingan,
+            'topik_bimbingan' => $request->topik_bimbingan,
+            'deskripsi' => $request->deskripsi,
+            'nilai' => $request->nilai,
+            'komentar' => $request->komentar,
+        ]);
+
+        return redirect()->route('dosen.data_log')->with('success', 'Log Bimbingan berhasil ditambahkan.');
     }
 
    
