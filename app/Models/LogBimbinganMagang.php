@@ -10,21 +10,22 @@ class LogBimbinganMagang extends Model
 
     protected $fillable = [
         'bimbingan_magang_id',
-        'metode',
+        'mahasiswa_id',
+        'metode_bimbingan',
         'waktu_bimbingan',
-        'topik',
+        'topik_bimbingan',
         'deskripsi',
-        'status',
+        'nilai',
+        'komentar',
     ];
 
     public function bimbinganMagang()
     {
-        return $this->belongsTo(BimbinganMagang::class);
+        return $this->belongsTo(BimbinganMagang::class, 'bimbingan_magang_id');
     }
 
     public function mahasiswa()
     {
         return $this->belongsTo(User::class, 'mahasiswa_id');
     }
-
 }

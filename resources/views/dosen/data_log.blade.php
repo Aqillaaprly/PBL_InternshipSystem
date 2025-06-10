@@ -61,8 +61,8 @@
                                         </a>
                                     </div>
                                 </td>
-                                <td class="px-5 py-4">{{ $bimbingan->pembimbing->nama ?? '-' }}</td>
-                                <td class="px-5 py-4">{{ $bimbingan->company->nama ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->pembimbing->nama_lengkap ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->company->nama_perusahaan ?? '-' }}</td>
                                 <td class="px-5 py-4">
                                     <div class="flex item-center justify-center space-x-1">
                                         <a href="{{ route('dosen.data_log.show', $bimbingan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
