@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
+use App\Models\Mahasiswa;
 use App\Models\Role;
-use App\Models\Mahasiswa; // Pastikan model Mahasiswa di-import
+use App\Models\User;
+use Illuminate\Http\Request; // Pastikan model Mahasiswa di-import
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule; // Untuk validasi unik yang lebih baik saat update
@@ -19,13 +19,14 @@ class UserController extends Controller
     {
         $search = request('search');
         $users = User::with('role')
-                       ->when($search, function ($query, $search) {
-                           return $query->where('name', 'like', "%{$search}%")
-                                        ->orWhere('username', 'like', "%{$search}%")
-                                        ->orWhere('email', 'like', "%{$search}%");
-                       })
-                       ->latest()
-                       ->paginate(15);
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            })
+            ->latest()
+            ->paginate(15);
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -35,6 +36,7 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::orderBy('name')->get();
+
         return view('admin.users.create', compact('roles'));
     }
 
@@ -51,16 +53,16 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role_id' => 'required|exists:roles,id',
-            'kelas' => 'nullable|required_if:role_id,' . $mahasiswaRoleId . '|string|max:255',
-            'program_studi' => 'nullable|required_if:role_id,' . $mahasiswaRoleId . '|string|max:255',
+            'kelas' => 'nullable|required_if:role_id,'.$mahasiswaRoleId.'|string|max:255',
+            'program_studi' => 'nullable|required_if:role_id,'.$mahasiswaRoleId.'|string|max:255',
             'nomor_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
             return redirect()->route('admin.users.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $user = User::create([
@@ -97,6 +99,7 @@ class UserController extends Controller
         if ($user->role && $user->role->name === 'mahasiswa') {
             $user->load('detailMahasiswa');
         }
+
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
@@ -137,7 +140,7 @@ class UserController extends Controller
                 $rules['username'][] = Rule::unique('mahasiswas', 'nim')->ignore($user->detailMahasiswa->id);
                 $rules['email'][] = Rule::unique('mahasiswas', 'email')->ignore($user->detailMahasiswa->id);
             } else {
-                 // Jika belum ada detailMahasiswa, username (NIM) dan email harus unik di tabel mahasiswas
+                // Jika belum ada detailMahasiswa, username (NIM) dan email harus unik di tabel mahasiswas
                 $rules['username'][] = Rule::unique('mahasiswas', 'nim');
                 $rules['email'][] = Rule::unique('mahasiswas', 'email');
             }
@@ -147,8 +150,8 @@ class UserController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.users.edit', $user->id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $previousRoleId = $user->role_id;
@@ -165,7 +168,7 @@ class UserController extends Controller
         }
 
         $user->update($userData);
-        $user->refresh(); 
+        $user->refresh();
 
         if ($request->role_id == $mahasiswaRoleId) {
             $mahasiswaDetailData = [
@@ -192,7 +195,7 @@ class UserController extends Controller
 
         // Logika Redirect yang lebih sesuai
         if ($user->role_id == $mahasiswaRoleId && $request->role_id == $mahasiswaRoleId) {
-             // Jika role tetap mahasiswa atau diubah menjadi mahasiswa
+            // Jika role tetap mahasiswa atau diubah menjadi mahasiswa
             return redirect()->route('admin.datamahasiswa')->with('success', 'Data mahasiswa berhasil diperbarui.');
         } else {
             // Jika role adalah non-mahasiswa atau diubah menjadi non-mahasiswa
@@ -212,6 +215,7 @@ class UserController extends Controller
         //     $user->detailMahasiswa->delete();
         // }
         $user->delete();
+
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus.');
     }
 }

@@ -13,25 +13,20 @@
                 </button>
 
                 <a href="{{ route('admin.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
-                    SIMMAGANG
+                    STRIDE UP    
                 </a>
             </div>
 
              <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-                {{-- Menggunakan nama route yang sudah diperbaiki dan konsisten --}}
-                <a href="{{ route('admin.users.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.users.index') ? 'border-blue-600 text-blue-600' : '' }}">Manajemen Users</a>
-                <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.datamahasiswa') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
-                <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.data_pembimbing') ? 'border-blue-600 text-blue-600' : '' }}">Pembimbing</a>
-                <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') ? 'border-blue-600 text-blue-600' : '' }}">Data Perusahaan</a>
+                 <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.datamahasiswa') || request()->is('admin/data-mahasiswa*') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
+                 <a href="{{ route('admin.pembimbings.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.pembimbings.index') || request()->is('admin/pembimbings*') ? 'border-blue-600 text-blue-600' : '' }}">Pembimbing</a>
+                 <a href="{{ route('admin.users.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.users.index') || request()->is('admin/users*') ? 'border-blue-600 text-blue-600' : '' }}">Manajemen Users</a>
+                   <a href="{{ route('admin.aktivitas-mahasiswa.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.aktivitas-mahasiswa.index') || request()->is('admin/aktivitas-mahasiswa*') ? 'border-blue-600 text-blue-600' : '' }}">Aktivitas Mahasiswa Magang</a>
             </nav>
 
             <div class="flex items-center space-x-4">
-                {{-- Google Translate dengan Ikon Globe --}}
                 <div class="flex items-center space-x-1">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9V3m0 9a9 9 0 016.364 2.636M12 12V3m-3.364 9.364A9 9 0 0112 3m0 18v-9m-3.364-6.364A9 9 0 005.636 7.364M12 12h9m-9 0H3"/>
-                    </svg>
                     <div id="google_translate_element"></div>
-
                 </div>
                 
                <div class="relative">
@@ -39,7 +34,6 @@
                         @if (Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture))
                             <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
                         @else
-                             {{-- Fallback ke UI Avatars jika tidak ada foto --}}
                             <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? Auth::user()->username) }}&background=random&color=fff&size=40" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
                         @endif
                         <span class="hidden sm:block font-medium text-gray-700">{{ Auth::user()->username ?? 'Admin' }}</span>
@@ -62,100 +56,31 @@
     </div>
 </header>
 <style>
-    /* Sembunyikan elemen branding Google Translate dan banner */
-    .goog-logo-link,
-    .goog-te-gadget span, /* Ini akan menyembunyikan teks "Powered by Google Translate" */
-    iframe.goog-te-banner-frame {
-        display: none !important;
-    }
-
-    .goog-te-gadget {
-        color: transparent !important; /* Membuat teks default transparan */
-        font-size: 0 !important; /* Membuat font size 0 agar tidak memakan tempat */
-        line-height: normal !important;
-        display: inline-block; /* Agar widget tidak terlalu lebar */
-        vertical-align: middle; /* Menjaga kesejajaran vertikal dengan ikon globe */
-    }
-
-    /* Mencegah Google menambahkan margin/padding ke body saat banner muncul */
-    body {
-        top: 0px !important;
-    }
-
-    /* Styling untuk dropdown bahasa dari Google Translate */
-    #google_translate_element select.goog-te-combo {
-        background-color: white;
-        color: #4B5563; /* text-gray-700 */
-        border: 1px solid #D1D5DB; /* border-gray-300 */
-        border-radius: 0.375rem; /* rounded-md */
-        padding: 0.25rem 0.5rem; /* py-1 px-2 */
-        font-size: 0.875rem; /* text-sm */
-        line-height: 1.25rem; /* leading-tight */
-        height: 2rem; /* Sesuaikan tinggi jika perlu, misal h-8 */
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        cursor: pointer;
-        margin-left: 0.25rem; /* ml-1 */
-        min-width: auto; /* Biarkan lebarnya menyesuaikan konten atau atur sesuai kebutuhan */
-    }
+    .goog-logo-link, .goog-te-gadget span, iframe.goog-te-banner-frame { display: none !important; }
+    .goog-te-gadget { color: transparent !important; font-size: 0 !important; line-height: normal !important; display: inline-block; vertical-align: middle; }
+    body { top: 0px !important; }
+    #google_translate_element select.goog-te-combo { background-color: white; color: #4B5563; border: 1px solid #D1D5DB; border-radius: 0.375rem; padding: 0.25rem 0.5rem; font-size: 0.875rem; line-height: 1.25rem; height: 2rem; appearance: none; -webkit-appearance: none; -moz-appearance: none; cursor: pointer; margin-left: 0.25rem; min-width: auto; }
 </style>
-
 <script type="text/javascript">
     function googleTranslateElementInit() {
-        new google.translate.TranslateElement({
-            pageLanguage: 'id',
-            includedLanguages: 'id,en,es,fr,de,ja,ko,ar', // Sesuaikan daftar bahasa
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false
-        }, 'google_translate_element');
-
-        // Fungsi untuk mencoba menyembunyikan elemen yang tidak diinginkan
-        // dan memastikan body tidak bergeser
+        new google.translate.TranslateElement({ pageLanguage: 'id', includedLanguages: 'id,en,es,fr,de,ja,ko,ar', layout: google.translate.TranslateElement.InlineLayout.SIMPLE, autoDisplay: false }, 'google_translate_element');
         function styleGoogleTranslateWidget() {
-            var bannerFrame = document.querySelector('iframe.goog-te-banner-frame');
-            if (bannerFrame) {
-                bannerFrame.style.display = 'none';
-            }
-            // Paksa body kembali ke posisi atas jika Google Translate mengubahnya
+            var bannerFrame = document.querySelector('iframe.goog-te-banner-frame'); if (bannerFrame) bannerFrame.style.display = 'none';
             document.body.style.top = '0px';
-
             var gtElement = document.getElementById('google_translate_element');
             if (gtElement) {
                 var spans = gtElement.querySelectorAll('.goog-te-gadget > span');
-                spans.forEach(function(span) {
-                    if (!span.querySelector('select')) { // Jangan sembunyikan span yang berisi select
-                        span.style.display = 'none';
-                    }
-                });
-                var logoLink = gtElement.querySelector('.goog-logo-link');
-                if (logoLink) logoLink.style.display = 'none';
+                spans.forEach(function(span) { if (!span.querySelector('select')) span.style.display = 'none'; });
+                var logoLink = gtElement.querySelector('.goog-logo-link'); if (logoLink) logoLink.style.display = 'none';
             }
         }
-
-        // Panggil fungsi styling beberapa kali setelah jeda untuk menangani pemuatan dinamis widget
-        setTimeout(styleGoogleTranslateWidget, 500);
-        setTimeout(styleGoogleTranslateWidget, 1500);
-        // Anda bisa juga menggunakan MutationObserver jika ingin solusi yang lebih robus
-        // untuk mendeteksi perubahan DOM oleh widget Google.
+        setTimeout(styleGoogleTranslateWidget, 500); setTimeout(styleGoogleTranslateWidget, 1500);
     }
-
-    // JavaScript untuk Profile Dropdown (tetap sama)
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');
-
     if (profileBtn && profileDropdown) {
-        profileBtn.addEventListener('click', () => {
-            const isHidden = profileDropdown.classList.toggle('hidden');
-            profileBtn.setAttribute('aria-expanded', !isHidden);
-        });
-
-        document.addEventListener('click', function(e) {
-            if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
-                profileDropdown.classList.add('hidden');
-                profileBtn.setAttribute('aria-expanded', false);
-            }
-        });
+        profileBtn.addEventListener('click', () => { const isHidden = profileDropdown.classList.toggle('hidden'); profileBtn.setAttribute('aria-expanded', !isHidden); });
+        document.addEventListener('click', function(e) { if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) { profileDropdown.classList.add('hidden'); profileBtn.setAttribute('aria-expanded', false); } });
     }
 </script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

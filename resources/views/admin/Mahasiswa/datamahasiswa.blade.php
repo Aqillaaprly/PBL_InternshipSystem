@@ -12,10 +12,11 @@
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
             <div class="flex justify-between items-center pb-4">
-                <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Mahasiswa</h1>
+                {{-- Removed ml-8 for better alignment with search/add buttons --}}
+                <h1 class="text-2xl font-bold text-blue-800">Data Mahasiswa</h1>
                 <div class="flex space-x-3">
                     <form method="GET" action="{{ route('admin.datamahasiswa') }}" class="flex">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500" aria-label="Cari mahasiswa">
                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
                     </form>
                     <a href="{{ route('admin.mahasiswa.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700">+ Tambah</a>
@@ -29,13 +30,13 @@
                 </div>
             @endif
             @if (session('error'))
-                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                   <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                     <strong class="font-bold">Gagal!</strong>
                     <span class="block sm:inline">{{ session('error') }}</span>
                 </div>
             @endif
 
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="min-w-full text-sm text-center">
                     <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
@@ -80,24 +81,25 @@
                         @empty
                             <tr>
                                 <td colspan="7" class="px-5 py-4 text-center text-gray-500">
-                                     @if(request('search'))
-                                        Tidak ada mahasiswa ditemukan untuk pencarian "{{ request('search') }}".
-                                    @else
-                                        Belum ada data mahasiswa.
-                                    @endif
+                                        @if(request('search'))
+                                            Tidak ada mahasiswa ditemukan untuk pencarian "{{ request('search') }}".
+                                        @else
+                                            Belum ada data mahasiswa.
+                                        @endif
                                 </td>
                             </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
-
-            @if ($mahasiswas->hasPages())
-                <div class="mt-6">
-                    {{ $mahasiswas->appends(request()->query())->links() }}
-                </div>
-            @endif
+            {{-- Removed the extra </div> here --}}
         </div>
+
+        @if ($mahasiswas->hasPages())
+            <div class="mt-6">
+                {{ $mahasiswas->appends(request()->query())->links() }}
+            </div>
+        @endif
     </main>
     @include('admin.template.footer')
 </body>

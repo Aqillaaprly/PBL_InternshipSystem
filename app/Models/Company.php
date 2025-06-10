@@ -30,11 +30,16 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the vacancies offered by the company.
-     */
-    public function lowongan() // Menggunakan nama method 'lowongan' agar konsisten
+    public function lowongans()
     {
-        return $this->hasMany(Lowongan::class); // Pastikan Lowongan model sudah ada dan benar
+        return $this->hasMany(Lowongan::class);
+    }
+    public function aktivitasMagangs()
+    {
+        return $this->hasMany(AktivitasMagang::class, 'company_id');
+    }
+     public function bimbinganMagangs()
+    {
+        return $this->hasMany(BimbinganMagang::class, 'company_id');
     }
 }

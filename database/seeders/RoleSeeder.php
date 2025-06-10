@@ -2,9 +2,8 @@
 
 namespace Database\Seeders; // Ini harus jadi statement pertama setelah <?php
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use App\Models\Role; // Pastikan model Role di-import dengan benar
+use App\Models\Role;
+use Illuminate\Database\Seeder; // Pastikan model Role di-import dengan benar
 
 class RoleSeeder extends Seeder
 {

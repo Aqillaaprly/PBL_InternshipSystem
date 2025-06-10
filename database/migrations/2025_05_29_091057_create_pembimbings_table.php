@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('pembimbings', function (Blueprint $table) {
             $table->id(); // Kolom ID auto-increment sebagai primary key
-            
+
             // Foreign key ke tabel users (jika pembimbing adalah user sistem)
             // Bisa dibuat unique jika satu user hanya bisa jadi satu entri pembimbing
-            $table->foreignId('user_id')->nullable()->unique()->constrained('users')->onDelete('set null'); 
-            
+            $table->foreignId('user_id')->nullable()->unique()->constrained('users')->onDelete('set null');
+
             $table->string('nip')->unique(); // Nomor Induk Pegawai/Dosen, unik
             $table->string('nama_lengkap');
             $table->string('email_institusi')->unique(); // Email resmi institusi

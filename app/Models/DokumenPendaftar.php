@@ -14,7 +14,13 @@ class DokumenPendaftar extends Model
         'nama_dokumen',
         'file_path',
         'tipe_file',
+        'status_validasi', // Tambahkan ini
     ];
+
+    // Opsional: Casting untuk enum jika diperlukan, tapi biasanya tidak wajib
+    // protected $casts = [
+    //     'status_validasi' => 'string', // Laravel akan menanganinya dengan baik
+    // ];
 
     public function pendaftar()
     {
