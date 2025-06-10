@@ -106,6 +106,9 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
         $company = \App\Models\Company::findOrFail($perusahaanId);
         return view('mahasiswa.company_profile', compact('company'));
     })->name('perusahaan.profile');
+    // Add this with your other mahasiswa routes
+    Route::get('/mahasiswa/perusahaan/{company}/profile', [CompanyController::class, 'showProfile'])
+        ->name('mahasiswa.company.profile');
 
     // Laporan Routes with Search
     Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
