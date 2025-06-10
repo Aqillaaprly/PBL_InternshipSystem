@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manajemen Lowongan - perusahaan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" xintegrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body class="bg-[#f0f6ff]">
     @include('perusahaan.template.navbar')
@@ -16,8 +17,7 @@
             <div class="flex space-x-3">
                 <input type="text" placeholder="Search" class="border border-gray-300 rounded px-4 py-2" />
                 <button class="border border-gray-300 px-4 py-2 rounded">Filter</button>
-                {{-- Link ke route perusahaan.lowongan.create jika ada --}}
-                <a href="{{route('perusahaan.tambah_lowongan')  }}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
+                <a href="{{ route('perusahaan.tambah_lowongan') }}" class="bg-blue-600 text-white px-5 py-2 rounded">+ Tambah Lowongan</a>
             </div>
         </div>
         <div class="overflow-x-auto">
@@ -46,20 +46,24 @@
                         <td class="px-5 py-3 text-center align-middle">
                             <span class="text-xs font-medium w-20 block mx-auto py-2 px-2 py-1 rounded-full
                                 @if($lowongan->status == 'Aktif') bg-green-100 text-green-600
-                                @elseif($lowongan->status == 'Non-Aktif') bg-red-100 text-red-700 
+                                @elseif($lowongan->status == 'Nonaktif') bg-red-100 text-red-700
                                 @else bg-gray-100 text-gray-600 @endif">
                                 {{ $lowongan->status }}
                             </span>
                         </td>
-
                        <td class="px-5 py-3">
-                         <div class="flex space-x-1">
-                            <a href="{{ url('/perusahaan/show') }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
-                            <form action="route('perusahaan.lowongan.destroy')" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
+                         <div class="flex space-x-1 justify-center">
+                            {{-- Tautan ke detail lowongan --}}
+                            <a href="{{ route('perusahaan.lowongan.show', $lowongan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">Show</a>
+                            {{-- Tautan ke form edit lowongan --}}
+                            <a href="{{ route('perusahaan.lowongan.edit', $lowongan->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
+                            {{-- Form untuk menghapus lowongan --}}
+                            <form action="{{ route('perusahaan.lowongan.destroy', $lowongan->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">Delete</button>
                             </form>
+                        </div>
                         </td>
                     </tr>
                 @empty

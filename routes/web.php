@@ -16,6 +16,7 @@ use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
 
+use App\Http\Controllers\Company\ProfilePerusahaanController;
 use App\Http\Controllers\Dosen\LogBimbingan;
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController;
 use App\Http\Controllers\UserController; // dosen
@@ -108,15 +109,31 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::get('/show', [CompanyController::class, 'show']);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Profile Management
-    Route::get('/profil', [CompanyController::class, 'show'])->name('profil');
-    Route::get('/profil/edit', [CompanyController::class, 'edit'])->name('profil.edit');
-    Route::put('/profil', [CompanyController::class, 'update'])->name('profil.update');
+    // Profile Show Management Routes
+    Route::get('/profil', [CompanyController::class, 'show'])->name('profile.perusahaanProfile1');
+    Route::get('/profil/edit', [CompanyController::class, 'edit'])->name('profile.edit1');
+    Route::put('/profil', [CompanyController::class, 'update'])->name('profile.update1');
+    
+    // Profile Management Routes 
+    Route::get('/profil', [ProfilePerusahaanController::class, 'show'])->name('profile.perusahaanProfile2'); // Changed name to match your controller's comment and redirect
+    Route::get('/profil/edit', [ProfilePerusahaanController::class, 'edit'])->name('profile.edit2');
+    Route::put('/profil', [ProfilePerusahaanController::class, 'update'])->name('profile.update2');
 
-    // Lowongan Management
+    // Manajemen Lowongan
+    // Rute Index Lowongan (daftar lowongan)
     Route::get('/lowongan', [CompanyController::class, 'lowongan'])->name('lowongan');
+    // Rute Menambah Lowongan
     Route::get('/lowongan/tambah', [CompanyController::class, 'createLowongan'])->name('tambah_lowongan');
     Route::post('/lowongan', [CompanyController::class, 'storeLowongan'])->name('lowongan.store');
+
+    // Rute Detail Lowongan
+    Route::get('/lowongan/{lowongan}', [CompanyController::class, 'showLowongan'])->name('lowongan.show'); // Rute Show
+    // Rute Edit Lowongan
+    Route::get('/lowongan/{lowongan}/edit', [CompanyController::class, 'editLowongan'])->name('lowongan.edit');
+    // Rute Update Lowongan
+    Route::put('/lowongan/{lowongan}', [CompanyController::class, 'updateLowongan'])->name('lowongan.update');
+    // Rute Hapus Lowongan
+    Route::delete('/lowongan/{lowongan}', [CompanyController::class, 'destroyLowongan'])->name('lowongan.destroy');
 
     // Pendaftar Management
     
@@ -127,5 +144,7 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [PendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
 
     // Activities
-    Route::get('/aktivitas_magang', [CompanyController::class, 'aktivitas_magang'])->name('aktivitas_magang');
+   Route::get('/aktivitas_magang', [App\Http\Controllers\Company\AktivitasMagangController::class, 'index']) ->name('aktivitas_magang');
+    Route::get('/aktivitas-mahasiswa/{mahasiswa_id}', [AktivitasMagangController::class, 'show'])->name('aktivitas_magang.show'); // Halaman detail kegiatan
+    Route::post('/aktivitas-mahasiswa/{id}/verify', [AktivitasMagangController::class, 'verify'])->name('aktivitas_magang.verify'); // Untuk verifikasi aktivitas
 });

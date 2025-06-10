@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Company;
+namespace App\Http\Controllers\Company; // Pastikan namespace sesuai dengan lokasi file Anda
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -10,13 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
-// Pastikan ini di-import jika digunakan
+use Carbon\Carbon; // Import Carbon untuk penanganan tanggal
 
 class CompanyController extends Controller
 {
-    // --- Metode dashboard() telah dihapus dari sini dan dipindahkan ke DashboardController ---
-
     /**
      * Menampilkan profil perusahaan.
      *
@@ -71,8 +68,8 @@ class CompanyController extends Controller
             'telepon' => 'required|string|max:20',
             'email_perusahaan' => 'required|email|max:255',
             'deskripsi' => 'nullable|string',
-            'industri' => 'nullable|string|max:255', // Pastikan kolom ini ada di tabel 'companies'
-            'ukuran_perusahaan' => 'nullable|string|max:255', // Pastikan kolom ini ada di tabel 'companies'
+            'industri' => 'nullable|string|max:255',
+            'ukuran_perusahaan' => 'nullable|string|max:255',
             'website' => 'nullable|url|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
@@ -138,6 +135,7 @@ class CompanyController extends Controller
     /**
      * Menyimpan lowongan baru.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function storeLowongan(Request $request)
@@ -173,7 +171,7 @@ class CompanyController extends Controller
             'deskripsi' => $request->deskripsi_lowongan,
             'lokasi' => $request->lokasi,
             'tipe' => $request->tipe_pekerjaan,
-            'gaji_min' => $request->gaji,
+            'gaji_min' => $request->gaji, // Jika gaji disimpan sebagai gaji_min saja
             'tanggal_tutup' => $request->tanggal_tutup,
             'kualifikasi' => $request->kualifikasi,
             'tanggung_jawab' => $request->tanggung_jawab,
@@ -181,6 +179,104 @@ class CompanyController extends Controller
         ]);
 
         return redirect()->route('perusahaan.lowongan')->with('success', 'Lowongan berhasil ditambahkan.');
+    }
+
+    /**
+     * Menampilkan detail lowongan tertentu.
+     * Menggunakan Route Model Binding untuk mengambil instance Lowongan.
+     *
+     * @param  \App\Models\Lowongan  $lowongan
+     * @return \Illuminate\View\View|\Illuminate\Http\Response
+     */
+    public function showLowongan(Lowongan $lowongan)
+    {
+        // Pastikan lowongan ini milik perusahaan yang sedang login
+        if (Auth::user()->company->id !== $lowongan->company_id) {
+            abort(403, 'Anda tidak memiliki akses ke lowongan ini.');
+        }
+
+        return view('perusahaan.show', compact('lowongan'));
+    }
+
+    /**
+     * Menampilkan form untuk mengedit lowongan tertentu.
+     *
+     * @param  \App\Models\Lowongan  $lowongan
+     * @return \Illuminate\View\View|\Illuminate\Http\Response
+     */
+    public function editLowongan(Lowongan $lowongan)
+    {
+        // Pastikan lowongan ini milik perusahaan yang sedang login
+        if (Auth::user()->company->id !== $lowongan->company_id) {
+            abort(403, 'Anda tidak memiliki akses untuk mengedit lowongan ini.');
+        }
+
+        return view('perusahaan.edit', compact('lowongan')); // Anda perlu membuat view ini
+    }
+
+    /**
+     * Memperbarui lowongan tertentu di penyimpanan.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Lowongan  $lowongan
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateLowongan(Request $request, Lowongan $lowongan)
+    {
+        // Pastikan lowongan ini milik perusahaan yang sedang login
+        if (Auth::user()->company->id !== $lowongan->company_id) {
+            abort(403, 'Anda tidak memiliki akses untuk memperbarui lowongan ini.');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'judul' => 'required|string|max:255',
+            'deskripsi_lowongan' => 'required|string',
+            'lokasi' => 'required|string|max:255',
+            'tipe_pekerjaan' => 'required|string|in:Full-time,Part-time,Magang,Kontrak',
+            'gaji' => 'nullable|numeric|min:0',
+            'tanggal_tutup' => 'required|date|after_or_equal:today',
+            'kualifikasi' => 'nullable|string',
+            'tanggung_jawab' => 'nullable|string',
+            'status' => 'required|in:Aktif,Nonaktif,Ditutup',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $lowongan->update([
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi_lowongan,
+            'lokasi' => $request->lokasi,
+            'tipe' => $request->tipe_pekerjaan,
+            'gaji_min' => $request->gaji, // Jika gaji disimpan sebagai gaji_min saja
+            'tanggal_tutup' => $request->tanggal_tutup,
+            'kualifikasi' => $request->kualifikasi,
+            'tanggung_jawab' => $request->tanggung_jawab,
+            'status' => $request->status,
+        ]);
+
+        return redirect()->route('lowongan.show', $lowongan->id)->with('success', 'Lowongan berhasil diperbarui.');
+    }
+
+    /**
+     * Menghapus lowongan tertentu dari penyimpanan.
+     *
+     * @param  \App\Models\Lowongan  $lowongan
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroyLowongan(Lowongan $lowongan)
+    {
+        // Pastikan lowongan ini milik perusahaan yang sedang login
+        if (Auth::user()->company->id !== $lowongan->company_id) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus lowongan ini.');
+        }
+
+        $lowongan->delete();
+
+        return redirect()->route('perusahaan.lowongan')->with('success', 'Lowongan berhasil dihapus.');
     }
 
     /**
@@ -213,3 +309,4 @@ class CompanyController extends Controller
         return view('perusahaan.aktivitas_magang', compact('pendaftars', 'company'));
     }
 }
+

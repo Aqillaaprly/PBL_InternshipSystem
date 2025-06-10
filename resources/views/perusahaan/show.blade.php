@@ -3,17 +3,73 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detail Perusahaan - {{ $company->nama_perusahaan ?? 'Informasi Perusahaan' }}</title>
+    <title>Detail Lowongan - {{ $lowongan->judul ?? 'Informasi Lowongan' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" xintegrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        body {
+            background-color: #f7f8fc;
+        }
+        .info-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            padding: 2rem;
+            position: relative;
+            z-index: 5;
+            text-align: left;
+        }
+        .detail-item {
+            padding: 0.5rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .detail-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.25rem;
+        }
+        .detail-label i {
+            margin-right: 0.5rem;
+            color: #9ca3af;
+        }
+        .detail-value {
+            color: #111827;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        .whitespace-pre-line {
+            white-space: pre-line;
+        }
+        .action-button {
+            transition: all 0.2s ease-in-out;
+            padding: 0.625rem 1.25rem;
+            font-size: 0.875rem;
+            border-radius: 0.5rem;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .edit-button {
+            background-image: linear-gradient(to right, #4f46e5, #7c3aed);
+        }
+        .edit-button:hover {
+             background-image: linear-gradient(to right, #4338ca, #6d28d9);
+        }
+    </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
     @include('perusahaan.template.navbar')
 
     <main class="max-w-4xl mx-auto px-4 py-10 mt-16">
-        <div class="bg-white p-8 rounded-xl shadow-md">
+        <div class="info-card">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-bold text-blue-800">Detail Perusahaan: {{ $company->nama_perusahaan ?? 'N/A' }}</h1>
-                <a href="{{ route('perusahaan.dashboard') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Dashboard</a>
+                <h1 class="text-2xl font-bold text-blue-800">Detail Lowongan: {{ $lowongan->judul ?? 'N/A' }}</h1>
+                {{-- Tautan kembali ke daftar lowongan --}}
+                <a href="{{ route('perusahaan.lowongan') }}" class="text-sm text-blue-600 hover:underline">&larr; Kembali ke Daftar Lowongan</a>
             </div>
 
             @if (session('success'))
@@ -28,110 +84,108 @@
                 </div>
             @endif
 
-            {{-- Memastikan $company adalah objek yang valid dan memiliki ID sebelum menampilkan detail --}}
-            @if(isset($company) && $company->id)
+            @if(isset($lowongan) && $lowongan->id)
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Nama Perusahaan:</strong>
-                        <p class="text-gray-900">{{ $company->nama_perusahaan ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Email Perusahaan:</strong>
-                        <p class="text-gray-900">{{ $company->email_perusahaan ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Telepon:</strong>
-                        <p class="text-gray-900">{{ $company->telepon ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Website:</strong>
-                        @if($company->website)
-                            <p class="text-gray-900"><a href="{{ $company->website }}" target="_blank" class="text-blue-500 hover:underline">{{ $company->website }}</a></p>
-                        @else
-                            <p class="text-gray-900">-</p>
-                        @endif
-                    </div>
-                    <div class="md:col-span-2">
-                        <strong class="text-gray-700 block mb-1">Alamat:</strong>
-                        <p class="text-gray-900">{{ $company->alamat ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Kota:</strong>
-                        <p class="text-gray-900">{{ $company->kota ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Provinsi:</strong>
-                        <p class="text-gray-900">{{ $company->provinsi ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Kode Pos:</strong>
-                        <p class="text-gray-900">{{ $company->kode_pos ?? '-' }}</p>
-                    </div>
-                    <div>
-                        <strong class="text-gray-700 block mb-1">Status Kerjasama:</strong>
-                        <span class="px-2 py-1 text-xs font-semibold leading-tight rounded-full
-                            @if($company->status_kerjasama == 'Aktif') bg-green-100 text-green-700
-                            @elseif($company->status_kerjasama == 'Non-Aktif') bg-red-100 text-red-700
-                            @else bg-yellow-100 text-yellow-700 @endif">
-                            {{ $company->status_kerjasama ?? '-' }}
-                        </span>
-                    </div>
-                    <div class="md:col-span-2">
-                        <strong class="text-gray-700 block mb-1">Deskripsi:</strong>
-                        <p class="text-gray-900 whitespace-pre-line">{{ $company->deskripsi ?? '-' }}</p>
-                    </div>
-                    <div class="md:col-span-2">
-                        <strong class="text-gray-700 block mb-1">Logo:</strong>
-                        @if($company->logo_path && Storage::disk('public')->exists($company->logo_path))
-                            <img src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo {{ $company->nama_perusahaan ?? 'Perusahaan' }}" class="mt-1 h-24 w-auto rounded border">
-                        @else
-                            <p class="text-gray-500 mt-1">Logo tidak tersedia.</p>
-                        @endif
+
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-briefcase"></i>Judul Lowongan</span>
+                        <span class="detail-value">{{ $lowongan->judul ?? '-' }}</span>
                     </div>
 
-                    {{-- Informasi Akun Login Terkait --}}
-                    @if($company->user)
-                        <div class="md:col-span-2 border-t pt-4 mt-4">
-                            <h3 class="text-lg font-semibold text-gray-700 mb-2">Informasi Akun Login Terkait</h3>
-                            <div>
-                                <strong class="text-gray-700 block mb-1">Username Akun:</strong>
-                                <p class="text-gray-900">{{ $company->user->username ?? '-' }}</p>
-                            </div>
-                            <div class="mt-2">
-                                <strong class="text-gray-700 block mb-1">Email Akun:</strong>
-                                <p class="text-gray-900">{{ $company->user->email ?? '-' }}</p>
-                            </div>
-                            <div class="mt-2">
-                                <strong class="text-gray-700 block mb-1">Nama Kontak Akun:</strong>
-                                <p class="text-gray-900">{{ $company->user->name ?? '-' }}</p>
-                            </div>
-                             <div>
-                                <strong class="text-gray-700 block mb-1">Role Akun:</strong>
-                                <p class="text-gray-800">{{ $company->user->role->name ?? '-' }}</p>
-                            </div>
-                            <div>
-                                <strong class="text-gray-700 block mb-1">Akun Dibuat:</strong>
-                                <p class="text-gray-800">{{ $company->user->created_at ? $company->user->created_at->format('d M Y, H:i') : '-' }}</p>
-                            </div>
-                        </div>
-                    @else
-                        <div class="md:col-span-2 border-t pt-4 mt-4">
-                             <h3 class="text-lg font-semibold text-gray-700 mb-2">Informasi Akun Login Terkait</h3>
-                            <p class="text-gray-500">Perusahaan ini belum memiliki akun login terkait.</p>
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-building"></i>Perusahaan</span>
+                        <span class="detail-value">{{ $lowongan->company->nama_perusahaan ?? 'N/A' }}</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-tag"></i>Tipe Lowongan</span>
+                        <span class="detail-value">{{ $lowongan->tipe ?? '-' }}</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-map-marker-alt"></i>Lokasi</span>
+                        <span class="detail-value">{{ $lowongan->lokasi ?? '-' }}</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-calendar-times"></i>Tanggal Tutup</span>
+                        <span class="detail-value">{{ \Carbon\Carbon::parse($lowongan->tanggal_tutup)->isoFormat('D MMMM YYYY') ?? '-' }}</span>
+                    </div>
+
+                    <div class="detail-item">
+                        <span class="detail-label"><i class="fas fa-info-circle"></i>Status Lowongan</span>
+                        <span class="detail-value">
+                            <span class="px-2 py-1 text-xs font-semibold leading-tight rounded-full
+                                @if($lowongan->status == 'Aktif') bg-green-100 text-green-700
+                                @elseif($lowongan->status == 'Nonaktif') bg-red-100 text-red-700
+                                @else bg-yellow-100 text-yellow-700 @endif">
+                                {{ $lowongan->status ?? '-' }}
+                            </span>
+                        </span>
+                    </div>
+
+                    @if($lowongan->gaji_min || $lowongan->gaji_max)
+                        <div class="detail-item md:col-span-2">
+                            <span class="detail-label"><i class="fas fa-money-bill-wave"></i>Estimasi Gaji</span>
+                            <span class="detail-value">
+                                @if($lowongan->gaji_min && $lowongan->gaji_max)
+                                    Rp. {{ number_format($lowongan->gaji_min, 0, ',', '.') }} - Rp. {{ number_format($lowongan->gaji_max, 0, ',', '.') }}
+                                @elseif($lowongan->gaji_min)
+                                    Mulai dari Rp. {{ number_format($lowongan->gaji_min, 0, ',', '.') }}
+                                @elseif($lowongan->gaji_max)
+                                    Hingga Rp. {{ number_format($lowongan->gaji_max, 0, ',', '.') }}
+                                @else
+                                    -
+                                @endif
+                            </span>
                         </div>
                     @endif
+
+                    <div class="detail-item md:col-span-2">
+                        <span class="detail-label"><i class="fas fa-align-left"></i>Deskripsi Pekerjaan</span>
+                        <p class="detail-value whitespace-pre-line">{{ $lowongan->deskripsi ?? 'Tidak ada deskripsi.' }}</p>
+                    </div>
+
+                    <div class="detail-item md:col-span-2">
+                        <span class="detail-label"><i class="fas fa-list-alt"></i>Persyaratan</span>
+                        <p class="detail-value whitespace-pre-line">{{ $lowongan->persyaratan ?? 'Tidak ada persyaratan.' }}</p>
+                    </div>
+
+                    <div class="detail-item md:col-span-2">
+                        <span class="detail-label"><i class="fas fa-hand-holding"></i>Tanggung Jawab</span>
+                        <p class="detail-value whitespace-pre-line">{{ $lowongan->tanggung_jawab ?? 'Tidak ada tanggung jawab.' }}</p>
+                    </div>
+
+                    <div class="detail-item md:col-span-2">
+                        <span class="detail-label"><i class="fas fa-calendar-plus"></i>Lowongan Dibuat</span>
+                        <span class="detail-value">{{ $lowongan->created_at ? $lowongan->created_at->isoFormat('D MMMM YYYY, HH:mm') : '-' }}</span>
+                    </div>
+
+                    <div class="detail-item md:col-span-2">
+                        <span class="detail-label"><i class="fas fa-history"></i>Terakhir Diperbarui</span>
+                        <span class="detail-value">{{ $lowongan->updated_at ? $lowongan->updated_at->diffForHumans() : '-' }}</span>
+                    </div>
+
                 </div>
 
                 <div class="mt-8 flex justify-end space-x-3">
-                    <a href="{{ route('perusahaan.profil.edit') }}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md shadow-sm">
-                        Edit Perusahaan
+                    {{-- Tautan ke form edit lowongan --}}
+                    <a href="{{ route('perusahaan.lowongan.edit', $lowongan->id) }}" class="action-button edit-button inline-flex items-center text-white shadow-lg">
+                        <i class="fas fa-pencil-alt mr-2"></i>Edit Lowongan
                     </a>
+                    {{-- Form untuk menghapus lowongan --}}
+                    <form action="{{ route('perusahaan.lowongan.destroy', $lowongan->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus lowongan ini?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="action-button bg-red-600 hover:bg-red-700 text-white shadow-lg">
+                            <i class="fas fa-trash-alt mr-2"></i>Hapus Lowongan
+                        </button>
+                    </form>
                 </div>
             @else
-                {{-- Pesan jika $company tidak valid atau tidak ditemukan --}}
                 <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-                    <p class="font-bold">Data Perusahaan Tidak Ditemukan</p>
-                    <p>Tidak dapat menampilkan detail karena data perusahaan tidak valid atau tidak ditemukan.</p>
+                    <p class="font-bold">Data Lowongan Tidak Ditemukan</p>
+                    <p>Tidak dapat menampilkan detail karena data lowongan tidak valid atau tidak ditemukan.</p>
                 </div>
             @endif
         </div>

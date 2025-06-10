@@ -34,6 +34,7 @@ class CompanySeeder extends Seeder
                 'username' => 'payfazz_user',
                 'user_email_prefix' => 'contact.payfazz',
                 'website' => 'https://fazz.com/about/',
+                'about' => 'https://fazz.com/about/',
                 'logo_path' => 'logos/payfazz_logo.png', // Ganti dengan path lokal jika Anda menyimpannya
                 'deskripsi' => 'Financial technology company focusing on payment solutions.',
                 'email_perusahaan' => 'official@payfazz.com',
@@ -48,6 +49,7 @@ class CompanySeeder extends Seeder
                 'username' => 'astra_user',
                 'user_email_prefix' => 'hr.astra',
                 'website' => 'https://www.astra.co.id',
+                'about' => 'https://www.astra.co.id/about-astra',
                 'logo_path' => 'logos/astra_logo.png', // Ganti dengan path lokal
                 'deskripsi' => 'Indonesian conglomerate operating in various sectors including automotive, financial services, and heavy equipment.',
                 'email_perusahaan' => 'recruitment@astra.co.id',
@@ -62,6 +64,7 @@ class CompanySeeder extends Seeder
                 'username' => 'mayora_user',
                 'user_email_prefix' => 'recruitment.mayora',
                 'website' => 'https://www.mayoraindah.co.id',
+                'about' => 'https://www.mayoraindah.co.id/landing/Perusahaan-1',
                 'logo_path' => 'logos/mayora_logo.png', // Ganti dengan path lokal
                 'deskripsi' => 'Indonesian food and beverage company.',
                 'email_perusahaan' => 'hr@mayora.co.id',
@@ -76,6 +79,7 @@ class CompanySeeder extends Seeder
                 'username' => 'bank_mandiri_user',
                 'user_email_prefix' => 'mandiricare.bankmandiri',
                 'website' => 'https://www.bankmandiri.co.id',
+                'about' => 'https://www.bankmandiri.co.id/web/guest/tentang-mandiri',
                 'logo_path' => 'logos/bank_mandiri_logo.png', // Ganti dengan path lokal
                 'deskripsi' => 'One of the largest banks in Indonesia.',
                 'email_perusahaan' => 'corporate.secretary@bankmandiri.co.id',
@@ -90,6 +94,7 @@ class CompanySeeder extends Seeder
                 'username' => 'indofood_user',
                 'user_email_prefix' => 'recruitment.indofood',
                 'website' => 'https://www.indofood.com',
+                'about' => 'https://www.indofood.com',
                 'logo_path' => 'logos/indofood_logo.png', // Ganti dengan path lokal
                 'deskripsi' => 'Major Indonesian food processing company.',
                 'email_perusahaan' => 'contact@indofood.co.id',
@@ -104,6 +109,7 @@ class CompanySeeder extends Seeder
                 'username' => 'pt_abc_jaya',
                 'user_email_prefix' => 'user_ptabc',
                 'website' => 'https://abcjaya.co.id',
+                'about' => 'https://abcjaya.co.id',
                 'logo_path' => 'logos/default_logo.png',
                 'deskripsi' => 'Perusahaan terkemuka di bidang teknologi informasi dan konsultasi.',
                 'email_perusahaan' => 'hrd@abcjaya.co.id',
@@ -118,6 +124,7 @@ class CompanySeeder extends Seeder
                 'username' => 'cv_sinar_maju',
                 'user_email_prefix' => 'user_cvsinar',
                 'website' => 'https://sinarmaju.com',
+                'about' => 'https://www.sinarjayagroup.co.id',
                 'logo_path' => 'logos/default_logo.png',
                 'deskripsi' => 'Distributor alat berat dan suku cadang.',
                 'email_perusahaan' => 'info@sinarmaju.com',
@@ -157,6 +164,7 @@ class CompanySeeder extends Seeder
                     'telepon' => $companyData['telepon'] ?? $faker->unique()->phoneNumber,
                     'email_perusahaan' => $companyData['email_perusahaan'], // Ambil dari data eksplisit
                     'website' => $companyData['website'],
+                    'about' => $companyData['about'],
                     'deskripsi' => $companyData['deskripsi'],
                     'logo_path' => $companyData['logo_path'], // Pastikan path ini benar relatif ke public/storage/
                     'status_kerjasama' => 'Aktif', // Default ke Aktif
