@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
+use App\Models\AktivitasMagang;
+use App\Models\BimbinganMagang;
 use App\Models\Company;
 use App\Models\Lowongan;
 use App\Models\Pendaftar;
 use App\Models\User;
+use App\Models\Role; // Tambahkan ini jika belum ada
 
-class DashboardController extends Controller
+class DDashboardController extends Controller
 {
     /**
      * Display the dosen dashboard.
@@ -21,13 +24,13 @@ class DashboardController extends Controller
         $jumlahPerusahaan = Company::count();
         $jumlahLowongan = Lowongan::count();
         $jumlahPendaftar = Pendaftar::count();
-        $mahasiswaRole = \App\Models\Role::where('name', 'mahasiswa')->first();
+        $mahasiswaRole = Role::where('name', 'mahasiswa')->first(); // Pastikan Role diimpor atau gunakan \App\Models\Role
         $jumlahMahasiswa = $mahasiswaRole ? User::where('role_id', $mahasiswaRole->id)->count() : 0;
 
-        $companies = Company::whereHas('lowongans') 
-            ->with('lowongans')   
+        $companies = Company::whereHas('lowongans')
+            ->with('lowongans')
             ->latest()
-            ->take(3) 
+            ->take(3)
             ->get();
 
         $acceptedPendaftars = Pendaftar::where('status_lamaran', 'Diterima')
@@ -58,6 +61,29 @@ class DashboardController extends Controller
                 }
             }
         }
+        
+        // === Data Bimbingan ===
+        $bimbingans = BimbinganMagang::with([
+                'mahasiswa.detailMahasiswa',
+                'mahasiswa',
+            ])
+            ->latest()
+            ->paginate(2); // Menggunakan paginate untuk tabel bimbingan jika diinginkan
+
+        // === Data Absensi Mahasiswa (rekap total hadir per mahasiswa bimbingan) ===
+        $data = BimbinganMagang::with([
+                'mahasiswa',
+                'pembimbing',
+                'company'
+            ])->paginate(5);
+            $data = $data->map(function ($item) {
+            $total_approved = AktivitasMagang::where('mahasiswa_id', $item->mahasiswa_id ?? $item->mahasiswa->id)
+                                ->where('status_verifikasi', 'approved')
+                                ->count();
+
+            $item->total_hadir = $total_approved; // kita anggap approved = hadir
+            return $item;
+        });
 
         return view('dosen.dashboard', compact(
             'jumlahPerusahaan',
@@ -65,7 +91,9 @@ class DashboardController extends Controller
             'jumlahPendaftar',
             'jumlahMahasiswa',
             'companies',
-            'statsProdiDiterima'
+            'statsProdiDiterima',
+            'bimbingans', // Pastikan ini juga ada di compact
+            'data' // <--- INI PERBAIKANNYA: Tambahkan variabel $data di sini
         ));
     }
 }

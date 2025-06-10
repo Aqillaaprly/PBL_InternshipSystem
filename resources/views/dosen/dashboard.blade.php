@@ -1,4 +1,4 @@
-<?php
+absen<?php
 // session_start();
 // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'perusahaan') {
 //     header('Location: ../index.php');
@@ -96,62 +96,113 @@
         @include('dosen.Job')
 
 {{--Tabel mahasiswa bimbingan--}}
-      <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
-                <h2 class="font-semibold text-gray-700 mb-4">Mahasiswa</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-500 uppercase border-b">
-                            <tr>
-                                <th class="px-4 py-2">No</th>
-                                <th class="px-4 py-2">Nama</th>
-                                <th class="px-4 py-2">Perusahaan</th>
-                                <th class="px-4 py-2">Posisi</th>
-                                <th class="px-4 py-2">Tanggal Masuk Magang</th>
-                                <th class="px-4 py-2">Tanggal Selesai Magang</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b">
-                                <td class="px-4 py-2">1</td>
-                                <td class="px-4 py-2">Andi Pratama</td>
-                                <td class="px-4 py-2">Astra</td>
-                                <td class="px-4 py-2">Web Dev</td>
-                                <td class="px-4 py-2">12 Mei 2025</td>
-                                <td class="px-4 py-2">12 November 2025</td>
-                            </tr>
-                            {{-- Data lainnya --}}
-                        </tbody>
-                    </table>
+       <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Mahasiswa Bimbingan</h2>
+                    <a href="{{ route('dosen.data_mahasiswabim') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Mahasiswa</a>
                 </div>
-            </div>
 
-{{--Tabel Absensi mahasiswa bimbingan--}}
-      <div class="bg-white p-6 rounded-xl shadow mb-6 hover:bg-blue-50 transition">
-                <h2 class="font-semibold text-gray-700 mb-4">Absensi Mahasiswa</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left text-gray-600">
-                        <thead class="text-xs text-gray-500 uppercase border-b">
+                @if (session('success')) <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-md relative mb-4" role="alert"><span class="block sm:inline">{{ session('success') }}</span></div> @endif
+                @if (session('error')) <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md relative mb-4" role="alert"><span class="block sm:inline">{{ session('error') }}</span></div> @endif
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full text-sm text-center">
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                        <tr>
+                            <th class="px-5 py-3">No</th>
+                            <th class="px-5 py-3">NIM</th>
+                            <th class="px-5 py-3">Nama Mahasiswa</th>
+                            <th class="px-5 py-3">Email</th>
+                            <th class="px-5 py-3">Program Studi</th>
+                            <th class="px-5 py-3">Kelas</th>
+                            <th class="px-5 py-3">Periode Magang</th>
+                            <th class="px-5 py-3">Tanggal Mulai</th>
+                            <th class="px-5 py-3">Tanggal Selesai</th>
+                            <th class="px-5 py-3">Status Bimbingan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600">
+                        @forelse ($bimbingans as $index => $bimbingan)
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="px-5 py-4">{{ $bimbingans->firstItem() + $index }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->mahasiswa->detailMahasiswa->nim ?? '-' }}</td>
+                                <td class="px-5 py-4 text-left">{{ $bimbingan->mahasiswa->name ?? '-' }}</td>
+                                <td class="px-5 py-4 text-left">{{ $bimbingan->mahasiswa->email ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->mahasiswa->detailMahasiswa->kelas ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->periode_magang ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->tanggal_mulai ? \Carbon\Carbon::parse($bimbingan->tanggal_mulai)->format('d-m-Y') : '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->tanggal_selesai ? \Carbon\Carbon::parse($bimbingan->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
+                                <td class="px-5 py-4">
+                                    @if ($bimbingan->status_bimbingan == 'Aktif')
+                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Aktif</span>
+                                    @elseif ($bimbingan->status_bimbingan == 'Selesai')
+                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Selesai</span>
+                                    @elseif ($bimbingan->status_bimbingan == 'Dibatalkan')
+                                        <span class="bg-red-100 text-red-800 text-xs px-2 py-1 rounded">Dibatalkan</span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
                             <tr>
-                                <th class="px-4 py-2">No</th>
-                                <th class="px-4 py-2">Nama</th>
-                                <th class="px-4 py-2">Perusahaan</th>
-                                <th class="px-4 py-2">Jam Masuk</th>
-                                <th class="px-4 py-2">Keterangan</th>
+                                <td colspan="11" class="px-5 py-4 text-center text-gray-500">
+                                     @if(request('search'))
+                                        Tidak ada bimbingan ditemukan untuk pencarian "{{ request('search') }}".
+                                    @else
+                                        Belum ada data bimbingan magang.
+                                    @endif
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b">
-                                <td class="px-4 py-2">1</td>
-                                <td class="px-4 py-2">Andi Pratama</td>
-                                <td class="px-4 py-2">Astra</td>
-                                <td class="px-4 py-2">08.55</td>
-                                <td class="px-4 py-2">Hadir</td>
-                            </tr>
-                            {{-- Data lainnya --}}
-                        </tbody>
-                    </table>
+                        @endforelse
+                    </tbody>
+                </table>
+                </div>
+       </div>
+
+  {{--Tabel Absensi mahasiswa bimbingan--}}
+       <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
+                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Absensi Mahasiswa</h2>
+                    <a href="{{ route('dosen.absensi.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Mahasiswa</a>
+                </div>
+
+                @if (session('success')) <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-md relative mb-4" role="alert"><span class="block sm:inline">{{ session('success') }}</span></div> @endif
+                @if (session('error')) <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md relative mb-4" role="alert"><span class="block sm:inline">{{ session('error') }}</span></div> @endif
+
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="min-w-full text-sm text-center border border-gray-200 rounded">
+                    <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
+                        <tr>
+                            <th class="px-5 py-3 border-b border-gray-300">No</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Nama Mahasiswa</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Pembimbing</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Perusahaan</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Periode</th>
+                            <th class="px-5 py-3 border-b border-gray-300">Total Hadir</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600">
+                        @forelse ($data as $item)
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="px-5 py-4">{{ $loop->iteration }}</td>
+                            <td class="px-5 py-4">{{ $item->mahasiswa->name ?? '-' }}</td>
+                            <td class="px-5 py-4">{{ $item->pembimbing->nama_lengkap ?? '-' }}</td>
+                            <td class="px-5 py-4">{{ $item->company->nama_perusahaan ?? '-' }}</td>
+                            <td class="px-5 py-4">{{ $item->periode_magang }}</td>
+                            <td class="px-5 py-4">{{ $item->total_hadir }}</td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="px-5 py-4 text-center text-gray-500">
+                                Belum ada data absensi.
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
                 </div>
             </div>
+       </div>       
         </main>
         @include('dosen.template.footer')
     <script>

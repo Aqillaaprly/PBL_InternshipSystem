@@ -15,11 +15,12 @@ use App\Http\Controllers\Admin\AktivitasMagangController;
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
-
 use App\Http\Controllers\Company\ProfilePerusahaanController;
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
 use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; //dosen
 use App\Http\Controllers\Dosen\LogBimbingan; //dosen
+use App\Http\Controllers\Dosen\ProfileController; //dosen
+use App\Http\Controllers\Dosen\DDashboardController; //dosen
 use App\Http\Controllers\UserController; // dosen
 // dosen
 use Illuminate\Support\Facades\Route; // dosen
@@ -74,9 +75,7 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
 
 // DOSEN GROUP
 Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dosen.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DDashboardController::class, 'index'])->name('dashboard');
     // Route untuk melihat daftar mahasiswa bimbingan
     Route::get('/mahasiswa-bimbingan', [MahasiswaBimbinganController::class, 'index'])->name('data_mahasiswabim');
     Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
@@ -86,6 +85,10 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::post('/log-bimbingan/store/{id}', [LogBimbingan::class, 'store'])->name('log_bimbingan.store');
     Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
     Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
+    // Profile Management Routes 
+    Route::get('/profil', [ProfileController::class, 'show'])->name('profile.dosenProfile2'); // Changed name to match your controller's comment and redirect
+    Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit3');
+    Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update3');
 });
 
 // MAHASISWA GROUP
