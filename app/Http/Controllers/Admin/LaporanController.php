@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+
 // Mungkin Anda memerlukan model lain terkait laporan
 
 class LaporanController extends Controller
@@ -18,5 +18,4 @@ class LaporanController extends Controller
     {
         return view('admin.Mahasiswa.laporan'); // compact('laporans') jika ada data
     }
-
 }

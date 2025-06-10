@@ -27,15 +27,14 @@ class SessionSeeder extends Seeder
 
         if ($userExists) {
             DB::table('sessions')->insert([
-                'id' => Str::random(40), 
-                'user_id' => $userId, 
+                'id' => Str::random(40),
+                'user_id' => $userId,
                 'ip_address' => '127.0.0.1',
                 'user_agent' => 'Contoh Seeder User Agent/1.0',
-                'payload' => base64_encode(serialize(['_token' => Str::random(40)])), 
-                'last_activity' => time(), 
+                'payload' => base64_encode(serialize(['_token' => Str::random(40)])),
+                'last_activity' => time(),
             ]);
 
-           
             // DB::table('sessions')->insert([
             //     'id' => Str::random(40),
             //     'user_id' => null, // Sesi untuk guest (pengguna belum login)
@@ -46,7 +45,7 @@ class SessionSeeder extends Seeder
             // ]);
 
         } else {
-            
+
             if (app()->runningInConsole()) {
                 $this->command->warn("User dengan ID {$userId} tidak ditemukan. Session seeder untuk pengguna ini dilewati.");
             }

@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800 flex flex-col min-h-screen">
-
     @include('dosen.template.navbar')
 
     <main class="flex-grow max-w-5xl mx-auto px-4 py-10">

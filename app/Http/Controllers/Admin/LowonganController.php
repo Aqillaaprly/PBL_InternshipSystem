@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Lowongan;
 use App\Models\Company;
+use App\Models\Lowongan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,11 +13,13 @@ class LowonganController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lowongans = Lowongan::with('company')->latest()->paginate(10);
-        $jumlahLowongan = Lowongan::count();
-        return view('admin.Company.lowongan', compact('lowongans', 'jumlahLowongan')); // Corrected view path
+        // ... (logika query Anda) ...
+        $lowongans = Lowongan::with('company')->latest()->paginate(10); // Contoh sederhana
+
+        // Jika file index ada di admin/Company/lowongan/index.blade.php
+        return view('admin.Company.lowongan.index', compact('lowongans'));
     }
 
     /**
@@ -25,8 +27,10 @@ class LowonganController extends Controller
      */
     public function create()
     {
-        $companies = Company::orderBy('nama_perusahaan')->get(); // Untuk dropdown pilih perusahaan
-        return view('admin.lowongan.create', compact('companies')); // Buat view ini: resources/views/admin/lowongan/create.blade.php
+        $companies = Company::orderBy('nama_perusahaan')->get();
+
+        // Jika file create ada di admin/Company/lowongan/create.blade.php
+        return view('admin.Company.lowongan.create', compact('companies'));
     }
 
     /**
@@ -35,17 +39,7 @@ class LowonganController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'company_id' => 'required|exists:companies,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'kualifikasi' => 'required|string',
-            'tipe' => 'required|in:Penuh Waktu,Paruh Waktu,Kontrak,Internship',
-            'lokasi' => 'required|string|max:255',
-            'gaji_min' => 'nullable|numeric|min:0',
-            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'tanggal_buka' => 'required|date',
-            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka',
-            'status' => 'required|in:Aktif,Ditutup',
+            'status' => 'required|in:Aktif,Non-Aktif', // Validasi status
         ]);
 
         if ($validator->fails()) {
@@ -54,7 +48,7 @@ class LowonganController extends Controller
                 ->withInput();
         }
 
-        Lowongan::create($request->all());
+        Lowongan::create($request->all()); // $request->all() akan mencakup 'status'
 
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil ditambahkan.');
     }
@@ -64,7 +58,10 @@ class LowonganController extends Controller
      */
     public function show(Lowongan $lowongan)
     {
-        return view('admin.lowongan.show', compact('lowongan')); // Buat view ini: resources/views/admin/lowongan/show.blade.php
+        $lowongan->load('company');
+
+        // Path view disesuaikan dengan struktur folder Anda
+        return view('admin.Company.lowongan.show', compact('lowongan'));
     }
 
     /**
@@ -73,7 +70,9 @@ class LowonganController extends Controller
     public function edit(Lowongan $lowongan)
     {
         $companies = Company::orderBy('nama_perusahaan')->get();
-        return view('admin.lowongan.edit', compact('lowongan', 'companies')); // Buat view ini: resources/views/admin/lowongan/edit.blade.php
+
+        // Path view disesuaikan dengan struktur folder Anda
+        return view('admin.Company.lowongan.edit', compact('lowongan', 'companies'));
     }
 
     /**
@@ -82,17 +81,7 @@ class LowonganController extends Controller
     public function update(Request $request, Lowongan $lowongan)
     {
         $validator = Validator::make($request->all(), [
-            'company_id' => 'required|exists:companies,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'kualifikasi' => 'required|string',
-            'tipe' => 'required|in:Penuh Waktu,Paruh Waktu,Kontrak,Internship',
-            'lokasi' => 'required|string|max:255',
-            'gaji_min' => 'nullable|numeric|min:0',
-            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
-            'tanggal_buka' => 'required|date',
-            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka',
-            'status' => 'required|in:Aktif,Ditutup',
+            'status' => 'required|in:Aktif,Non-Aktif', // Ubah di sini untuk menyertakan 'Non-Aktif'
         ]);
 
         if ($validator->fails()) {
@@ -101,7 +90,7 @@ class LowonganController extends Controller
                 ->withInput();
         }
 
-        $lowongan->update($request->all());
+        $lowongan->update($request->all()); // $request->all() akan mencakup 'status'
 
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil diperbarui.');
     }
@@ -111,7 +100,6 @@ class LowonganController extends Controller
      */
     public function destroy(Lowongan $lowongan)
     {
-        $lowongan->delete();
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil dihapus.');
     }
 }

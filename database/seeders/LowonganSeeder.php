@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
+use App\Models\Company;
 use App\Models\Lowongan;
-use App\Models\Company; // Pastikan model Company di-import
-use Carbon\Carbon; // Untuk manipulasi tanggal
+use Carbon\Carbon; // Pastikan model Company di-import
+use Illuminate\Database\Seeder; // Untuk manipulasi tanggal
 
 class LowonganSeeder extends Seeder
 {
@@ -50,6 +49,58 @@ class LowonganSeeder extends Seeder
                 'status' => 'Aktif',
             ],
             [
+                'company_id' => $company2 ? $company2->id : null,
+                'judul' => 'Backend Developer Intern',
+                'deskripsi' => 'Berpartisipasi dalam pengembangan backend aplikasi web menggunakan Laravel dan MySQL.',
+                'kualifikasi' => "- Mahasiswa aktif jurusan Teknik Informatika atau sejenis.\n- Memahami dasar-dasar PHP dan Laravel.\n- Familiar dengan database relasional (MySQL, PostgreSQL).\n- Mampu bekerja secara tim dan mandiri.",
+                'tipe' => 'Internship',
+                'lokasi' => 'Remote / Jakarta',
+                'gaji_min' => null,
+                'gaji_max' => null,
+                'tanggal_buka' => Carbon::now()->subDays(3)->toDateString(),
+                'tanggal_tutup' => Carbon::now()->addDays(30)->toDateString(),
+                'status' => 'Non-Aktif',
+            ],
+            [
+                'company_id' => $company2 ? $company2->id : null,
+                'judul' => 'UI/UX Designer Intern',
+                'deskripsi' => 'Mendukung tim desain dalam membuat user interface dan user experience untuk aplikasi mobile.',
+                'kualifikasi' => "- Mahasiswa jurusan DKV, Informatika, atau sejenis.\n- Menguasai Figma atau Adobe XD.\n- Memiliki portofolio desain menjadi nilai tambah.\n- Kreatif dan detail-oriented.",
+                'tipe' => 'Internship',
+                'lokasi' => 'Bandung, Jawa Barat',
+                'gaji_min' => null,
+                'gaji_max' => null,
+                'tanggal_buka' => Carbon::now()->subDays(2)->toDateString(),
+                'tanggal_tutup' => Carbon::now()->addDays(20)->toDateString(),
+                'status' => 'Non-Aktif',
+            ],
+            [
+                'company_id' => $company2 ? $company2->id : null,
+                'judul' => 'Data Analyst Intern',
+                'deskripsi' => 'Menganalisis data penjualan dan membuat laporan visual untuk mendukung pengambilan keputusan bisnis.',
+                'kualifikasi' => "- Mahasiswa jurusan Statistika, Informatika, atau sejenis.\n- Menguasai Excel, SQL, dan salah satu tools visualisasi (Power BI/Tableau).\n- Analitis dan detail.\n- Komunikasi yang baik dalam menyampaikan insight.",
+                'tipe' => 'Internship',
+                'lokasi' => 'Yogyakarta',
+                'gaji_min' => null,
+                'gaji_max' => null,
+                'tanggal_buka' => Carbon::now()->subDays(7)->toDateString(),
+                'tanggal_tutup' => Carbon::now()->addDays(23)->toDateString(),
+                'status' => 'Non-Aktif',
+            ],
+            [
+                'company_id' => $company2 ? $company2->id : null,
+                'judul' => 'Cybersecurity Intern',
+                'deskripsi' => 'Membantu tim keamanan informasi dalam mengidentifikasi dan menanggulangi potensi ancaman siber.',
+                'kualifikasi' => "- Mahasiswa jurusan Teknik Informatika, Keamanan Siber, atau sejenis.\n- Memahami konsep dasar keamanan jaringan.\n- Familiar dengan tools pentesting seperti Wireshark atau Burp Suite.\n- Memiliki integritas dan keingintahuan tinggi.",
+                'tipe' => 'Internship',
+                'lokasi' => 'Remote',
+                'gaji_min' => null,
+                'gaji_max' => null,
+                'tanggal_buka' => Carbon::now()->subDays(1)->toDateString(),
+                'tanggal_tutup' => Carbon::now()->addDays(15)->toDateString(),
+                'status' => 'Non-Aktif',
+            ],
+            [
                 'company_id' => $company3 ? $company3->id : null,
                 'judul' => 'Marketing Intern',
                 'deskripsi' => 'Terlibat dalam perencanaan dan eksekusi kampanye pemasaran digital dan offline.',
@@ -88,7 +139,7 @@ class LowonganSeeder extends Seeder
                 'tanggal_tutup' => Carbon::now()->addDays(40)->toDateString(),
                 'status' => 'Aktif',
             ],
-             [
+            [
                 'company_id' => $company2 ? $company2->id : null,
                 'judul' => 'Finance & Accounting Intern',
                 'deskripsi' => 'Membantu departemen keuangan dan akuntansi dalam tugas sehari-hari, termasuk pembukuan dan pelaporan.',
@@ -113,6 +164,6 @@ class LowonganSeeder extends Seeder
             }
         }
 
-        $this->command->info(count($lowongans) . ' lowongan telah ditambahkan (atau diskip jika perusahaan tidak ditemukan).');
+        $this->command->info(count($lowongans).' lowongan telah ditambahkan (atau diskip jika perusahaan tidak ditemukan).');
     }
 }

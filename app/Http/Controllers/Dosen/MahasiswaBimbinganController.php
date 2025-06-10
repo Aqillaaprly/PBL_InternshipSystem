@@ -27,6 +27,7 @@ class MahasiswaBimbinganController extends Controller
     public function show($id)
     {
         $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
+
         // This view needs to exist at: resources/views/dosen/mahasiswa_bimbingan/show.blade.php
         return view('dosen.showdataM', compact('mahasiswa'));
     }

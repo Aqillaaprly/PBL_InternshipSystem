@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Role;
 use App\Models\Mahasiswa;
+use App\Models\Role;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule; // Import Rule
@@ -16,7 +16,7 @@ class MahasiswaController extends Controller
     public function index(Request $request)
     {
         $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
-        if (!$mahasiswaRole) {
+        if (! $mahasiswaRole) {
             return redirect()->route('admin.dashboard')->with('error', 'Role mahasiswa tidak ditemukan.');
         }
         $query = User::with('detailMahasiswa')->where('role_id', $mahasiswaRole->id);
@@ -24,11 +24,12 @@ class MahasiswaController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%{$searchTerm}%")
-                  ->orWhere('username', 'like', "%{$searchTerm}%")
-                  ->orWhere('email', 'like', "%{$searchTerm}%");
+                    ->orWhere('username', 'like', "%{$searchTerm}%")
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
             });
         }
         $mahasiswas = $query->orderBy('name')->paginate(15)->withQueryString();
+
         return view('admin.Mahasiswa.datamahasiswa', compact('mahasiswas'));
     }
 
@@ -52,11 +53,11 @@ class MahasiswaController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.mahasiswa.create')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
         $mahasiswaRole = Role::where('name', 'mahasiswa')->first();
-        if (!$mahasiswaRole) {
+        if (! $mahasiswaRole) {
             return redirect()->route('admin.mahasiswa.create')->with('error', 'Role mahasiswa tidak ditemukan.')->withInput();
         }
         $user = User::create([
@@ -77,6 +78,7 @@ class MahasiswaController extends Controller
             'nomor_hp' => $request->nomor_hp,
             'alamat' => $request->alamat,
         ]);
+
         return redirect()->route('admin.datamahasiswa')->with('success', 'Data mahasiswa berhasil ditambahkan.');
     }
 
@@ -86,6 +88,7 @@ class MahasiswaController extends Controller
             abort(404, 'User bukan mahasiswa.');
         }
         $mahasiswa->load('detailMahasiswa');
+
         return view('admin.Mahasiswa.show', compact('mahasiswa'));
     }
 
@@ -95,10 +98,11 @@ class MahasiswaController extends Controller
      */
     public function edit(User $mahasiswa)
     {
-        if (!$mahasiswa->role || $mahasiswa->role->name !== 'mahasiswa') {
+        if (! $mahasiswa->role || $mahasiswa->role->name !== 'mahasiswa') {
             abort(404, 'User yang akan diedit bukan mahasiswa.');
         }
         $mahasiswa->load('detailMahasiswa'); // Load detail mahasiswa
+
         // View ada di resources/views/admin/Mahasiswa/edit.blade.php
         return view('admin.Mahasiswa.edit', compact('mahasiswa'));
     }
@@ -109,7 +113,7 @@ class MahasiswaController extends Controller
      */
     public function update(Request $request, User $mahasiswa)
     {
-        if (!$mahasiswa->role || $mahasiswa->role->name !== 'mahasiswa') {
+        if (! $mahasiswa->role || $mahasiswa->role->name !== 'mahasiswa') {
             abort(403, 'Tidak diizinkan mengubah user yang bukan mahasiswa melalui endpoint ini.');
         }
 
@@ -135,8 +139,8 @@ class MahasiswaController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.mahasiswa.edit', $mahasiswa->id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         // Update data di tabel users
@@ -174,6 +178,7 @@ class MahasiswaController extends Controller
                 'alamat' => $request->alamat,
             ]);
         }
+
         return redirect()->route('admin.datamahasiswa')->with('success', 'Data mahasiswa berhasil diperbarui.');
     }
 
@@ -183,11 +188,12 @@ class MahasiswaController extends Controller
      */
     public function destroy(User $mahasiswa)
     {
-        if (!$mahasiswa->role || $mahasiswa->role->name !== 'mahasiswa') {
+        if (! $mahasiswa->role || $mahasiswa->role->name !== 'mahasiswa') {
             abort(403, 'Tidak diizinkan menghapus user yang bukan mahasiswa melalui endpoint ini.');
         }
         // Menghapus User akan otomatis menghapus Mahasiswa detail jika onDelete('cascade') diset
         $mahasiswa->delete();
+
         return redirect()->route('admin.datamahasiswa')->with('success', 'Mahasiswa berhasil dihapus.');
     }
-}   
+}

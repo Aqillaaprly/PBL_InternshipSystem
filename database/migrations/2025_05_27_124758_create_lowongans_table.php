@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('lowongans', function (Blueprint $table) {
-    $table->id();
-    $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
-    $table->string('judul');
-    $table->text('deskripsi');
-    $table->text('kualifikasi');
-    $table->enum('tipe', ['Penuh Waktu', 'Paruh Waktu', 'Kontrak', 'Internship']);
-    $table->string('lokasi');
-    $table->decimal('gaji_min', 15, 2)->nullable();
-    $table->decimal('gaji_max', 15, 2)->nullable();
-    $table->date('tanggal_buka');
-    $table->date('tanggal_tutup');
-    $table->enum('status', ['Aktif', 'Ditutup'])->default('Aktif');
-    $table->timestamps();
-});
+        Schema::create('lowongans', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
+            $table->string('judul');
+            $table->text('deskripsi');
+            $table->text('kualifikasi');
+            $table->enum('tipe', ['Penuh Waktu', 'Paruh Waktu', 'Kontrak', 'Internship']);
+            $table->string('lokasi');
+            $table->decimal('gaji_min', 15, 2)->nullable();
+            $table->decimal('gaji_max', 15, 2)->nullable();
+            $table->date('tanggal_buka');
+            $table->date('tanggal_tutup');
+            $table->enum('status', ['Aktif', 'Non-Aktif'])->default('Aktif');
+            $table->timestamps();
+        });
     }
 
     /**
