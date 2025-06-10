@@ -1,158 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Job Listing Dashboard</title>
+  <title>Lowongan Tersedia </title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .kualifikasi-list ul {
+        list-style-type: disc;
+        margin-left: 1.5rem;
+        padding-left: 0;
+    }
+    .kualifikasi-list li {
+        margin-bottom: 0.25rem; 
+    }
+  </style>
 </head>
+
 <body class="bg-blue-50 text-gray-900">
 
-  <div class="max-w-7xl mx-auto px-6 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-    <!-- Header Section -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-12">
+    <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-8 text-blue-900 text-center">
+      Daftar Perusahaan Magang
+    </h1>
+        
+    {{-- Pengecekan diubah agar sesuai dengan Collection --}}
+    @if(isset($companies) && $companies instanceof \Illuminate\Support\Collection && $companies->count() > 0)
+      <div class="space-y-8">
+        @foreach($companies as $company)
+          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-800" title="{{ $company->nama_perusahaan }}">{{ $company->nama_perusahaan }}</h2>
+                        <p class="text-sm text-gray-600">{{ $company->kota ?? 'N/A' }}</p>
+                        @if($company->website)
+                        <a href="{{ $company->website }}" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:underline">
+                            Kunjungi Website
+                        </a>
+                        @endif
+                    </div>
+                </div>
 
-    <!-- Job Cards Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                @if($company->lowongan && $company->lowongan->count() > 0)
+                  <div class="space-y-6 mt-4">
+                    @foreach($company->lowongan as $lowongan)
+                      <div class="border border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow">
+                        <h3 class="text-lg font-semibold text-blue-700">{{ $lowongan->judul }}</h3>
+                        <p class="text-xs text-gray-500 mb-1">Lokasi: {{ $lowongan->lokasi }} | Tipe: {{ $lowongan->tipe }}</p>
+                        @if($lowongan->tanggal_tutup)
+                        <p class="text-xs text-gray-500 mb-2">Batas Akhir: {{ \Carbon\Carbon::parse($lowongan->tanggal_tutup)->isoFormat('D MMMM YYYY') }}</p>
+                        @endif
+                        
+                        <div class="mt-2 text-sm text-gray-700">
+                            <strong class="block mb-1">Deskripsi Singkat:</strong>
+                            <p class="text-gray-600 text-xs leading-relaxed line-clamp-3">{{ Str::limit(strip_tags($lowongan->deskripsi), 200) }}</p>
+                        </div>
 
-      <!-- Card 1: Payfazz -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://logovectorseek.com/wp-content/uploads/2021/06/PAYFAZZ-Logo-Vector.svg" alt="Payfazz logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Payfazz</h2>
-        <div class="flex items-center space-x-1 mb-3">
-          <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 rounded">4.1</span>
-          <div class="flex text-yellow-400 text-sm">★★★★☆</div>
-        </div>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
+                        <div class="mt-3 text-sm text-gray-700 kualifikasi-list">
+                            <strong class="block mb-1">Kriteria/Kualifikasi yang Dicari:</strong>
+                            @if($lowongan->kualifikasi)
+                                <ul class="text-xs text-gray-600">
+                                    @foreach(explode("\n", $lowongan->kualifikasi) as $kriteria)
+                                        @if(trim($kriteria) !== '')
+                                            <li>{{ trim(str_replace(['-', '*'], '', $kriteria)) }}</li>
+                                        @endif
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-xs text-gray-500">Kualifikasi tidak disebutkan.</p>
+                            @endif
+                        </div>
+                      </div>
+                    @endforeach
+                  </div>
+                @else
+                  <p class="text-sm text-gray-500 mt-4">Saat ini belum ada lowongan tersedia dari perusahaan ini.</p>
+                @endif
+            </div>
+          </div>
+        @endforeach
       </div>
-
-      <!-- Card 2: Astra -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://seeklogo.com/images/A/astra-logo-7B7B7C8E4D-seeklogo.com.png" alt="Astra logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Astra</h2>
-        <div class="flex items-center space-x-1 mb-3"></div>
-        <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 rounded">4.1</span>
-          <div class="flex text-yellow-400 text-sm">★★★★☆</div>
-       
-          <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 3: Mayora -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://mayora.com/favicon.ico" alt="Mayora logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Mayora</h2>
-        <div class="flex items-center space-x-1 mb-3">
-          <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 rounded">4.2</span>
-          <div class="flex text-yellow-400 text-sm">★★★★☆</div>
-        </div>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 4: Bank Mandiri -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://bankmandiri.co.id/favicon.ico" alt="Bank Mandiri logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Bank Mandiri</h2>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 5: Indofood -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://seeklogo.com/images/I/indofood-logo-298884-seeklogo.com.png" alt="Indofood logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Indofood</h2>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 6: Paragon -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://brandfetch.com/paragon-innovation.com/logo.svg" alt="Paragon Technology logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Paragon Technology And Innovation</h2>
-        <div class="flex items-center space-x-1 mb-3">
-          <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 rounded">4.7</span>
-          <div class="flex text-yellow-400 text-sm">★★★★★</div>
-        </div>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 7: Kawan Lama -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://kawanlama.com/favicon.ico" alt="Kawan Lama Sejahtera logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Kawan Lama Sejahtera</h2>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Card 8: Indomaret -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <div class="mb-3">
-          <img src="https://seeklogo.com/images/I/indomaret-logo-339890-seeklogo.com.png" alt="Indomaret logo" class="h-8 object-contain" />
-        </div>
-        <h2 class="font-semibold mb-1">Indomaret</h2>
-        <div class="mt-auto flex justify-between items-center">
-          <button class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">Apply now</button>
-          <button class="flex items-center space-x-1 text-gray-600 text-xs border border-gray-300 rounded px-2 py-1 hover:bg-gray-100 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5l14 14M19 5l-14 14" /></svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-
-    </div>
+      
+    @elseif(isset($companies) && $companies->isEmpty())
+      <p class="text-gray-600 text-center">Tidak ada data perusahaan yang ditemukan.</p>
+    @else
+      <p class="text-gray-600 text-center">Data perusahaan tidak tersedia saat ini.</p>
+    @endif
   </div>
 
 </body>

@@ -3,34 +3,55 @@
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-// ... other necessary imports ...
-use Illuminate\Http\Request; // Used in the index method
+use Illuminate\Http\Request;
+use App\Models\Mahasiswa; // Mahasiswa model might be used for direct operations if needed, but not directly in the show method here.
+use App\Models\User; // Used for fetching user data
+use App\Models\BimbinganMagang; // Used for fetching bimbingan data
 
 class MahasiswaBimbinganController extends Controller
 {
+    /**
+     * Display a listing of the bimbingan for supervised students.
+     * Allows searching by student name or NIM.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
-        $query = User::whereHas('role', fn ($q) => $q->where('name', 'mahasiswa'));
+        $search = $request->input('search'); // Get search query from request
 
-        if ($search = $request->input('search')) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('username', 'like', "%{$search}%");
-            });
-        }
+        // Retrieve bimbingan records with eager loaded relationships for mahasiswa and their details
+        $bimbingans = BimbinganMagang::with(['mahasiswa.detailMahasiswa'])
+            // Conditionally apply search filter if a search term is provided
+            ->when($search, function ($query, $search) {
+                // Filter bimbingans where the related Mahasiswa's nama or NIM matches the search term
+                $query->whereHas('mahasiswa.detailMahasiswa', function ($q) use ($search) {
+                    $q->where('nama', 'like', "%{$search}%")
+                      ->orWhere('nim', 'like', "%{$search}%");
+                });
+            })
+            ->paginate(10); // Paginate the results for better performance and UI
 
-        $mahasiswas = $query->with('detailMahasiswa')->paginate(10);
-
-        // This view needs to exist at: resources/views/dosen/data_mahasiswabim.blade.php
-        return view('dosen.data_mahasiswabim', compact('mahasiswas'));
+        // Return the view with the paginated bimbingan data
+        return view('dosen.data_mahasiswabim', compact('bimbingans'));
     }
 
-    public function show($id)
+    /**
+     * Display the specified student (User) with their detailed Mahasiswa information.
+     *
+     * @param \App\Models\User $mahasiswa The User model instance, resolved by Route Model Binding.
+     * @return \Illuminate\View\View
+     */
+    public function show(User $mahasiswa)
     {
-        $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
+        // The $mahasiswa object is already resolved by Route Model Binding.
+        // We only need to eager load its 'detailMahasiswa' relationship to access student-specific data
+        // associated with this user, ensuring it's available in the view.
+        $mahasiswa->load('detailMahasiswa');
 
-        // This view needs to exist at: resources/views/dosen/mahasiswa_bimbingan/show.blade.php
+        // Pass the resolved and loaded $mahasiswa object to the view.
+        // Ensure the view 'dosen.showdataM' exists at resources/views/dosen/showdataM.blade.php
         return view('dosen.showdataM', compact('mahasiswa'));
     }
 }
