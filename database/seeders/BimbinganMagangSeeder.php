@@ -17,13 +17,14 @@ class BimbinganMagangSeeder extends Seeder
             $q->where('name', 'mahasiswa');
         })->get();
 
-        $pembimbing = Pembimbing::first(); // Ambil 1 pembimbing pertama
+        $pembimbing = Pembimbing::first();
         $company = Company::first();
         $lowongan = Lowongan::first();
 
         foreach ($mahasiswaUsers as $mahasiswa) {
             BimbinganMagang::firstOrCreate(
                 [
+                    // PERBAIKI: Ubah dari 'user_id' menjadi 'mahasiswa_user_id'
                     'mahasiswa_user_id' => $mahasiswa->id,
                     'pembimbing_id' => $pembimbing->id,
                     'periode_magang' => 'Semester Ganjil 2024/2025',
@@ -31,6 +32,7 @@ class BimbinganMagangSeeder extends Seeder
                 [
                     'company_id' => $company->id,
                     'lowongan_id' => $lowongan->id,
+                    'jenis_bimbingan' => 'Pembekalan Awal Magang',
                     'tanggal_mulai' => now()->subMonths(2),
                     'tanggal_selesai' => now()->addMonths(1),
                     'status_bimbingan' => 'Aktif',
