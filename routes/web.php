@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-
+use App\Http\Controllers\UserController; 
+use Illuminate\Support\Facades\Route; 
+//admin
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\LowonganController as AdminLowonganController; // Untuk manajemen user data
@@ -11,20 +13,17 @@ use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController
 use App\Http\Controllers\Admin\PendaftarController as AdminPendaftarController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\AktivitasMagangController;
-
+//Company
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Company\ProfilePerusahaanController;
-
+//Dosen
 use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
-use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
-use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; //dosen
+use App\Http\Controllers\Dosen\MahasiswaBimbinganController; 
+use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; 
 use App\Http\Controllers\Dosen\ProfileController; 
-use App\Http\Controllers\Dosen\LogBimbingan; //dosen
-use App\Http\Controllers\UserController; // dosen
-// dosen
-use Illuminate\Support\Facades\Route; // dosen
+use App\Http\Controllers\Dosen\LogBimbingan; 
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
