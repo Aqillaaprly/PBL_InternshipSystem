@@ -12,7 +12,9 @@ class LowonganController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Lowongan::with('company')
+        $query = Lowongan::with(['company' => function($query) {
+            $query->where('status_kerjasama', 'Aktif');
+        }])
             ->whereHas('company', function($q) {
                 $q->where('status_kerjasama', 'Aktif');
             });
@@ -47,7 +49,9 @@ class LowonganController extends Controller
 
     public function create()
     {
-        $companies = Company::orderBy('nama_perusahaan')->get();
+        $companies = Company::where('status_kerjasama', 'Aktif')
+            ->orderBy('nama_perusahaan')
+            ->get();
         return view('mahasiswa.lowongan.create', compact('companies'));
     }
 
@@ -73,6 +77,12 @@ class LowonganController extends Controller
                 ->withInput();
         }
 
+        // Ensure company is active before creating lowongan
+        $company = Company::findOrFail($request->company_id);
+        if ($company->status_kerjasama !== 'Aktif') {
+            return back()->with('error', 'Tidak dapat membuat lowongan untuk perusahaan yang tidak aktif');
+        }
+
         Lowongan::create($request->all());
 
         return redirect()->route('mahasiswa.lowongan.index')->with('success', 'Lowongan berhasil ditambahkan.');
@@ -80,12 +90,19 @@ class LowonganController extends Controller
 
     public function show(Lowongan $lowongan)
     {
+        // Eager load company and its relationships
+        $lowongan->load(['company' => function($query) {
+            $query->withCount('lowongans');
+        }]);
+
         return view('mahasiswa.lowongan.show', compact('lowongan'));
     }
 
     public function edit(Lowongan $lowongan)
     {
-        $companies = Company::orderBy('nama_perusahaan')->get();
+        $companies = Company::where('status_kerjasama', 'Aktif')
+            ->orderBy('nama_perusahaan')
+            ->get();
         return view('mahasiswa.lowongan.edit', compact('lowongan', 'companies'));
     }
 
@@ -109,6 +126,12 @@ class LowonganController extends Controller
             return redirect()->route('mahasiswa.lowongan.edit', $lowongan->id)
                 ->withErrors($validator)
                 ->withInput();
+        }
+
+        // Verify company status before update
+        $company = Company::findOrFail($request->company_id);
+        if ($company->status_kerjasama !== 'Aktif') {
+            return back()->with('error', 'Tidak dapat mengubah lowongan ke perusahaan yang tidak aktif');
         }
 
         $lowongan->update($request->all());

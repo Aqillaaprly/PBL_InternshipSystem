@@ -30,15 +30,24 @@ class Company extends Model
         return $this->belongsTo(User::class);
     }
 
+    // Keep the plural relationship for consistency
     public function lowongans()
     {
         return $this->hasMany(Lowongan::class);
     }
+
+    // Add singular alias if needed elsewhere in the codebase
+    public function lowongan()
+    {
+        return $this->hasMany(Lowongan::class);
+    }
+
     public function aktivitasMagangs()
     {
         return $this->hasMany(AktivitasMagang::class, 'company_id');
     }
-     public function bimbinganMagangs()
+
+    public function bimbinganMagangs()
     {
         return $this->hasMany(BimbinganMagang::class, 'company_id');
     }

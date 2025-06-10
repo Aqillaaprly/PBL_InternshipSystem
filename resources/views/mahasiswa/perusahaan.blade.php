@@ -6,6 +6,7 @@
     <title>SIMMAGANG Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body class="bg-blue-50 text-gray-800 pt-20">
@@ -114,37 +115,59 @@
             </button>
         </div>
         <div id="companyProfileContent">
-            <!-- Content will be loaded here via AJAX -->
+            <div class="p-4 text-center">
+                <i class="fas fa-spinner fa-spin text-blue-500"></i> Memuat data perusahaan...
+            </div>
         </div>
     </div>
 </div>
 
 <script>
     function showCompanyProfile(companyId) {
-        fetch(`/mahasiswa/perusahaan/${companyId}/profile`)
+        // Show loading state immediately
+        document.getElementById('companyModal').classList.remove('hidden');
+
+        // Set up headers with CSRF token
+        const headers = new Headers({
+            'Accept': 'text/html',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        });
+
+        fetch(`/mahasiswa/perusahaan/${companyId}/profile`, {
+            headers: headers,
+            credentials: 'same-origin'
+        })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Gagal memuat profil perusahaan');
+                    throw new Error(`Gagal memuat profil perusahaan (Status: ${response.status})`);
                 }
                 return response.text();
             })
             .then(html => {
                 document.getElementById('companyProfileContent').innerHTML = html;
-                document.getElementById('companyModal').classList.remove('hidden');
             })
             .catch(error => {
+                console.error('Error:', error);
                 document.getElementById('companyProfileContent').innerHTML = `
-                    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                        ${error.message}
-                    </div>
-                `;
-                document.getElementById('companyModal').classList.remove('hidden');
+                <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                    ${error.message}<br>
+                    Silakan refresh halaman dan coba lagi.
+                </div>
+            `;
             });
     }
 
     function hideCompanyModal() {
         document.getElementById('companyModal').classList.add('hidden');
     }
+
+    // Close modal when clicking outside content
+    document.getElementById('companyModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            hideCompanyModal();
+        }
+    });
 </script>
 
 {{-- Footer --}}
