@@ -30,8 +30,7 @@ class BimbinganMagang extends Model
 
     public function mahasiswa()
     {
-        // Relasi ke User model yang berperan sebagai mahasiswa
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'mahasiswa_user_id');
     }
 
     public function pembimbing()
