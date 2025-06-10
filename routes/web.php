@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\UserController; 
-use Illuminate\Support\Facades\Route; 
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 //admin
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\PembimbingController as AdminPembimbingController
 use App\Http\Controllers\Admin\PendaftarController as AdminPendaftarController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
 use App\Http\Controllers\Admin\AktivitasMagangController;
+use App\Http\Controllers\Admin\BimbinganController;
 //Company
 use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
@@ -20,10 +21,10 @@ use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk da
 use App\Http\Controllers\Company\ProfilePerusahaanController;
 //Dosen
 use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
-use App\Http\Controllers\Dosen\MahasiswaBimbinganController; 
-use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; 
-use App\Http\Controllers\Dosen\ProfileController; 
-use App\Http\Controllers\Dosen\LogBimbingan; 
+use App\Http\Controllers\Dosen\MahasiswaBimbinganController;
+use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan;
+use App\Http\Controllers\Dosen\ProfileController;
+use App\Http\Controllers\Dosen\LogBimbingan;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -70,7 +71,11 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/aktivitas-mahasiswa/{mahasiswa_id}', [AktivitasController::class, 'show'])->name('aktivitas-mahasiswa.show'); // Halaman detail kegiatan
     Route::post('/aktivitas-mahasiswa/{id}/verify', [AktivitasController::class, 'verify'])->name('aktivitas-mahasiswa.verify'); // Untuk verifikasi aktivitas
 
-
+    Route::post('/bimbingan', [BimbinganController::class, 'store'])->name('bimbingan.store');
+    Route::get('/bimbingan/create', [BimbinganController::class, 'create'])->name('bimbingan.create');
+    Route::get('/bimbingan/{bimbinganMagang}/edit', [BimbinganController::class, 'edit'])->name('bimbingan.edit'); // NEW
+    Route::put('/bimbingan/{bimbinganMagang}', [BimbinganController::class, 'update'])->name('bimbingan.update'); // NEW
+    Route::delete('/bimbingan/{bimbinganMagang}', [BimbinganController::class, 'destroy'])->name('bimbingan.destroy'); // NEW
 });
 
 // DOSEN GROUP
@@ -86,7 +91,7 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::post('/log-bimbingan/store/{id}', [LogBimbingan::class, 'store'])->name('log_bimbingan.store');
     Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
     Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
-        // Profile Management Routes 
+    // Profile Management Routes 
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.dosenProfile2'); // Changed name to match your controller's comment and redirect
     Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit3');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update3');

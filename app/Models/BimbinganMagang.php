@@ -9,7 +9,7 @@ class BimbinganMagang extends Model
 {
     use HasFactory;
 
-    protected $table = 'bimbingan_magangs';
+    protected $table = 'bimbingan_magangs'; // Pastikan nama tabel benar
 
     protected $fillable = [
         'mahasiswa_user_id',
@@ -30,11 +30,13 @@ class BimbinganMagang extends Model
 
     public function mahasiswa()
     {
+        // Relasi ke User model yang berperan sebagai mahasiswa
         return $this->belongsTo(User::class, 'mahasiswa_user_id');
     }
 
     public function pembimbing()
     {
+        // Relasi ke Pembimbing model
         return $this->belongsTo(Pembimbing::class, 'pembimbing_id');
     }
 
@@ -47,6 +49,7 @@ class BimbinganMagang extends Model
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
+
     public function logBimbinganMagangs()
     {
         return $this->hasMany(LogBimbinganMagang::class);

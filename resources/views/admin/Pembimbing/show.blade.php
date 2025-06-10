@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Pembimbing - {{ $pembimbing->nama_lengkap ?? ($pembimbing->user->name ?? 'Informasi Pembimbing') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -59,14 +59,18 @@
             background-color: #fee2e2;
             color: #991b1b;
         }
-        .edit-button {
+        .action-button {
             background-image: linear-gradient(to right, #4f46e5, #7c3aed);
             color: white;
             padding: 0.625rem 1.25rem;
             font-size: 0.875rem;
             border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
-        .edit-button:hover {
+        .action-button:hover {
             background-image: linear-gradient(to right, #4338ca, #6d28d9);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -102,7 +106,7 @@
                     <div class="info-item"><span class="info-label">Jabatan Fungsional</span><span class="info-value">{{ $pembimbing->jabatan_fungsional ?? '-' }}</span></div>
                     <div class="info-item"><span class="info-label">Program Studi Homebase</span><span class="info-value">{{ $pembimbing->program_studi_homebase ?? '-' }}</span></div>
                     <div class="info-item"><span class="info-label">Bidang Keahlian Utama</span><span class="info-value">{{ $pembimbing->bidang_keahlian_utama ?? '-' }}</span></div>
-                    <div class="info-item"><span class="info-label">Kuota Bimbingan Aktif</span><span class="info-value">{{ $pembimbing->kuota_bimbingan_aktif ?? 0 }}</span></div>
+                    <div class="info-item"><span class="info-label">Kuota Bimbingan Aktif</span><span class="info-value">{{ $pembimbing->kuota_aktif ?? 0 }}</span></div>
                     <div class="info-item"><span class="info-label">Maksimal Kuota</span><span class="info-value">{{ $pembimbing->maks_kuota_bimbingan ?? 0 }}</span></div>
                     <div class="info-item"><span class="info-label">Status Aktif</span>
                         <span class="info-value">
@@ -113,25 +117,13 @@
                     </div>
                 </div>
 
-                <div class="border-t border-gray-200 pt-6 mt-6 text-sm">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Informasi Akun Login</h2>
-
-                    @if($pembimbing->user)
-                        <div class="space-y-4">
-                            <div class="info-item"><span class="info-label">Username</span><span class="info-value">{{ $pembimbing->user->username ?? '-' }}</span></div>
-                            <div class="info-item"><span class="info-label">Email</span><span class="info-value">{{ $pembimbing->user->email ?? '-' }}</span></div>
-                            <div class="info-item"><span class="info-label">Nama Akun</span><span class="info-value">{{ $pembimbing->user->name ?? '-' }}</span></div>
-                            <div class="info-item"><span class="info-label">Role</span><span class="info-value">{{ $pembimbing->user->role->name ?? '-' }}</span></div>
-                            <div class="info-item"><span class="info-label">Dibuat Pada</span><span class="info-value">{{ $pembimbing->user->created_at ? $pembimbing->user->created_at->format('d M Y, H:i') : '-' }}</span></div>
-                        </div>
-                    @else
-                        <p class="text-gray-500">Pembimbing ini belum memiliki akun login sistem.</p>
-                    @endif
-                </div>
-
                 {{-- NEW SECTION: Mahasiswa Bimbingan --}}
                 <div class="border-t border-gray-200 pt-6 mt-6 text-sm">
-                    <h2 class="text-lg font-semibold text-gray-700 mb-4">Mahasiswa Bimbingan</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-700">Mahasiswa Bimbingan</h2>
+                    
+                    </div>
+
                     @if($pembimbing->bimbinganMagangs->isNotEmpty())
                         <div class="overflow-x-auto rounded-lg border border-gray-200">
                             <table class="min-w-full text-sm text-left">
@@ -149,13 +141,10 @@
                                     @foreach($pembimbing->bimbinganMagangs as $index => $bimbingan)
                                         <tr class="border-b hover:bg-gray-50">
                                             <td class="px-4 py-2">{{ $index + 1 }}</td>
-                                            {{-- Access student data --}}
-                                            <td class="px-4 py-2">{{ $bimbingan->mahasiswa->username ?? '-' }}</td>
+                                            <td class="px-4 py-2">{{ $bimbingan->mahasiswa->detailMahasiswa->nim ?? '-' }}</td>
                                             <td class="px-4 py-2">{{ $bimbingan->mahasiswa->name ?? '-' }}</td>
                                             <td class="px-4 py-2">{{ $bimbingan->mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
-                                            {{-- Access company data --}}
                                             <td class="px-4 py-2">{{ $bimbingan->company->nama_perusahaan ?? '-' }}</td>
-                                            {{-- Access status bimbingan --}}
                                             <td class="px-4 py-2 text-center">
                                                 <span class="badge
                                                     @if($bimbingan->status_bimbingan == 'Aktif') bg-green-100 text-green-700
@@ -175,8 +164,8 @@
                 </div>
 
                 <div class="mt-10 flex justify-center">
-                    <a href="{{ route('admin.pembimbings.edit', $pembimbing->id) }}" class="edit-button inline-flex items-center shadow-lg">
-                        <i class="fas fa-pencil-alt mr-2"></i>Edit Pembimbing
+                    <a href="{{ route('admin.pembimbings.edit', $pembimbing->id) }}" class="action-button">
+                        Edit Pembimbing
                     </a>
                 </div>
             @else
