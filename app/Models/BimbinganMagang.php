@@ -35,7 +35,6 @@ class BimbinganMagang extends Model
 
     public function pembimbing()
     {
-        // Relasi ke Pembimbing model
         return $this->belongsTo(Pembimbing::class, 'pembimbing_id');
     }
 
