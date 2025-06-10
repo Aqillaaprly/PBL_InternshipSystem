@@ -32,8 +32,8 @@
                         <tr class="border-b border-gray-200 hover:bg-gray-50">
                             <td class="px-5 py-4">{{ $loop->iteration }}</td>
                             <td class="px-5 py-4">{{ $item->mahasiswa->name ?? '-' }}</td>
-                            <td class="px-5 py-4">{{ $item->pembimbing->nama ?? '-' }}</td>
-                            <td class="px-5 py-4">{{ $item->company->nama ?? '-' }}</td>
+                            <td class="px-5 py-4">{{ $item->pembimbing->nama_lengkap ?? '-' }}</td>
+                            <td class="px-5 py-4">{{ $item->company->nama_perusahaan ?? '-' }}</td>
                             <td class="px-5 py-4">{{ $item->periode_magang }}</td>
                             <td class="px-5 py-4">{{ $item->total_hadir }}</td>
                             <td class="px-5 py-4">

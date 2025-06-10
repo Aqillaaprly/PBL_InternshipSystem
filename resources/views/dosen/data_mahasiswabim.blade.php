@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Log Bimbingan Magang - Dosen STRIDEUP</title>
+    <title>Data Mahasiswa Bimbingan Magang - Dosen STRIDEUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -12,7 +12,7 @@
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
             <div class="flex justify-between items-center pb-4">
-                <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Log Bimbingan Magang</h1>
+                <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Mahasiswa Bimbingan Magang</h1>
                 <div class="flex space-x-3">
                     <form method="GET" action="{{ route('dosen.data_mahasiswabim') }}" class="flex">
                         <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
