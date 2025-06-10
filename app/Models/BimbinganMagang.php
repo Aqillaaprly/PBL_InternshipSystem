@@ -49,4 +49,13 @@ class BimbinganMagang extends Model
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
+    public function logBimbinganMagangs()
+    {
+        return $this->hasMany(LogBimbinganMagang::class);
+    }
+
+    public function absensiMagangs()
+    {
+        return $this->hasMany(AbsensiMagang::class);
+    }
 }

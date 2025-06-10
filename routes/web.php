@@ -16,8 +16,9 @@ use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
 
-use App\Http\Controllers\Dosen\LogBimbingan;
-use App\Http\Controllers\Dosen\MahasiswaBimbinganController;
+use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
+use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; //dosen
+use App\Http\Controllers\Dosen\LogBimbingan; //dosen
 use App\Http\Controllers\UserController; // dosen
 // dosen
 use Illuminate\Support\Facades\Route; // dosen
@@ -80,6 +81,10 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
     Route::get('/log-bimbingan', [LogBimbingan::class, 'index'])->name('data_log');
     Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
+    Route::get('/log-bimbingan/add/{id}', [LogBimbingan::class, 'create'])->name('log_bimbingan.create');
+    Route::post('/log-bimbingan/store/{id}', [LogBimbingan::class, 'store'])->name('log_bimbingan.store');
+    Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
+    Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
 });
 
 // MAHASISWA GROUP

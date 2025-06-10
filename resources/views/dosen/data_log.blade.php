@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Data Mahasiswa - Dosen STRIDEUP</title>
+    <title>Data Log Bimbingan - Dosen STRIDEUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -12,10 +12,10 @@
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
             <div class="flex justify-between items-center pb-4">
-                <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Mahasiswa</h1>
+                <h1 class="text-2xl font-bold text-blue-800 ml-8">Data Log Bimbingan</h1>
                 <div class="flex space-x-3">
                     <form method="GET" action="{{ route('dosen.data_log') }}" class="flex">
-                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama/NIM..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama mahasiswa..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                     </form>
                 </div>
             </div>
@@ -38,34 +38,39 @@
                     <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
                             <th class="px-5 py-3">No</th>
-                            <th class="px-5 py-3">NIM</th>
                             <th class="px-5 py-3">Nama Mahasiswa</th>
-                            <th class="px-5 py-3">Email</th>
-                            <th class="px-5 py-3">Program Studi</th>
-                            <th class="px-5 py-3">Kelas</th>
+                            <th class="px-5 py-3">Periode Magang</th>
+                            <th class="px-5 py-3">Status Bimbingan</th>
+                            <th class="px-5 py-3">Pembimbing</th>
+                            <th class="px-5 py-3">Perusahaan</th>
                             <th class="px-5 py-3">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="text-gray-600">
-                        @forelse ($mahasiswas as $index => $mahasiswa)
+                        @forelse ($bimbingans as $index => $bimbingan)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                <td class="px-5 py-4">{{ $mahasiswas->firstItem() + $index }}</td>
-                                <td class="px-5 py-4">{{ $mahasiswa->username ?? ($mahasiswa->detailMahasiswa->nim ?? '-') }}</td>
-                                <td class="px-5 py-4 text-left">{{ $mahasiswa->name ?? ($mahasiswa->detailMahasiswa->nama ?? '-') }}</td>
-                                <td class="px-5 py-4 text-left">{{ $mahasiswa->email ?? ($mahasiswa->detailMahasiswa->email ?? '-') }}</td>
-                                <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
-                                <td class="px-5 py-4">{{ $mahasiswa->detailMahasiswa->kelas ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingans->firstItem() + $index }}</td>
+                                <td class="px-5 py-4">
+                                    {{ $bimbingan->mahasiswa->name ?? '-' }}
+                                </td>
+                                <td class="px-5 py-4">{{ $bimbingan->periode_magang ?? '-' }}</td>
                                 <td class="px-5 py-4">
                                     <div class="flex item-center justify-center space-x-1">
-                                        <a href="{{ route('dosen.data_log.show', $mahasiswa->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
-                                            Show
+                                        <a href="{{ route('dosen.data_log.show', $bimbingan->status_bimbingan) }}" class="bg-green-100 text-green-600 text-xs font-medium px-3 py-1 rounded hover:bg-green-200">
+                                            Aktif
                                         </a>
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="bg-red-100 text-red-600 text-xs font-medium px-3 py-1 rounded hover:bg-red-200">
-                                                Delete
-                                            </button>
-                                        </form>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4">{{ $bimbingan->pembimbing->nama ?? '-' }}</td>
+                                <td class="px-5 py-4">{{ $bimbingan->company->nama ?? '-' }}</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex item-center justify-center space-x-1">
+                                        <a href="{{ route('dosen.data_log.show', $bimbingan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                            Show Log
+                                        </a>
+                                        <a href="{{ route('dosen.log_bimbingan.create', $bimbingan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                            Add Log
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -73,9 +78,9 @@
                             <tr>
                                 <td colspan="7" class="px-5 py-4 text-center text-gray-500">
                                      @if(request('search'))
-                                        Tidak ada mahasiswa ditemukan untuk pencarian "{{ request('search') }}".
+                                        Tidak ada bimbingan ditemukan untuk pencarian "{{ request('search') }}".
                                     @else
-                                        Belum ada data mahasiswa.
+                                        Belum ada data log bimbingan.
                                     @endif
                                 </td>
                             </tr>
@@ -84,9 +89,9 @@
                 </table>
             </div>
 
-            @if ($mahasiswas->hasPages())
+            @if ($bimbingans->hasPages())
                 <div class="mt-6">
-                    {{ $mahasiswas->appends(request()->query())->links() }}
+                    {{ $bimbingans->appends(request()->query())->links() }}
                 </div>
             @endif
         </div>

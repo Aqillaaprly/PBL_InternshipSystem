@@ -19,8 +19,7 @@
                 {{-- Menggunakan nama route yang sudah diperbaiki dan konsisten --}}
                 <a href="{{ route('dosen.data_mahasiswabim') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.data_mahasiswabim') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
                 <a href="{{ route('dosen.data_log') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.data_mahasiswa') ? 'border-blue-600 text-blue-600' : '' }}">Log Bimbingan</a>
-                <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.data_pembimbing') ? 'border-blue-600 text-blue-600' : '' }}">Absensi Mahasiwa</a>
-                <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') ? 'border-blue-600 text-blue-600' : '' }}">Laporan Magang</a>
+                <a href="{{ route('dosen.absensi.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.absensi.index') ? 'border-blue-600 text-blue-600' : '' }}">Absensi Mahasiwa</a>
             </nav>
             <div class="flex items-center space-x-4">
                 {{-- Google Translate dengan Ikon Globe --}}
