@@ -38,7 +38,7 @@
 
             <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6  border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Terbaru</h2> {{-- Updated title --}}
+                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Diterima</h2> {{-- Updated title --}}
                     <a href="{{ route('perusahaan.pendaftar.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Pendaftar</a>
                 </div>
 
