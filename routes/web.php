@@ -16,11 +16,12 @@ use App\Http\Controllers\Company\CompanyController;
 use App\Http\Controllers\Company\DashboardController;
 use App\Http\Controllers\Company\PendaftarController; // Ini controller untuk dashboard Perusahaan (Role)
 use App\Http\Controllers\Company\ProfilePerusahaanController;
+
+use App\Http\Controllers\Dosen\DashboardController as DosenDashboardController;
 use App\Http\Controllers\Dosen\MahasiswaBimbinganController; //dosen 
 use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan; //dosen
+use App\Http\Controllers\Dosen\ProfileController; 
 use App\Http\Controllers\Dosen\LogBimbingan; //dosen
-use App\Http\Controllers\Dosen\ProfileController; //dosen
-use App\Http\Controllers\Dosen\DDashboardController; //dosen
 use App\Http\Controllers\UserController; // dosen
 // dosen
 use Illuminate\Support\Facades\Route; // dosen
@@ -75,7 +76,8 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
 
 // DOSEN GROUP
 Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')->group(function () {
-    Route::get('/dashboard', [DDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DosenDashboardController::class, 'index'])->name('dashboard');
+
     // Route untuk melihat daftar mahasiswa bimbingan
     Route::get('/mahasiswa-bimbingan', [MahasiswaBimbinganController::class, 'index'])->name('data_mahasiswabim');
     Route::get('/mahasiswa-bimbingan/{id}', [MahasiswaBimbinganController::class, 'show'])->name('mahasiswa.show');
@@ -85,7 +87,7 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::post('/log-bimbingan/store/{id}', [LogBimbingan::class, 'store'])->name('log_bimbingan.store');
     Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
     Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
-    // Profile Management Routes 
+        // Profile Management Routes 
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.dosenProfile2'); // Changed name to match your controller's comment and redirect
     Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit3');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update3');
@@ -121,7 +123,7 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::get('/profil', [CompanyController::class, 'show'])->name('profile.perusahaanProfile1');
     Route::get('/profil/edit', [CompanyController::class, 'edit'])->name('profile.edit1');
     Route::put('/profil', [CompanyController::class, 'update'])->name('profile.update1');
-    
+
     // Profile Management Routes 
     Route::get('/profil', [ProfilePerusahaanController::class, 'show'])->name('profile.perusahaanProfile2'); // Changed name to match your controller's comment and redirect
     Route::get('/profil/edit', [ProfilePerusahaanController::class, 'edit'])->name('profile.edit2');
@@ -144,15 +146,15 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::delete('/lowongan/{lowongan}', [CompanyController::class, 'destroyLowongan'])->name('lowongan.destroy');
 
     // Pendaftar Management
-    
-     Route::patch('/pendaftar/{pendaftar}/update-status-lamaran', [PendaftarController::class, 'updateStatusLamaran'])->name('pendaftar.updateStatusLamaran');
+
+    Route::patch('/pendaftar/{pendaftar}/update-status-lamaran', [PendaftarController::class, 'updateStatusLamaran'])->name('pendaftar.updateStatusLamaran');
     Route::get('/pendaftar', [PendaftarController::class, 'index'])->name('pendaftar.index');
     Route::get('/pendaftar/{pendaftar}', [PendaftarController::class, 'show'])->name('pendaftar.detail');
     Route::get('/pendaftar/{pendaftar}/dokumen', [PendaftarController::class, 'showDokumen'])->name('pendaftar.showDokumen');
     Route::patch('/pendaftar/{pendaftar}/dokumen/{dokumenPendaftar}/update-status', [PendaftarController::class, 'updateStatusDokumen'])->name('pendaftar.dokumen.updateStatus');
 
     // Activities
-   Route::get('/aktivitas_magang', [App\Http\Controllers\Company\AktivitasMagangController::class, 'index']) ->name('aktivitas_magang');
+    Route::get('/aktivitas_magang', [App\Http\Controllers\Company\AktivitasMagangController::class, 'index'])->name('aktivitas_magang');
     Route::get('/aktivitas-mahasiswa/{mahasiswa_id}', [AktivitasMagangController::class, 'show'])->name('aktivitas_magang.show'); // Halaman detail kegiatan
     Route::post('/aktivitas-mahasiswa/{id}/verify', [AktivitasMagangController::class, 'verify'])->name('aktivitas_magang.verify'); // Untuk verifikasi aktivitas
 });

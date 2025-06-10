@@ -11,7 +11,7 @@ use App\Models\Pendaftar;
 use App\Models\User;
 use App\Models\Role; // Tambahkan ini jika belum ada
 
-class DDashboardController extends Controller
+class DashboardController extends Controller
 {
     /**
      * Display the dosen dashboard.

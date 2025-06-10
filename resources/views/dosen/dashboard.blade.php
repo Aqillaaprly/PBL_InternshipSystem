@@ -1,34 +1,44 @@
-absen<?php
-// session_start();
-// if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'perusahaan') {
-//     header('Location: ../index.php');
-//     exit;
-// }
-
-// require '../koneksi.php';
-
-// // Contoh query, sesuaikan dengan tabel Anda
-// $jumlahLowongan   = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM lowongan WHERE perusahaan_id = 1"))['total'];
-// $jumlahPendaftar  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM pendaftaran WHERE perusahaan_id = 1"))['total'];
-?>
-
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard Pembimbing - STRIDEUP</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dashboard SIMMAGANG - Dosen</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Tambahkan CDN Chart.js dan plugin datalabels --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            margin: auto;
+            /* Anda bisa mengatur tinggi dan lebar default di sini atau membiarkannya responsif */
+            /* height: 300px; */
+            /* width: 100%; */ /* Biarkan lebar responsif */
+        }
+        /* Style untuk kualifikasi list jika Dosen.job di-include dan membutuhkannya */
+        .kualifikasi-list ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            padding-left: 0;
+        }
+        .kualifikasi-list li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
 </head>
+
 <body class="bg-blue-50 text-gray-800">
 
-    @include('dosen.template.navbar') 
+    @include('dosen.template.navbar')
 
     <main class="flex flex-col min-h-screen">
         <div class="p-6 max-w-7xl mx-auto w-full mt-16"> {{-- Tambahkan margin top jika navbar fixed --}}
             <div class="w-full mb-6">
                 <img src="https://www.pixelstalk.net/wp-content/uploads/2016/05/Images-New-York-City-Backgrounds.jpg"
-                     alt="Header"
-                     class="w-full h-48 object-cover rounded-b-lg shadow" />
+                    alt="Header"
+                    class="w-full h-48 object-cover rounded-b-lg shadow" />
             </div>
 
              <div class="text-center mb-10">
@@ -73,9 +83,9 @@ absen<?php
                                     @endif
                                 </ul>
                                 @php
-                                    $totalDiterimaHitung = ($statsProdiDiterima['Teknik Informatika'] ?? 0) + 
-                                                           ($statsProdiDiterima['Sistem Informasi Bisnis'] ?? 0) + 
-                                                           ($statsProdiDiterima['Lainnya'] ?? 0);
+                                    $totalDiterimaHitung = ($statsProdiDiterima['Teknik Informatika'] ?? 0) +
+                                                         ($statsProdiDiterima['Sistem Informasi Bisnis'] ?? 0) +
+                                                         ($statsProdiDiterima['Lainnya'] ?? 0);
                                 @endphp
                                 @if($totalDiterimaHitung == 0)
                                     <p class="text-sm text-gray-500 mt-3 text-center md:text-left">Belum ada data mahasiswa diterima yang tercatat.</p>
@@ -93,10 +103,21 @@ absen<?php
                         </div>
                     </div>
                 </div>
-        @include('dosen.Job')
+            </div>
 
-{{--Tabel mahasiswa bimbingan--}}
-       <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
+            {{-- Bagian ini akan di-include dari resources/views/dosen/Job.blade.php --}}
+            {{-- Pastikan controller mengirimkan variabel $companies yang berisi Collection perusahaan --}}
+            @if(view()->exists('dosen.Job'))
+                @include('dosen.Job')
+            @else
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+                    <p class="font-bold">Perhatian:</p>
+                    <p>View <code>dosen.Job</code> tidak ditemukan. Bagian rekomendasi lowongan tidak dapat ditampilkan.</p>
+                </div>
+            @endif
+
+            {{--Tabel mahasiswa bimbingan--}}
+            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
                     <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Mahasiswa Bimbingan</h2>
                     <a href="{{ route('dosen.data_mahasiswabim') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Mahasiswa</a>
@@ -132,7 +153,7 @@ absen<?php
                                 <td class="px-5 py-4">{{ $bimbingan->mahasiswa->detailMahasiswa->kelas ?? '-' }}</td>
                                 <td class="px-5 py-4">{{ $bimbingan->periode_magang ?? '-' }}</td>
                                 <td class="px-5 py-4">{{ $bimbingan->tanggal_mulai ? \Carbon\Carbon::parse($bimbingan->tanggal_mulai)->format('d-m-Y') : '-' }}</td>
-                                <td class="px-5 py-4">{{ $bimbingan->tanggal_selesai ? \Carbon\Carbon::parse($bimbingan->tanggal_selesai)->format('d-m-Y') : '-' }}</td>
+                                <td class="px-5 py-4">{{ \Carbon\Carbon::parse($bimbingan->tanggal_selesai)->format('d-m-Y') ?? '-' }}</td>
                                 <td class="px-5 py-4">
                                     @if ($bimbingan->status_bimbingan == 'Aktif')
                                         <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Aktif</span>
@@ -146,7 +167,7 @@ absen<?php
                         @empty
                             <tr>
                                 <td colspan="11" class="px-5 py-4 text-center text-gray-500">
-                                     @if(request('search'))
+                                    @if(request('search'))
                                         Tidak ada bimbingan ditemukan untuk pencarian "{{ request('search') }}".
                                     @else
                                         Belum ada data bimbingan magang.
@@ -155,12 +176,12 @@ absen<?php
                             </tr>
                         @endforelse
                     </tbody>
-                </table>
+                    </table>
                 </div>
-       </div>
+            </div>
 
-  {{--Tabel Absensi mahasiswa bimbingan--}}
-       <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
+            {{--Tabel Absensi mahasiswa bimbingan--}}
+            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
                     <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Absensi Mahasiswa</h2>
                     <a href="{{ route('dosen.absensi.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Mahasiswa</a>
@@ -199,17 +220,17 @@ absen<?php
                         </tr>
                         @endforelse
                     </tbody>
-                </table>
+                    </table>
                 </div>
             </div>
-       </div>       
-        </main>
-        @include('dosen.template.footer')
+        </div>
+    </main>
+    @include('dosen.template.footer')
     <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Pastikan variabel $statsProdiDiterima ada dan dikirim dari controller
     const statsData = @json($statsProdiDiterima ?? ['Teknik Informatika' => 0, 'Sistem Informasi Bisnis' => 0, 'Lainnya' => 0]);
-    
+
     const dataValues = [
         statsData['Teknik Informatika'],
         statsData['Sistem Informasi Bisnis'],
@@ -312,5 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     @endif
-        </body>
+});
+</script>
+</body>
 </html>
