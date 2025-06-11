@@ -62,7 +62,7 @@ class MahasiswaController extends Controller
 
     public function perusahaan(Request $request)
     {
-        $query = Company::with('lowongan');
+        $query = Company::with('lowongans'); // Fixed: should be 'lowongans' not 'lowongan'
 
         if ($request->has('search')) {
             $search = $request->search;

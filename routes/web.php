@@ -18,6 +18,7 @@ use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileControll
 use App\Http\Controllers\Mahasiswa\LowonganController as MahasiswaLowonganController;
 use App\Http\Controllers\Mahasiswa\PendaftarController;
 use App\Http\Controllers\Mahasiswa\LaporanController as MahasiswaLaporanController;
+use App\Http\Controllers\Mahasiswa\CompanyController as MahasiswaCompanyController;
 use App\Models\Company;
 use App\Models\AktivitasAbsensi;
 
@@ -44,7 +45,6 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::put('/perusahaan/{companyId}', [AdminCompanyController::class, 'update'])->name('perusahaan.update'); // Gunakan {companyId}
     Route::delete('/perusahaan/{companyId}', [AdminCompanyController::class, 'destroy'])->name('perusahaan.destroy'); // Gunakan {companyId}
 
-
     Route::get('/data-mahasiswa', [AdminMahasiswaController::class, 'index'])->name('datamahasiswa');
     Route::get('/data-mahasiswa/create', [AdminMahasiswaController::class, 'create'])->name('mahasiswa.create');
     Route::post('/data-mahasiswa', [AdminMahasiswaController::class, 'store'])->name('mahasiswa.store');
@@ -58,7 +58,6 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
     Route::get('/profile/edit', [AdminProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
-
 
     // Manajemen Penugasan Pembimbing
     Route::resource('penugasan-pembimbing', PenugasanPembimbingController::class);
@@ -76,8 +75,7 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::get('/log-bimbingan/{id}', [LogBimbingan::class, 'show'])->name('data_log.show');
 });
 
-
-// MAHASISWA GROUP
+// MAHASISWA GROUP - Updated Routes Section
 Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
@@ -96,25 +94,15 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
-    // Perusahaan Routes with Search
+    // Perusahaan Routes with Search - FIXED
     Route::get('/perusahaan', [MahasiswaController::class, 'perusahaan'])->name('perusahaan');
-    Route::get('/perusahaan/{perusahaanId}', function ($perusahaanId) {
-        $company = \App\Models\Company::with('lowongan')->findOrFail($perusahaanId);
-        return view('mahasiswa.detail_perusahaan', compact('company'));
-    })->name('perusahaan.detail');
-    Route::get('/perusahaan/{perusahaanId}/profile', function ($perusahaanId) {
-        $company = \App\Models\Company::findOrFail($perusahaanId);
-        return view('mahasiswa.company_profile', compact('company'));
-    })->name('perusahaan.profile');
-    // Add this with your other mahasiswa routes
-    Route::get('/mahasiswa/perusahaan/{company}/profile', [CompanyController::class, 'showProfile'])
-        ->name('mahasiswa.company.profile');
+    Route::get('/perusahaan/{company}/profile', [App\Http\Controllers\Mahasiswa\CompanyController::class, 'showProfile'])
+        ->name('perusahaan.profile');
 
     // Laporan Routes with Search
     Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
     Route::post('/laporan', [MahasiswaLaporanController::class, 'store'])->name('laporan.store');
     Route::delete('/laporan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('laporan.destroy');
-
 
     // Lowongan Routes with Search/Filter
     Route::get('/lowongan', [MahasiswaLowonganController::class, 'index'])->name('lowongan.index');
@@ -126,16 +114,15 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::delete('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'destroy'])->name('lowongan.destroy');
 
     // Pendaftar Routes
-    Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranForm'])->name('pendaftar');
+    Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranTable'])->name('pendaftar');
+    Route::get('/pendaftar/form', [PendaftarController::class, 'showPendaftaranForm'])->name('pendaftar.form');
     Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])->name('pendaftar.submit');
+    Route::delete('/pendaftar/{pendaftar}', [PendaftarController::class, 'cancelPendaftaran'])->name('pendaftar.cancel');
     Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])
         ->name('apply.from.lowongan');
-    // Add this inside the mahasiswa group
     Route::get('/pendaftar/dokumen/{pendaftarId}', [PendaftarController::class, 'showDocuments'])
         ->name('pendaftar.dokumen');
 });
-
-
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {

@@ -126,6 +126,11 @@
     function showCompanyProfile(companyId) {
         // Show loading state immediately
         document.getElementById('companyModal').classList.remove('hidden');
+        document.getElementById('companyProfileContent').innerHTML = `
+            <div class="p-4 text-center">
+                <i class="fas fa-spinner fa-spin text-blue-500"></i> Memuat data perusahaan...
+            </div>
+        `;
 
         // Set up headers with CSRF token
         const headers = new Headers({
@@ -135,12 +140,13 @@
         });
 
         fetch(`/mahasiswa/perusahaan/${companyId}/profile`, {
+            method: 'GET',
             headers: headers,
             credentials: 'same-origin'
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`Gagal memuat profil perusahaan (Status: ${response.status})`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.text();
             })
@@ -151,8 +157,12 @@
                 console.error('Error:', error);
                 document.getElementById('companyProfileContent').innerHTML = `
                 <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                    ${error.message}<br>
-                    Silakan refresh halaman dan coba lagi.
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>Error:</strong>
+                    </div>
+                    <p class="mt-2">Gagal memuat profil perusahaan (Status: ${error.message})</p>
+                    <p class="text-sm mt-1">Silakan refresh halaman dan coba lagi.</p>
                 </div>
             `;
             });
@@ -165,6 +175,13 @@
     // Close modal when clicking outside content
     document.getElementById('companyModal').addEventListener('click', function(e) {
         if (e.target === this) {
+            hideCompanyModal();
+        }
+    });
+
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
             hideCompanyModal();
         }
     });
