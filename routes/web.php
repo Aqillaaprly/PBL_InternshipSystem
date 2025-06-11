@@ -116,6 +116,9 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
         return view('mahasiswa.perusahaan');
     })->name('perusahaan');
     // Tambahkan route mahasiswa lainnya di sini
+     Route::get('/fuzzy-topsis', function () {
+        return view('mahasiswa.spk.kalkulatorFuzzy');
+    })->name('spk');
 });
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
