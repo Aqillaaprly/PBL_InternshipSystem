@@ -53,7 +53,7 @@ class CompanyController extends Controller
             'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
             'username' => 'required|string|max:255|unique:users,username',
             'password' => 'required|string|min:6|confirmed',
-            // Modifikasi di sini: hapus whereNull('deleted_at')
+            'about' => 'nullable|url|max:255|unique:companies,about',
             'telepon' => ['nullable', 'string', 'max:20', Rule::unique('companies', 'telepon')],
             'alamat' => 'nullable|string',
             'kota' => 'nullable|string|max:100',
@@ -91,7 +91,7 @@ class CompanyController extends Controller
             ]);
 
             Company::create(array_merge(
-                $request->only(['nama_perusahaan', 'alamat', 'kota', 'provinsi', 'kode_pos', 'telepon', 'email_perusahaan', 'website', 'deskripsi', 'status_kerjasama']),
+                $request->only(['nama_perusahaan', 'alamat', 'kota', 'provinsi', 'kode_pos', 'telepon', 'email_perusahaan', 'website', 'about','deskripsi', 'status_kerjasama']),
                 ['user_id' => $user->id, 'logo_path' => $logoPath]
             ));
             DB::commit();
@@ -132,6 +132,7 @@ class CompanyController extends Controller
             'nama_perusahaan' => ['required', 'string', 'max:255', Rule::unique('companies')->ignore($company->id)],
             'email_perusahaan' => ['required', 'string', 'email', 'max:255', Rule::unique('companies', 'email_perusahaan')->ignore($company->id)],
             'website' => 'required|url|max:255',
+            'about' => ['nullable', 'url', 'max:255', Rule::unique('companies', 'about')->ignore($company->id)],
             'status_kerjasama' => 'required|in:Aktif,Non-Aktif,Review',
             // Modifikasi di sini: hapus whereNull('deleted_at')
             'telepon' => ['nullable', 'string', 'max:20', Rule::unique('companies', 'telepon')->ignore($company->id)],
@@ -165,7 +166,7 @@ class CompanyController extends Controller
         try {
             $companyData = $request->only([
                 'nama_perusahaan', 'alamat', 'kota', 'provinsi', 'kode_pos',
-                'telepon', 'email_perusahaan', 'website', 'deskripsi', 'status_kerjasama',
+                'telepon', 'email_perusahaan', 'website','about', 'deskripsi', 'status_kerjasama',
             ]);
 
             if ($request->hasFile('logo_path') && $request->file('logo_path')->isValid()) {

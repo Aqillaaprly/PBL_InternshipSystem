@@ -18,10 +18,10 @@
             </div>
 
              <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
-                 <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.datamahasiswa') || request()->is('admin/data-mahasiswa*') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
-                 <a href="{{ route('admin.pembimbings.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.pembimbings.index') || request()->is('admin/pembimbings*') ? 'border-blue-600 text-blue-600' : '' }}">Pembimbing</a>
-                 <a href="{{ route('admin.users.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.users.index') || request()->is('admin/users*') ? 'border-blue-600 text-blue-600' : '' }}">Manajemen Users</a>
-                   <a href="{{ route('admin.aktivitas-mahasiswa.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.aktivitas-mahasiswa.index') || request()->is('admin/aktivitas-mahasiswa*') ? 'border-blue-600 text-blue-600' : '' }}">Aktivitas Mahasiswa Magang</a>
+                <a href="{{ route('admin.datamahasiswa') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.datamahasiswa') || request()->is('admin/data-mahasiswa*') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
+                <a href="{{ route('admin.pembimbings.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.pembimbings.index') || request()->is('admin/pembimbings*') ? 'border-blue-600 text-blue-600' : '' }}">Pembimbing</a>
+                <a href="{{ route('admin.aktivitas-mahasiswa.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.aktivitas-mahasiswa.index') || request()->is('admin/aktivitas-mahasiswa*') ? 'border-blue-600 text-blue-600' : '' }}">Aktivitas Mahasiswa Magang</a>
+                <a href="{{ route('admin.users.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.users.index') || request()->is('admin/users*') ? 'border-blue-600 text-blue-600' : '' }}">Manajemen Users</a>
             </nav>
 
             <div class="flex items-center space-x-4">
