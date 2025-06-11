@@ -5,30 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manajemen Pembimbing - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
-        }
-        /* Custom styles for badges, alerts, and buttons if needed, consistent with previous immersives */
-        .badge {
-            padding: 0.25rem 0.75rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-            border-radius: 9999px;
-            display: inline-block;
-        }
-        /* Ensure table cells do not wrap text */
-        .min-w-full th, .min-w-full td {
-            white-space: nowrap;
-        }
-        /* Add horizontal scroll if content overflows */
-        .overflow-x-auto {
-            overflow-x: auto;
-        }
-    </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
-    {{-- Include the admin navigation bar --}}
     @include('admin.template.navbar')
 
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
@@ -44,16 +22,14 @@
                 </div>
             </div>
 
-            {{-- Display success message if available --}}
             @if (session('success'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
                     <strong class="font-bold">Berhasil!</strong>
                     <span class="block sm:inline">{{ session('success') }}</span>
                 </div>
             @endif
-            {{-- Display error message if available --}}
             @if (session('error'))
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                     <strong class="font-bold">Gagal!</strong>
                     <span class="block sm:inline">{{ session('error') }}</span>
                 </div>
@@ -73,7 +49,7 @@
                             <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="overflow-x: auto;text-gray-600 text-left">
+                    <tbody class="text-gray-600 text-left">
                         @forelse ($pembimbings as $index => $pembimbing)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
                                 <td class="px-5 py-4 text-center">{{ $pembimbings->firstItem() + $index }}</td>
@@ -81,12 +57,12 @@
                                 <td class="px-5 py-4">{{ $pembimbing->nama_lengkap }}</td>
                                 <td class="px-5 py-4">{{ $pembimbing->email_institusi }}</td>
                                 <td class="px-5 py-4">{{ $pembimbing->program_studi_homebase ?? '-' }}</td>
-                                <td class="px-5 py-4 text-center">{{ $pembimbing->kuota_aktif }}/{{ $pembimbing->maks_kuota_bimbingan }}</td>
+                                <td class="px-5 py-4 text-center">{{ $pembimbing->kuota_bimbingan_aktif }}/{{ $pembimbing->maks_kuota_bimbingan }}</td>
                                 <td class="px-5 py-4 text-center">
                                     @if($pembimbing->status_aktif)
-                                        <span class="badge bg-green-100 text-green-700">Aktif</span>
+                                        <span class="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-full text-xs">Aktif</span>
                                     @else
-                                        <span class="badge bg-red-100 text-red-700">Tidak Aktif</span>
+                                        <span class="px-2 py-1 font-semibold leading-tight text-red-700 bg-red-100 rounded-full text-xs">Tidak Aktif</span>
                                     @endif
                                 </td>
                                 <td class="px-5 py-4 text-center">
@@ -105,7 +81,7 @@
                         @empty
                             <tr>
                                 <td colspan="8" class="px-5 py-4 text-center text-gray-500">
-                                    @if(request('search'))
+                                     @if(request('search'))
                                         Tidak ada pembimbing ditemukan untuk pencarian "{{ request('search') }}".
                                     @else
                                         Belum ada data pembimbing.
@@ -121,13 +97,8 @@
                     {{ $pembimbings->appends(request()->query())->links() }}
                 </div>
             @endif
-
-            {{-- The "Tetapkan Bimbingan Magang Form" has been removed from this page as per your request --}}
-
         </div>
     </main>
-
-    {{-- Include the admin footer --}}
     @include('admin.template.footer')
 </body>
 </html>

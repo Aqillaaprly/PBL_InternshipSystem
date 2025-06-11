@@ -20,7 +20,6 @@ class Company extends Model
         'telepon',
         'email_perusahaan',
         'website',
-        'about',
         'deskripsi',
         'logo_path',
         'status_kerjasama',

@@ -2,18 +2,16 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Perusahaan - Stride Up</title>
+    <title>Dashboard Perusahaan - SIMMAGANG</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-blue-50 text-gray-800">
-
-    @include('perusahaan.template.navbar')
+    
+    @include('perusahaan.template.navbar') 
 
     <main class="flex flex-col min-h-screen">
-        <div class="p-6 max-w-7xl mx-auto w-full mt-16">
+        <div class="p-6 max-w-7xl mx-auto w-full mt-16"> 
             <div class="w-full mb-6">
                 <img src="https://www.pixelstalk.net/wp-content/uploads/2016/05/Images-New-York-City-Backgrounds.jpg"
                      alt="Header"
@@ -38,19 +36,9 @@
                 </div>
             </div>
 
-            {{-- New Bar Chart Section --}}
-            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200 mb-10">
-                <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-6">Statistik Status Pendaftar</h2>
-                <div class="relative h-96"> {{-- Set a height for the chart container --}}
-                    <canvas id="applicantStatusChart"></canvas>
-                </div>
-            </div>
-            {{-- End New Bar Chart Section --}}
-
-
-            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6 border border-gray-200">
+            <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg mt-6  border border-gray-200">
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Diterima</h2>
+                    <h2 class="text-xl sm:text-2xl font-bold text-blue-800 mb-4 sm:mb-0">Daftar Pendaftar Magang Diterima</h2> {{-- Updated title --}}
                     <a href="{{ route('perusahaan.pendaftar.index') }}" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Lihat Semua Pendaftar</a>
                 </div>
 
@@ -72,7 +60,7 @@
                         </thead>
                         <tbody class="text-gray-600 divide-y divide-gray-200">
                             @forelse ($recentPendaftars as $index => $pendaftar)
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50">   
                                     <td class="px-5 py-3 text-center align-middle">{{ $loop->iteration }}</td>
                                     <td class="px-5 py-3 align-middle font-medium text-gray-900">{{ $pendaftar->user->name ?? ($pendaftar->user->username ?? 'N/A') }}</td>
                                     <td class="px-5 py-3 align-middle">{{ $pendaftar->lowongan->judul ?? 'N/A' }}</td>
@@ -111,78 +99,6 @@
             </div>
         </div>
     </main>
-    @include('perusahaan.template.footer')
-
-    <script>
-        // Get the data passed from the Laravel controller
-        const ditinjauCount = {{ $ditinjauCount ?? 0 }};
-        const diterimaCount = {{ $diterimaCount ?? 0 }};
-        const ditolakCount = {{ $ditolakCount ?? 0 }};
-
-        // Get the canvas element
-        const ctx = document.getElementById('applicantStatusChart').getContext('2d');
-
-        // Create the bar chart
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['Ditinjau', 'Diterima', 'Ditolak'],
-                datasets: [{
-                    label: 'Jumlah Pendaftar',
-                    data: [ditinjauCount, diterimaCount, ditolakCount],
-                    backgroundColor: [
-                        'rgba(79, 70, 229, 0.7)', // Indigo (Ditinjau)
-                        'rgba(34, 197, 94, 0.7)',  // Green (Diterima)
-                        'rgba(239, 68, 68, 0.7)'   // Red (Ditolak)
-                    ],
-                    borderColor: [
-                        'rgba(79, 70, 229, 1)',
-                        'rgba(34, 197, 94, 1)',
-                        'rgba(239, 68, 68, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false, // Allow chart to fit its container's height
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Jumlah Pendaftar'
-                        },
-                        ticks: {
-                            precision: 0 // Ensure y-axis labels are whole numbers
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Status Lamaran'
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: false // Hide the legend since there's only one dataset
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                label += context.raw;
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    </script>
+    @include('perusahaan.template.footer') 
 </body>
 </html>

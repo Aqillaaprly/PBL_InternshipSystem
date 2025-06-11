@@ -19,14 +19,6 @@
             background-color: #fef3c7; /* yellow-100 */
             color: #92400e; /* yellow-800 */
         }
-         /* Ensure table cells do not wrap text */
-        .min-w-full th, .min-w-full td {
-            white-space: nowrap;
-        }
-        /* Add horizontal scroll if content overflows */
-        .overflow-x-auto {
-            overflow-x: auto;
-        }
     </style>
 </head>
 
@@ -80,7 +72,7 @@
                             <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="overflow-x: auto; text-gray-600 divide-y divide-gray-200">
+                    <tbody class="text-gray-600 divide-y divide-gray-200">
                         @forelse ($companies as $index => $company)
                             <tr class="hover:bg-gray-50">
                                 <td class="px-5 py-4 text-center align-middle">{{ $companies->firstItem() + $index }}</td>

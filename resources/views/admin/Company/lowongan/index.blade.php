@@ -6,16 +6,6 @@
     <title>Manajemen Lowongan - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<style>
-     /* Ensure table cells do not wrap text */
-        .min-w-full th, .min-w-full td {
-            white-space: nowrap;
-        }
-        /* Add horizontal scroll if content overflows */
-        .overflow-x-auto {
-            overflow-x: auto;
-        }
-</style>
 <body class="bg-[#f0f6ff]">
     @include('admin.template.navbar')
 
@@ -24,10 +14,14 @@
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-semibold">Manajemen Lowongan</h1>
             <div class="flex space-x-3">
+                {{-- Form Pencarian --}}
                 <form method="GET" action="{{ route('admin.lowongan.index') }}" class="flex">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari judul, perusahaan..." class="border border-gray-300 rounded-l px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-r text-sm -ml-px">Cari</button>
                 </form>
+                {{-- Tombol Filter (jika diperlukan) --}}
+                {{-- <button class="border border-gray-300 px-4 py-2 rounded">Filter</button> --}}
+                <a href="{{ route('admin.lowongan.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded text-sm hover:bg-blue-700 whitespace-nowrap">+ Tambah Lowongan</a>
             </div>
         </div>
 

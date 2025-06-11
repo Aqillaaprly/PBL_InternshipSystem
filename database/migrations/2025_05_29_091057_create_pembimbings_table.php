@@ -26,11 +26,11 @@ return new class extends Migration
             $table->string('program_studi_homebase')->nullable(); // Prodi utama dosen
             $table->text('bidang_keahlian_utama')->nullable();
             $table->integer('kuota_bimbingan_aktif')->default(0); // Jumlah mahasiswa yang sedang dibimbing
-            $table->integer('maks_kuota_bimbingan')->default(8); // Kuota maksimal
+            $table->integer('maks_kuota_bimbingan')->default(10); // Kuota maksimal
             $table->boolean('status_aktif')->default(true); // Apakah pembimbing ini aktif atau tidak
             $table->timestamps(); // Kolom created_at dan updated_at
         });
-    }   
+    }
 
     /**
      * Reverse the migrations.

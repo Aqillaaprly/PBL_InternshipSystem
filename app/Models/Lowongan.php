@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Lowongan extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'company_id',
         'judul',
@@ -20,17 +19,16 @@ class Lowongan extends Model
         'gaji_max',
         'tanggal_buka',
         'tanggal_tutup',
-        'status',
+        'status'
     ];
-
     public function company()
     {
 
         return $this->belongsTo(Company::class);
     }
-
-    public function pendaftars()
+     public function pendaftars()
     {
         return $this->hasMany(Pendaftar::class);
     }
 }
+

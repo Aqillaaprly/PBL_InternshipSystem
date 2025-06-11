@@ -8,7 +8,7 @@
     {{-- <link rel="stylesheet" href="{{ asset('css/perusahaan_style.css') }}"> --}}
 </head>
 <body class="bg-blue-50 text-gray-800">
-@include('perusahaan.template.navbar') 
+@include('perusahaan.template.navbar')
     <main class="max-w-screen-xl mx-auto px-8 py-12 mt-16">
         <div class="bg-white p-8 rounded-xl shadow">
             <div class="flex justify-between items-center mb-6">

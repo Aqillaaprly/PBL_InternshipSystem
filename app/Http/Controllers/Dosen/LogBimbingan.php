@@ -3,73 +3,33 @@
 namespace App\Http\Controllers\Dosen;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\User;
-use App\Models\BimbinganMagang;
-use App\Models\LogBimbinganMagang;
+use Illuminate\Http\Request;
 
 class LogBimbingan extends Controller
 {
     public function index(Request $request)
-{
-    $search = $request->input('search');
+    {
+        $query = User::whereHas('role', fn ($q) => $q->where('name', 'mahasiswa'));
 
-    $bimbingans = BimbinganMagang::with(['mahasiswa', 'pembimbing', 'company'])
-        ->when($search, function ($query, $search) {
-            $query->whereHas('mahasiswa', function ($q) use ($search) {
+        if ($search = $request->input('search')) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%");
+                    ->orWhere('username', 'like', "%{$search}%");
             });
-        })
-        ->paginate(10);
+        }
 
-    return view('dosen.data_log', compact('bimbingans'));
-}
-   public function show($id)
-{
-    $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
+        $mahasiswas = $query->with('detailMahasiswa')->paginate(10);
 
-    $bimbinganIds = BimbinganMagang::where('mahasiswa_user_id', $id)->pluck('id');
-
-    $logs = LogBimbinganMagang::whereIn('bimbingan_magang_id', $bimbinganIds)->get();
-
-    return view('dosen.showLog', compact('mahasiswa', 'logs'));
-}
-
-
-    public function create($bimbingan_id)
-    {
-        $bimbingan = BimbinganMagang::with('mahasiswa')->findOrFail($bimbingan_id);
-
-        return view('dosen.addLog', compact('bimbingan'));
+        // This view needs to exist at: resources/views/dosen/data_mahasiswabim.blade.php
+        return view('dosen.data_log', compact('mahasiswas'));
     }
 
-    public function store(Request $request, $bimbingan_id)
+    public function show($id)
     {
-        $request->validate([
-            'metode_bimbingan' => 'required|string|max:255',
-            'waktu_bimbingan' => 'required|date',
-            'topik_bimbingan' => 'required|string',
-            'deskripsi' => 'required|string',
-            'nilai' => 'required|numeric|min:0|max:100',
-            'komentar' => 'nullable|string',
-        ]);
+        $mahasiswa = User::with('detailMahasiswa')->findOrFail($id);
 
-        $bimbingan = BimbinganMagang::findOrFail($bimbingan_id);
-
-        // Simpan log bimbingan
-        LogBimbinganMagang::create([
-            'bimbingan_magang_id' => $bimbingan->id,
-            'metode_bimbingan' => $request->metode_bimbingan,
-            'waktu_bimbingan' => $request->waktu_bimbingan,
-            'topik_bimbingan' => $request->topik_bimbingan,
-            'deskripsi' => $request->deskripsi,
-            'nilai' => $request->nilai,
-            'komentar' => $request->komentar,
-        ]);
-
-        return redirect()->route('dosen.data_log')->with('success', 'Log Bimbingan berhasil ditambahkan.');
+        // This view needs to exist at: resources/views/dosen/mahasiswa_bimbingan/show.blade.php
+        return view('dosen.showLog', compact('mahasiswa'));
     }
-
-   
 }

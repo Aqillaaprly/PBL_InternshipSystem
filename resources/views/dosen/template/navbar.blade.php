@@ -12,14 +12,15 @@
                 </button>
 
                 <a href="{{ route('dosen.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
-                    STRIDE UP
+                    STRIDEUP
                 </a>
             </div>
                 <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
                 {{-- Menggunakan nama route yang sudah diperbaiki dan konsisten --}}
                 <a href="{{ route('dosen.data_mahasiswabim') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.data_mahasiswabim') ? 'border-blue-600 text-blue-600' : '' }}">Data Mahasiswa</a>
                 <a href="{{ route('dosen.data_log') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.data_mahasiswa') ? 'border-blue-600 text-blue-600' : '' }}">Log Bimbingan</a>
-                <a href="{{ route('dosen.absensi.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('dosen.absensi.index') ? 'border-blue-600 text-blue-600' : '' }}">Absensi Mahasiwa</a>
+                <a href="{{ route('admin.data_pembimbing') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.data_pembimbing') ? 'border-blue-600 text-blue-600' : '' }}">Absensi Mahasiwa</a>
+                <a href="{{ route('admin.perusahaan.index') }}" class="hover:text-blue-600 border-b-2 border-transparent hover:border-blue-600 transition {{ request()->routeIs('admin.perusahaan.index') ? 'border-blue-600 text-blue-600' : '' }}">Laporan Magang</a>
             </nav>
             <div class="flex items-center space-x-4">
                 {{-- Google Translate dengan Ikon Globe --}}
@@ -35,12 +36,13 @@
                         @if (Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture))
                             <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
                         @else
+                             {{-- Fallback ke UI Avatars jika tidak ada foto --}}
                             <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? Auth::user()->username) }}&background=random&color=fff&size=40" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
                         @endif
-                        <span class="hidden sm:block font-medium text-gray-700">{{ Auth::user()->username ?? 'Dosen' }}</span>
+                        <span class="hidden sm:block font-medium text-gray-700">{{ Auth::user()->username ?? 'Admin' }}</span>
                     </button>
                     <div id="profileDropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
-                        <a href="{{ route('dosen.profile.dosenProfile2') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md">Profil</a>
+                        {{-- <a href="{{ route('perusahaan.profile') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-md">Profil</a> --}}
                         <div class="border-t border-gray-200"></div>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
                             @csrf
