@@ -10,14 +10,17 @@ use Illuminate\Support\Facades\Log;
 class CompanyController extends Controller
 {
     /**
-     * Display the company profile with related data
+     * Display the company profile page
      *
-     * @param Company $company
-     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\JsonResponse
+     * @param int $id
+     * @return \Illuminate\Contracts\View\View
      */
-    public function showProfile(Company $company)
+    public function showProfile($id)
     {
         try {
+            // Find the company by ID
+            $company = Company::findOrFail($id);
+
             // Eager load relationships with optimized queries
             $company->load([
                 'user' => function($query) {
@@ -36,34 +39,17 @@ class CompanyController extends Controller
                 'activeLowonganCount' => $company->lowongans->count(),
             ];
 
-            // Handle AJAX requests
-            if (request()->ajax() || request()->wantsJson()) {
-                return response()->json([
-                    'success' => true,
-                    'html' => view('mahasiswa.company_profile', $viewData)->render()
-                ]);
-            }
-
-            // Return full view for direct access
+            // Return the company profile page
             return view('mahasiswa.company_profile', $viewData);
 
         } catch (\Exception $e) {
             Log::error('Failed to load company profile', [
-                'company_id' => $company->id,
+                'company_id' => $id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            $errorMessage = 'Gagal memuat profil perusahaan. Silakan coba lagi.';
-
-            if (request()->ajax() || request()->wantsJson()) {
-                return response()->json([
-                    'error' => true,
-                    'message' => $errorMessage
-                ], 500);
-            }
-
-            return back()->with('error', $errorMessage);
+            return back()->with('error', 'Gagal memuat profil perusahaan. Silakan coba lagi.');
         }
     }
 

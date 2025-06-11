@@ -94,9 +94,9 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
-    // Perusahaan Routes with Search - FIXED
+    // Perusahaan Routes - UPDATED
     Route::get('/perusahaan', [MahasiswaController::class, 'perusahaan'])->name('perusahaan');
-    Route::get('/perusahaan/{company}/profile', [App\Http\Controllers\Mahasiswa\CompanyController::class, 'showProfile'])
+    Route::get('/perusahaan/{id}/profile', [MahasiswaCompanyController::class, 'showProfile'])
         ->name('perusahaan.profile');
 
     // Laporan Routes with Search

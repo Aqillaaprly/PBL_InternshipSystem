@@ -74,10 +74,10 @@
                         </span>
                     </td>
                     <td class="px-5 py-3 text-center">
-                        <button onclick="showCompanyProfile('{{ $company->id }}')"
-                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1 rounded transition duration-200">
+                        <a href="{{ route('mahasiswa.perusahaan.profile', $company->id) }}"
+                           class="inline-block bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1 rounded transition duration-200">
                             Lihat Profil
-                        </button>
+                        </a>
                     </td>
                 </tr>
                 @empty
@@ -102,90 +102,6 @@
         @endif
     </div>
 </main>
-
-<!-- Company Profile Modal -->
-<div id="companyModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold">Profil Perusahaan</h3>
-            <button onclick="hideCompanyModal()" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
-        <div id="companyProfileContent">
-            <div class="p-4 text-center">
-                <i class="fas fa-spinner fa-spin text-blue-500"></i> Memuat data perusahaan...
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function showCompanyProfile(companyId) {
-        // Show loading state immediately
-        document.getElementById('companyModal').classList.remove('hidden');
-        document.getElementById('companyProfileContent').innerHTML = `
-            <div class="p-4 text-center">
-                <i class="fas fa-spinner fa-spin text-blue-500"></i> Memuat data perusahaan...
-            </div>
-        `;
-
-        // Set up headers with CSRF token
-        const headers = new Headers({
-            'Accept': 'text/html',
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        });
-
-        fetch(`/mahasiswa/perusahaan/${companyId}/profile`, {
-            method: 'GET',
-            headers: headers,
-            credentials: 'same-origin'
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById('companyProfileContent').innerHTML = html;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                document.getElementById('companyProfileContent').innerHTML = `
-                <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                    <div class="flex items-center">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        <strong>Error:</strong>
-                    </div>
-                    <p class="mt-2">Gagal memuat profil perusahaan (Status: ${error.message})</p>
-                    <p class="text-sm mt-1">Silakan refresh halaman dan coba lagi.</p>
-                </div>
-            `;
-            });
-    }
-
-    function hideCompanyModal() {
-        document.getElementById('companyModal').classList.add('hidden');
-    }
-
-    // Close modal when clicking outside content
-    document.getElementById('companyModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            hideCompanyModal();
-        }
-    });
-
-    // Close modal with Escape key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            hideCompanyModal();
-        }
-    });
-</script>
 
 {{-- Footer --}}
 @include('mahasiswa.template.footer')
