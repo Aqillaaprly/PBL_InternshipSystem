@@ -49,7 +49,7 @@
                             <th class="px-5 py-3">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="text-gray-600">
+                    <tbody class="overflow-x: auto; text-gray-600">
                         @forelse ($mahasiswas as $index => $mahasiswa)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
                                 <td class="px-5 py-4">{{ $mahasiswas->firstItem() + $index }}</td>
