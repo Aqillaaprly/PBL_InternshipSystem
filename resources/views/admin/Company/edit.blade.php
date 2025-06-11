@@ -125,7 +125,7 @@
                             @error('website') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
                         <div class="info-block">
-                            <label for="about" class="info-label block mb-1">Website <span class="text-red-500">*</span></label>
+                            <label for="about" class="info-label block mb-1">About<span class="text-red-500">*</span></label>
                             <input type="url" name="about" id="about" value="{{ old('about', $company->about) }}" required placeholder="https://example.com" class="mt-1 block w-full px-3 py-2 border @error('about') border-red-500 @else border-gray-300 @enderror rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm info-value">
                             @error('about') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
