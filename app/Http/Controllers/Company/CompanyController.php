@@ -175,18 +175,18 @@ class CompanyController extends Controller
         // Validasi data input untuk lowongan baru.
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
-            'deskripsi_lowongan' => 'required|string', // Name from HTML form
-            'provinsi' => 'required|string|max:100', // Required based on HTML form
-            'kota' => 'required|string|max:100',     // Required based on HTML form
-            'alamat' => 'nullable|string|max:255',   // Nullable based on HTML form
-            'kode_pos' => 'nullable|string|max:10',  // Nullable based on HTML form
-            'tipe_pekerjaan' => 'required|string|in:Full-time,Part-time,Magang,Kontrak', // Name from HTML form, enum values
-            'gaji' => 'nullable|numeric|min:0', // Gaji from HTML form, maps to gaji_min
-            'tanggal_buka' => 'required|date', // Required, from HTML (readonly)
-            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka', // Must be after or equal to tanggal_buka
+            'deskripsi_lowongan' => 'required|string',
+            'provinsi' => 'required|string|max:100',
+            'kota' => 'required|string|max:100',
+            'alamat' => 'nullable|string|max:255',
+            'kode_pos' => 'nullable|string|max:10',
+            'tipe_pekerjaan' => 'required|string|in:Full-time,Part-time,Magang,Kontrak',
+            'gaji' => 'nullable|numeric|min:0', // This maps to gaji_min
+            'tanggal_buka' => 'required|date',
+            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka',
             'kualifikasi' => 'nullable|string',
-            'tanggung_jawab' => 'nullable|string', // Added validation for tanggung_jawab
-            'status' => 'required|in:Aktif,Nonaktif,Ditutup', // Enum values from HTML
+            'tanggung_jawab' => 'nullable|string',
+            'status' => 'required|in:Aktif,Nonaktif,Ditutup',
         ]);
 
         // Jika validasi gagal, kembalikan ke halaman sebelumnya dengan error dan input yang sudah ada.
@@ -200,15 +200,15 @@ class CompanyController extends Controller
         Lowongan::create([
             'company_id' => $company->id,
             'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi_lowongan, // Menggunakan nama dari form HTML
+            'deskripsi' => $request->deskripsi_lowongan,
             'provinsi' => $request->provinsi,
             'kota' => $request->kota,
             'alamat' => $request->alamat,
             'kode_pos' => $request->kode_pos,
-            'tipe' => $request->tipe_pekerjaan, // Menggunakan nama dari form HTML
-            'gaji_min' => $request->gaji, // Gaji dari form HTML disimpan sebagai gaji_min
-            'gaji_max' => null, // Set gaji_max ke null atau sesuaikan jika ada input gaji_max
-            'tanggal_buka' => $request->tanggal_buka, // Mengambil dari form HTML
+            'tipe' => $request->tipe_pekerjaan,
+            'gaji_min' => $request->gaji, // 'gaji' from form becomes 'gaji_min'
+            'gaji_max' => null, // Assuming no gaji_max field in your form
+            'tanggal_buka' => $request->tanggal_buka,
             'tanggal_tutup' => $request->tanggal_tutup,
             'kualifikasi' => $request->kualifikasi,
             'tanggung_jawab' => $request->tanggung_jawab,
@@ -251,7 +251,7 @@ class CompanyController extends Controller
         }
 
         // Tampilkan view edit lowongan dengan data lowongan.
-        return view('perusahaan.edit', compact('lowongan')); // Pastikan Anda memiliki view ini
+        return view('perusahaan.edit', compact('lowongan'));
     }
 
     /**
@@ -271,18 +271,18 @@ class CompanyController extends Controller
         // Validasi data input untuk pembaruan lowongan.
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
-            'deskripsi_lowongan' => 'required|string', // Name from HTML form
+            'deskripsi_lowongan' => 'required|string',
             'provinsi' => 'required|string|max:100',
             'kota' => 'required|string|max:100',
             'alamat' => 'nullable|string|max:255',
             'kode_pos' => 'nullable|string|max:10',
-            'tipe_pekerjaan' => 'required|string|in:Full-time,Part-time,Magang,Kontrak', // Name from HTML form, enum values
-            'gaji' => 'nullable|numeric|min:0', // Gaji from HTML form, maps to gaji_min
+            'tipe_pekerjaan' => 'required|string|in:Full-time,Part-time,Magang,Kontrak',
+            'gaji_min' => 'nullable|numeric|min:0', // Changed from 'gaji' to 'gaji_min'
             'tanggal_buka' => 'required|date',
-            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka', // Must be after or equal to tanggal_buka
+            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka',
             'kualifikasi' => 'nullable|string',
-            'tanggung_jawab' => 'nullable|string', // Added validation for tanggung_jawab
-            'status' => 'required|in:Aktif,Nonaktif,Ditutup', // Enum values from HTML
+            'tanggung_jawab' => 'nullable|string',
+            'status' => 'required|in:Aktif,Nonaktif,Ditutup',
         ]);
 
         // Jika validasi gagal, kembalikan ke halaman sebelumnya dengan error dan input yang sudah ada.
@@ -301,8 +301,8 @@ class CompanyController extends Controller
             'alamat' => $request->alamat,
             'kode_pos' => $request->kode_pos,
             'tipe' => $request->tipe_pekerjaan,
-            'gaji_min' => $request->gaji, // Gaji dari form HTML disimpan sebagai gaji_min
-            'gaji_max' => null, // Set gaji_max ke null atau sesuaikan jika ada input gaji_max
+            'gaji_min' => $request->gaji_min, // 'gaji_min' from form
+            'gaji_max' => null, // Assuming no gaji_max field in your form
             'tanggal_buka' => $request->tanggal_buka,
             'tanggal_tutup' => $request->tanggal_tutup,
             'kualifikasi' => $request->kualifikasi,
@@ -310,8 +310,8 @@ class CompanyController extends Controller
             'status' => $request->status,
         ]);
 
-        // Arahkan kembali ke halaman detail lowongan dengan pesan sukses.
-        return redirect()->route('lowongan.show', $lowongan->id)->with('success', 'Lowongan berhasil diperbarui.');
+        // Arahkan kembali ke halaman manajemen lowongan dengan pesan sukses.
+        return redirect()->route('perusahaan.lowongan')->with('success', 'Lowongan berhasil diperbarui.');
     }
 
     /**
