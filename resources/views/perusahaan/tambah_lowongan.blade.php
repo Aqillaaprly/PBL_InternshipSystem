@@ -165,6 +165,18 @@
                     </div>
 
                     <div class="input-group">
+                        <label for="alamat" class="input-label">Alamat Lengkap <span class="text-gray-500 text-xs">(Opsional)</span></label>
+                        <textarea name="alamat" id="alamat" rows="2" class="form-textarea @error('alamat') border-red-500 @enderror" placeholder="Contoh: Jl. Sudirman No. 123">{{ old('alamat') }}</textarea>
+                        @error('alamat') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label for="kode_pos" class="input-label">Kode Pos <span class="text-gray-500 text-xs">(Opsional)</span></label>
+                        <input type="text" name="kode_pos" id="kode_pos" value="{{ old('kode_pos') }}" class="form-input @error('kode_pos') border-red-500 @enderror" placeholder="Contoh: 12345">
+                        @error('kode_pos') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
                         <label for="tipe_pekerjaan" class="input-label">Tipe Pekerjaan <span class="text-red-500">*</span></label>
                         <select name="tipe_pekerjaan" id="tipe_pekerjaan" required class="form-select @error('tipe_pekerjaan') border-red-500 @enderror">
                             <option value="">Pilih Tipe</option>
@@ -220,8 +232,7 @@
                             <option value="Nonaktif" {{ old('status') == 'Nonaktif' ? 'selected' : '' }}>Nonaktif</option>
                             <option value="Ditutup" {{ old('status') == 'Ditutup' ? 'selected' : '' }}>Ditutup</option>
                         </select>
-                        @error('status') <p class="error-message">{{ $message }}</p> @enderror
-                    </div>
+                        @error('status') <p class="error-message">{{ $message }}</p> @enderror </div>
 
                 </div>
 

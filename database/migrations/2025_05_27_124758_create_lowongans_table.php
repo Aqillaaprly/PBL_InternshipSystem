@@ -16,14 +16,26 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->string('judul');
             $table->text('deskripsi');
-            $table->text('kualifikasi');
-            $table->enum('tipe', ['Penuh Waktu', 'Paruh Waktu', 'Kontrak', 'Internship']);
-            $table->string('lokasi');
+            $table->text('kualifikasi')->nullable(); // Made nullable based on HTML form's optional status
+            $table->text('tanggung_jawab')->nullable(); // Added tanggung_jawab as it's in the form
+
+            // Updated 'tipe' enum values to match HTML form
+            $table->enum('tipe', ['Full-time', 'Part-time', 'Magang', 'Kontrak']);
+
+            // Removed 'lokasi' and added detailed address fields
+            $table->string('provinsi'); // Mark as not nullable if it's required in the form
+            $table->string('kota');     // Mark as not nullable if it's required in the form
+            $table->string('alamat')->nullable();   // Added alamat as nullable (optional in form)
+            $table->string('kode_pos', 10)->nullable(); // Added kode_pos as nullable (optional in form)
+
             $table->decimal('gaji_min', 15, 2)->nullable();
             $table->decimal('gaji_max', 15, 2)->nullable();
             $table->date('tanggal_buka');
             $table->date('tanggal_tutup');
-            $table->enum('status', ['Aktif', 'Non-Aktif'])->default('Aktif');
+            
+            // Updated 'status' enum values to match HTML form
+            $table->enum('status', ['Aktif', 'Nonaktif', 'Ditutup'])->default('Aktif');
+            
             $table->timestamps();
         });
     }
