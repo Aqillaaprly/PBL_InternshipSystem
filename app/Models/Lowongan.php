@@ -15,7 +15,11 @@ class Lowongan extends Model
         'deskripsi',
         'kualifikasi',
         'tipe',
-        'lokasi',
+        'provinsi', // Add this
+        'kota',     // Add this
+        'alamat',   // Add this
+        'kode_pos', // Add this
+        'lokasi',   // Keep if used for a combined string, otherwise consider removing if it conflicts with separate address fields
         'gaji_min',
         'gaji_max',
         'tanggal_buka',
@@ -25,7 +29,6 @@ class Lowongan extends Model
 
     public function company()
     {
-
         return $this->belongsTo(Company::class);
     }
 

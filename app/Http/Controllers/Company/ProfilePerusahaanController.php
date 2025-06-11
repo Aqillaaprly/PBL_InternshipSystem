@@ -5,17 +5,17 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Hash; // Still useful for general password checks, but not used for this form
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules\Password; // Not directly used in this form
 use Illuminate\Validation\ValidationException;
-use App\Models\Company; // Make sure to import the Company model
+use App\Models\Company; // Ensure this is imported
 
 class ProfilePerusahaanController extends Controller
 {
     /**
      * Display the perusahaan's profile.
-     * Route: perusahaan.profile.perusahaanProfile
+     * Route: perusahaan.profile.perusahaanProfile2
      */
     public function show()
     {
@@ -38,15 +38,20 @@ class ProfilePerusahaanController extends Controller
 
     /**
      * Show the form for editing the perusahaan's profile.
-     * Route: perusahaan.profile.edit
+     * Route: perusahaan.profile.edit2
      */
     public function edit()
     {
         /** @var \App\Models\User $perusahaan */
         $perusahaan = Auth::user();
 
-        // Fetch the company data for the edit form if needed
+        // Fetch the company data for the edit form
         $company = $perusahaan->company;
+
+        // Ensure company data exists before proceeding to edit form
+        if (!$company) {
+            return redirect()->route('profile.perusahaanProfile2')->with('error', 'Data perusahaan tidak ditemukan.');
+        }
 
         // Return the edit view
         return view('perusahaan.Profile.edit', compact('perusahaan', 'company'));
@@ -54,73 +59,72 @@ class ProfilePerusahaanController extends Controller
 
     /**
      * Update the perusahaan's profile.
-     * Route: perusahaan.profile.update
+     * Route: perusahaan.profile.update2
      */
     public function update(Request $request)
     {
         /** @var \App\Models\User $perusahaan */
         $perusahaan = Auth::user();
 
+        // Ensure the authenticated user has a company profile
+        if (!$perusahaan->company) {
+            return redirect()->route('perusahaan.profile.perusahaanProfile2')->with('error', 'Profil perusahaan tidak ditemukan.');
+        }
+
+        $company = $perusahaan->company; // Get the associated company model
+
+        // Define validation rules for the company fields only
         $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username,'.$perusahaan->id],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,'.$perusahaan->id],
-            'current_password' => ['nullable', 'string'],
-            'new_password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'profile_picture' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:2048'],
-            // You might also want to add validation rules for company data if you're updating it here
-            // e.g., 'nama_perusahaan' => ['required', 'string', 'max:255'],
-            // 'website' => ['nullable', 'url', 'max:255'],
-            // 'about' => ['nullable', 'url', 'max:255'],
-            // ... and so on for other company fields
+            'nama_perusahaan' => ['required', 'string', 'max:255'],
+            'telepon' => ['required', 'string', 'max:20'],
+            'email_perusahaan' => ['required', 'string', 'email', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'deskripsi' => ['nullable', 'string'],
+            'industri' => ['nullable', 'string', 'max:255'],
+            'ukuran_perusahaan' => ['nullable', 'string', 'max:255'],
+            'alamat' => ['nullable', 'string', 'max:255'],
+            'kota' => ['nullable', 'string', 'max:100'],
+            'provinsi' => ['nullable', 'string', 'max:100'],
+            'kode_pos' => ['nullable', 'string', 'max:10'],
+            'logo' => ['nullable', 'image', 'mimes:jpg,png,jpeg,gif,svg', 'max:2048'], // Matches form name
         ];
 
+        // Validate the request data
         $request->validate($rules);
 
-        // Validate current_password if new_password is filled
-        if ($request->filled('new_password')) {
-            if (!Hash::check($request->current_password, $perusahaan->password)) {
-                throw ValidationException::withMessages([
-                    'current_password' => __('auth.password'),
-                ]);
+        // Prepare data for company update
+        $companyData = $request->only([
+            'nama_perusahaan',
+            'telepon',
+            'email_perusahaan',
+            'website',
+            'deskripsi',
+            'industri',
+            'ukuran_perusahaan',
+            'alamat',
+            'kota',
+            'provinsi',
+            'kode_pos',
+        ]);
+
+        // Handle logo upload
+        if ($request->hasFile('logo')) {
+            // Delete old logo if exists
+            if ($company->logo_path && Storage::disk('public')->exists($company->logo_path)) {
+                Storage::disk('public')->delete($company->logo_path);
             }
-        }
 
-        $perusahaan->name = $request->name;
-        $perusahaan->username = $request->username;
-        $perusahaan->email = $request->email;
-
-        // Handle profile picture upload
-        if ($request->hasFile('profile_picture')) {
-            // Delete old profile picture if exists
-            if ($perusahaan->profile_picture && Storage::disk('public')->exists($perusahaan->profile_picture)) {
-                Storage::disk('public')->delete($perusahaan->profile_picture);
-            }
-
-            $file = $request->file('profile_picture');
+            $file = $request->file('logo');
             $filename = time().'_'.$file->getClientOriginalName();
-            $path = $file->storeAs('profile_pictures', $filename, 'public');
-            $perusahaan->profile_picture = $path;
+            // Store the logo in 'company_logos' directory in public storage
+            $path = $file->storeAs('company_logos', $filename, 'public');
+            $companyData['logo_path'] = $path; // Update the logo_path field for the company
         }
 
-        if ($request->filled('new_password')) {
-            $perusahaan->password = Hash::make($request->new_password);
-        }
+        // Update the company data
+        $company->update($companyData);
 
-        $perusahaan->save();
-
-        // If you also want to update company data, you'd do it here:
-        // if ($perusahaan->company) {
-        //     $perusahaan->company->update([
-        //         'nama_perusahaan' => $request->nama_perusahaan,
-        //         'website' => $request->website,
-        //         'about' => $request->about,
-        //         // ... update other company fields
-        //     ]);
-        // }
-
-
-        // Fixed redirect to match the route name
-        return redirect()->route('perusahaan.profile.perusahaanProfile2')->with('success', 'Profil berhasil diperbarui.');
+        // Redirect back to the company profile page with a success message
+        return redirect()->route('perusahaan.profile.perusahaanProfile2')->with('success', 'Profil perusahaan berhasil diperbarui.');
     }
 }

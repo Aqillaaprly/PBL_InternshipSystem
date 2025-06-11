@@ -6,9 +6,15 @@
     <title>Edit Lowongan - {{ $lowongan->judul ?? 'Lowongan' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" xintegrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    {{-- Toastify-JS CDN links --}}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <style>
         body {
             background-color: #f7f8fc;
+            font-family: 'Inter', sans-serif; /* Consistent font */
         }
         .form-card {
             background-color: white;
@@ -98,7 +104,8 @@
                 <p class="text-sm text-gray-500">Perbarui detail lowongan pekerjaan ini.</p>
             </div>
 
-            @if ($errors->any())
+            {{-- Validation errors via Toastify-JS are handled at the bottom, so we remove the large block here --}}
+            {{-- @if ($errors->any())
                 <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded-md mb-6" role="alert">
                     <div class="flex">
                         <div class="py-1"><i class="fas fa-exclamation-triangle fa-lg mr-3 text-red-500"></i></div>
@@ -112,7 +119,7 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @endif --}}
 
             <form method="POST" action="{{ route('perusahaan.lowongan.update', $lowongan->id) }}" class="space-y-8">
                 @csrf
@@ -122,39 +129,83 @@
                     <div class="form-section-title">Detail Lowongan</div>
                     <div class="input-group">
                         <label for="judul" class="input-label">Judul Lowongan <span class="text-red-500">*</span></label>
+                        {{-- Changed to text input for direct editing, similar to your original edit page --}}
                         <input type="text" name="judul" id="judul" value="{{ old('judul', $lowongan->judul) }}" required class="form-input @error('judul') border-red-500 @enderror">
                         @error('judul') <p class="error-message">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
                         <div class="input-group">
-                            <label for="lokasi" class="input-label">Lokasi <span class="text-red-500">*</span></label>
-                            <input type="text" name="lokasi" id="lokasi" value="{{ old('lokasi', $lowongan->lokasi) }}" required class="form-input @error('lokasi') border-red-500 @enderror">
-                            @error('lokasi') <p class="error-message">{{ $message }}</p> @enderror
+                            <label for="provinsi" class="input-label">Provinsi <span class="text-red-500">*</span></label>
+                            <select name="provinsi" id="provinsi" required class="form-select @error('provinsi') border-red-500 @enderror">
+                                <option value="">Pilih Provinsi</option>
+                                <option value="DKI Jakarta" {{ old('provinsi', $lowongan->provinsi) == 'DKI Jakarta' ? 'selected' : '' }}>DKI Jakarta</option>
+                                <option value="Jawa Barat" {{ old('provinsi', $lowongan->provinsi) == 'Jawa Barat' ? 'selected' : '' }}>Jawa Barat</option>
+                                <option value="Jawa Tengah" {{ old('provinsi', $lowongan->provinsi) == 'Jawa Tengah' ? 'selected' : '' }}>Jawa Tengah</option>
+                                <option value="Jawa Timur" {{ old('provinsi', $lowongan->provinsi) == 'Jawa Timur' ? 'selected' : '' }}>Jawa Timur</option>
+                                <option value="Banten" {{ old('provinsi', $lowongan->provinsi) == 'Banten' ? 'selected' : '' }}>Banten</option>
+                                <option value="Yogyakarta" {{ old('provinsi', $lowongan->provinsi) == 'Yogyakarta' ? 'selected' : '' }}>Yogyakarta</option>
+                            </select>
+                            @error('provinsi') <p class="error-message">{{ $message }}</p> @enderror
                         </div>
                         <div class="input-group">
-                            <label for="tipe_pekerjaan" class="input-label">Tipe Pekerjaan <span class="text-red-500">*</span></label>
-                            <select name="tipe_pekerjaan" id="tipe_pekerjaan" required class="form-select @error('tipe_pekerjaan') border-red-500 @enderror">
-                                <option value="">Pilih Tipe</option>
-                                <option value="Full-time" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Full-time' ? 'selected' : '' }}>Full-time</option>
-                                <option value="Part-time" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Part-time' ? 'selected' : '' }}>Part-time</option>
-                                <option value="Magang" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Magang' ? 'selected' : '' }}>Magang</option>
-                                <option value="Kontrak" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
+                            <label for="kota" class="input-label">Kota <span class="text-red-500">*</span></label>
+                            <select name="kota" id="kota" required class="form-select @error('kota') border-red-500 @enderror">
+                                <option value="">Pilih Kota</option>
+                                {{-- These options should ideally be dynamically loaded based on selected provinsi via JavaScript --}}
+                                <option value="Jakarta Selatan" {{ old('kota', $lowongan->kota) == 'Jakarta Selatan' ? 'selected' : '' }}>Jakarta Selatan</option>
+                                <option value="Bandung" {{ old('kota', $lowongan->kota) == 'Bandung' ? 'selected' : '' }}>Bandung</option>
+                                <option value="Surabaya" {{ old('kota', $lowongan->kota) == 'Surabaya' ? 'selected' : '' }}>Surabaya</option>
+                                <option value="Semarang" {{ old('kota', $lowongan->kota) == 'Semarang' ? 'selected' : '' }}>Semarang</option>
+                                <option value="Tangerang" {{ old('kota', $lowongan->kota) == 'Tangerang' ? 'selected' : '' }}>Tangerang</option>
+                                <option value="Yogyakarta" {{ old('kota', $lowongan->kota) == 'Yogyakarta' ? 'selected' : '' }}>Yogyakarta</option>
                             </select>
-                            @error('tipe_pekerjaan') <p class="error-message">{{ $message }}</p> @enderror
+                            @error('kota') <p class="error-message">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <label for="gaji" class="input-label">Gaji (Estimasi/Bulan) <span class="text-gray-500 text-xs">(Opsional)</span></label>
-                        <input type="number" name="gaji" id="gaji" value="{{ old('gaji', $lowongan->gaji_min) }}" class="form-input @error('gaji') border-red-500 @enderror" placeholder="Contoh: 5000000">
-                        @error('gaji') <p class="error-message">{{ $message }}</p> @enderror
+                        <label for="alamat" class="input-label">Alamat Lengkap <span class="text-gray-500 text-xs">(Opsional)</span></label>
+                        <textarea name="alamat" id="alamat" rows="2" class="form-textarea @error('alamat') border-red-500 @enderror" placeholder="Contoh: Jl. Sudirman No. 123">{{ old('alamat', $lowongan->alamat) }}</textarea>
+                        @error('alamat') <p class="error-message">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="input-group">
-                        <label for="tanggal_tutup" class="input-label">Tanggal Tutup <span class="text-red-500">*</span></label>
-                        <input type="date" name="tanggal_tutup" id="tanggal_tutup" value="{{ old('tanggal_tutup', \Carbon\Carbon::parse($lowongan->tanggal_tutup)->format('Y-m-d')) }}" required class="form-input @error('tanggal_tutup') border-red-500 @enderror">
-                        @error('tanggal_tutup') <p class="error-message">{{ $message }}</p> @enderror
+                        <label for="kode_pos" class="input-label">Kode Pos <span class="text-gray-500 text-xs">(Opsional)</span></label>
+                        <input type="text" name="kode_pos" id="kode_pos" value="{{ old('kode_pos', $lowongan->kode_pos) }}" class="form-input @error('kode_pos') border-red-500 @enderror" placeholder="Contoh: 12345">
+                        @error('kode_pos') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label for="tipe_pekerjaan" class="input-label">Tipe Pekerjaan <span class="text-red-500">*</span></label>
+                        <select name="tipe_pekerjaan" id="tipe_pekerjaan" required class="form-select @error('tipe_pekerjaan') border-red-500 @enderror">
+                            <option value="">Pilih Tipe</option>
+                            <option value="Full-time" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Full-time' ? 'selected' : '' }}>Full-time</option>
+                            <option value="Part-time" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Part-time' ? 'selected' : '' }}>Part-time</option>
+                            <option value="Magang" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Magang' ? 'selected' : '' }}>Magang</option>
+                            <option value="Kontrak" {{ old('tipe_pekerjaan', $lowongan->tipe) == 'Kontrak' ? 'selected' : '' }}>Kontrak</option>
+                        </select>
+                        @error('tipe_pekerjaan') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="input-group">
+                        <label for="gaji_min" class="input-label">Gaji (Estimasi/Bulan) <span class="text-gray-500 text-xs">(Opsional)</span></label>
+                        {{-- Assuming 'gaji_min' in your database for this field --}}
+                        <input type="number" name="gaji_min" id="gaji_min" value="{{ old('gaji_min', $lowongan->gaji_min) }}" class="form-input @error('gaji_min') border-red-500 @enderror" placeholder="Contoh: 5000000">
+                        @error('gaji_min') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                        <div class="input-group">
+                            <label for="tanggal_buka" class="input-label">Tanggal Buka <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_buka" id="tanggal_buka" value="{{ old('tanggal_buka', \Carbon\Carbon::parse($lowongan->tanggal_buka)->format('Y-m-d')) }}" required class="form-input @error('tanggal_buka') border-red-500 @enderror" readonly>
+                            @error('tanggal_buka') <p class="error-message">{{ $message }}</p> @enderror
+                        </div>
+                        <div class="input-group">
+                            <label for="tanggal_tutup" class="input-label">Tanggal Tutup <span class="text-red-500">*</span></label>
+                            <input type="date" name="tanggal_tutup" id="tanggal_tutup" value="{{ old('tanggal_tutup', \Carbon\Carbon::parse($lowongan->tanggal_tutup)->format('Y-m-d')) }}" required class="form-input @error('tanggal_tutup') border-red-500 @enderror">
+                            @error('tanggal_tutup') <p class="error-message">{{ $message }}</p> @enderror
+                        </div>
                     </div>
 
                     <div class="input-group">
@@ -187,10 +238,11 @@
 
                 </div>
 
-                {{-- <div class="mt-10 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3">
-                    <a href="{{ route('perusahaan.show', $lowongan->id) }}" class="action-button cancel-button mt-3 sm:mt-0 w-full sm:w-auto">
+                <div class="mt-10 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-3">
+                    {{-- Changed href to go back to the management page --}}
+                    <a href="{{ route('perusahaan.lowongan') }}" class="action-button cancel-button mt-3 sm:mt-0 w-full sm:w-auto">
                         Batal
-                    </a> --}}
+                    </a>
                     <button type="submit" class="action-button save-button w-full sm:w-auto">
                         <i class="fas fa-save mr-2"></i>Simpan Perubahan
                     </button>
@@ -200,5 +252,82 @@
     </main>
 
     @include('perusahaan.template.footer')
+
+    {{-- Toastify-JS Integration --}}
+    <script>
+        // Display success message
+        @if (session('success'))
+            Toastify({
+                text: "{{ session('success') }}",
+                duration: 3000, // 3 seconds
+                newWindow: true,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing on hover
+                style: {
+                    background: "linear-gradient(to right, #4CAF50, #66BB6A)", // Green gradient
+                    borderRadius: "0.6rem", // Tailored to your form-card rounded-lg
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)", // A subtle shadow
+                    padding: "1rem 1.5rem" // Good padding
+                },
+                offset: { // Offset from the corner
+                    x: 20, // horizontal axis - can be a number or a string indicating unity. eg: "2em"
+                    y: 20 // vertical axis - can be a number or a string indicating unity. eg: "2em"
+                },
+                onClick: function(){} // Callback after click
+            }).showToast();
+        @endif
+
+        // Display error message (e.g., from controller catches)
+        @if (session('error'))
+            Toastify({
+                text: "{{ session('error') }}",
+                duration: 5000, // Longer duration for errors
+                newWindow: true,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                style: {
+                    background: "linear-gradient(to right, #EF4444, #DC2626)", // Red gradient
+                    borderRadius: "0.6rem",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    padding: "1rem 1.5rem"
+                },
+                offset: {
+                    x: 20,
+                    y: 20
+                },
+                onClick: function(){}
+            }).showToast();
+        @endif
+
+        // Display validation errors (iterates through $errors->all())
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                Toastify({
+                    text: "{{ $error }}",
+                    duration: 5000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #F59E0B, #D97706)", // Orange/Amber gradient for warnings/validation
+                        borderRadius: "0.6rem",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        padding: "1rem 1.5rem"
+                    },
+                    offset: {
+                        x: 20,
+                        y: 20 + {{ $loop->index * 70 }} // Stagger multiple toasts if many errors
+                    },
+                    onClick: function(){}
+                }).showToast();
+            @endforeach
+        @endif
+    </script>
 </body>
 </html>
