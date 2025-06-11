@@ -12,7 +12,7 @@
                 </button>
 
                 <a href="{{ route('dosen.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
-                    STRIDEUP
+                    STRIDE UP
                 </a>
             </div>
                 <nav class="hidden md:flex space-x-6 font-medium text-gray-700">
