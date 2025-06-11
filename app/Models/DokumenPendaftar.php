@@ -14,13 +14,24 @@ class DokumenPendaftar extends Model
         'nama_dokumen',
         'file_path',
         'tipe_file',
-        'status_validasi', // Tambahkan ini
+        'status_validasi',
     ];
 
-    // Opsional: Casting untuk enum jika diperlukan, tapi biasanya tidak wajib
-    // protected $casts = [
-    //     'status_validasi' => 'string', // Laravel akan menanganinya dengan baik
-    // ];
+    // Define possible validation statuses
+    const STATUS_BELUM_DIVERIFIKASI = 'Belum Diverifikasi';
+    const STATUS_VALID = 'Valid';
+    const STATUS_TIDAK_VALID = 'Tidak Valid';
+    const STATUS_PERLU_REVISI = 'Perlu Revisi';
+
+    public static function getValidationStatuses()
+    {
+        return [
+            self::STATUS_BELUM_DIVERIFIKASI,
+            self::STATUS_VALID,
+            self::STATUS_TIDAK_VALID,
+            self::STATUS_PERLU_REVISI,
+        ];
+    }
 
     public function pendaftar()
     {

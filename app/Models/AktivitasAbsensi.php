@@ -5,15 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class BimbinganMagang extends Model
+class AktivitasAbsensi extends Model
 {
     use HasFactory;
 
-    protected $table = 'bimbingan_magangs';
+    protected $table = 'aktivitas_absensis'; // updated table name
 
     protected $fillable = [
         'mahasiswa_user_id',
-        'pembimbing_id',
         'company_id',
         'lowongan_id',
         'periode_magang',
@@ -24,7 +23,7 @@ class BimbinganMagang extends Model
         'mahasiswa_id',
         'pembimbing_id',
         'tanggal',
-        'jenis_bimbingan',
+        'jenis_aktivitas', // assuming you renamed jenis_aktivitas to jenis_bimbingan for a reason
         'catatan'
     ];
 
@@ -35,13 +34,11 @@ class BimbinganMagang extends Model
 
     public function mahasiswa()
     {
-        // Relasi ke User model yang berperan sebagai mahasiswa
         return $this->belongsTo(User::class, 'mahasiswa_user_id');
     }
 
     public function pembimbing()
     {
-        // Relasi ke Pembimbing model
         return $this->belongsTo(Pembimbing::class, 'pembimbing_id');
     }
 
@@ -55,9 +52,9 @@ class BimbinganMagang extends Model
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
 
-    // ✅ New relation to BimbinganFoto
+    // ✅ Updated: relasi ke aktivitas_fotos
     public function foto()
     {
-        return $this->hasOne(BimbinganFoto::class, 'bimbingan_id');
+        return $this->hasMany(AktivitasFoto::class, 'aktivitas_absensi_id');
     }
 }

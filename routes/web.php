@@ -98,28 +98,53 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
 });
 
 // MAHASISWA GROUP
-Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('mahasiswa.dashboard');
-    })->name('dashboard');
+// Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+//     // Dashboard
+//     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
 
-    Route::get('/absensi', function () {
-        return view('mahasiswa.absensi');
-    })->name('absensi');
-    Route::get('/job', function () {
-        return view('mahasiswa.job');
-    })->name('job');
-    Route::get('/profile', function () {
-        return view('mahasiswa.mahasiswaProfile');
-    })->name('profile');
-    Route::get('/perusahaan', function () {
-        return view('mahasiswa.perusahaan');
-    })->name('perusahaan');
-    // Tambahkan route mahasiswa lainnya di sini
-     Route::get('/fuzzy-topsis', function () {
-        return view('mahasiswa.spk.kalkulatorFuzzy');
-    })->name('spk');
-});
+//     // Pembimbing
+//     Route::get('/pembimbing', [MahasiswaController::class, 'lihatPembimbing'])->name('pembimbing');
+
+//     // Absensi
+//     Route::get('/absensi', fn() => view('mahasiswa.absensi'))->name('absensi');
+
+//     // Job
+//     Route::get('/job', fn() => view('mahasiswa.job'))->name('job');
+
+//     // Profile Routes
+//     Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
+//     Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
+//     Route::put('/profile', [MahasiswaProfileController::class, 'update'])->name('profile.update');
+
+//     // Perusahaan Routes - UPDATED
+//     Route::get('/perusahaan', [MahasiswaController::class, 'perusahaan'])->name('perusahaan');
+//     Route::get('/perusahaan/{id}/profile', [MahasiswaCompanyController::class, 'showProfile'])
+//         ->name('perusahaan.profile');
+
+//     // Laporan Routes with Search
+//     Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
+//     Route::post('/laporan', [MahasiswaLaporanController::class, 'store'])->name('laporan.store');
+//     Route::delete('/laporan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('laporan.destroy');
+
+//     // Lowongan Routes with Search/Filter
+//     Route::get('/lowongan', [MahasiswaLowonganController::class, 'index'])->name('lowongan.index');
+//     Route::get('/lowongan/create', [MahasiswaLowonganController::class, 'create'])->name('lowongan.create');
+//     Route::post('/lowongan', [MahasiswaLowonganController::class, 'store'])->name('lowongan.store');
+//     Route::get('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'show'])->name('lowongan.show');
+//     Route::get('/lowongan/{lowongan}/edit', [MahasiswaLowonganController::class, 'edit'])->name('lowongan.edit');
+//     Route::put('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'update'])->name('lowongan.update');
+//     Route::delete('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'destroy'])->name('lowongan.destroy');
+
+//     // Pendaftar Routes
+//     Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranTable'])->name('pendaftar');
+//     Route::get('/pendaftar/form', [PendaftarController::class, 'showPendaftaranForm'])->name('pendaftar.form');
+//     Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])->name('pendaftar.submit');
+//     Route::delete('/pendaftar/{pendaftar}', [PendaftarController::class, 'cancelPendaftaran'])->name('pendaftar.cancel');
+//     Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])
+//         ->name('apply.from.lowongan');
+//     Route::get('/pendaftar/dokumen/{pendaftarId}', [PendaftarController::class, 'showDocuments'])
+//         ->name('pendaftar.dokumen');
+// });
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {

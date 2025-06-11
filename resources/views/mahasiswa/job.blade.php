@@ -2,54 +2,95 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Job Listing Dashboard - Admin</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rekomendasi Lowongan Magang - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .kualifikasi-list ul {
+            list-style-type: disc;
+            margin-left: 1.5rem; /* Memberi indentasi pada bullet points */
+            padding-left: 0;
+        }
+        .kualifikasi-list li {
+            margin-bottom: 0.25rem; /* Sedikit jarak antar item kualifikasi */
+        }
+    </style>
 </head>
 
 <body class="bg-blue-50 text-gray-900">
 
-  <div class="max-w-7xl mx-auto px-6 py-12 mt-16"> {{-- Added mt-16 for fixed navbar --}}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        <h1 class="text-2xl md:text-3xl font-extrabold leading-tight mb-4 text-blue-900">
-          Rekomendasi Lowongan Magang
-        </h1>
-        
-    @if(isset($companies) && $companies->count() > 0)
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    @foreach($companies as $company)
-      <a href="{{ $company->website ? $company->website : '#' }}" target="_blank" rel="noopener noreferrer" class="block no-underline text-inherit">
-        <div class="bg-white rounded-lg shadow-md p-4 flex flex-col hover:bg-blue-50 transition cursor-pointer h-full">
-          <div class="mb-3 flex justify-center items-center h-20">
-            @if($company->logo_path)
-              @if(Str::startsWith($company->logo_path, ['http://', 'https://']))
-                <img src="{{ $company->logo_path }}" alt="{{ $company->nama_perusahaan }} logo" class="h-16 max-h-full object-contain" />
-              @else
-                <img src="{{ asset('storage/' . $company->logo_path) }}" alt="{{ $company->nama_perusahaan }} logo" class="h-16 max-h-full object-contain" />
-              @endif
-            @else
-              {{-- Placeholder Icon --}}
-              <div class="w-16 h-16 bg-gray-200 flex items-center justify-center rounded">
-                <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 5H5c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V7c0-1.103-.897-2-2-2zM5 17V7h14l.002 10H5z"/><path d="M10 9h4v6h-4z"/></svg>
-              </div>
-            @endif
-          </div>
-          <h2 class="font-semibold mb-1 text-center truncate" title="{{ $company->nama_perusahaan }}">{{ $company->nama_perusahaan }}</h2>
-          <p class="text-xs text-gray-500 text-center mb-2">{{ $company->kota ?? 'N/A' }}</p>
+    <h1 class="text-3xl md:text-4xl font-extrabold leading-tight mb-8 text-blue-900 text-center">
+        Rekomendasi Lowongan Magang
+    </h1>
 
-          <div class="mt-auto flex justify-between items-center pt-3">
-            <span class="text-blue-900 border border-blue-900 px-3 py-1 rounded text-xs hover:bg-blue-900 hover:text-white transition">
-              Kunjungi Website
-            </span>
-          </div>
+    {{-- Pengecekan diubah agar sesuai dengan Collection --}}
+    @if(isset($companies) && $companies instanceof \Illuminate\Support\Collection && $companies->count() > 0)
+    <div class="space-y-8">
+        @foreach($companies as $company)
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+
+                    <div>
+                        <h2 class="text-2xl font-bold text-blue-800" title="{{ $company->nama_perusahaan }}">{{ $company->nama_perusahaan }}</h2>
+                        <p class="text-sm text-gray-600">{{ $company->kota ?? 'N/A' }}</p>
+                        @if($company->website)
+                        <a href="{{ $company->website }}" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:underline">
+                            Kunjungi Website
+                        </a>
+                        @endif
+                    </div>
+                </div>
+
+                @if($company->lowongans && $company->lowongans->count() > 0)
+                <div class="space-y-6 mt-4">
+                    @foreach($company->lowongans as $lowongans)
+                    <div class="border border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow">
+                        <h3 class="text-lg font-semibold text-blue-700">{{ $lowongans->judul }}</h3>
+                        <p class="text-xs text-gray-500 mb-1">Lokasi: {{ $lowongans->lokasi }} | Tipe: {{ $lowongans->tipe }}</p>
+                        @if($lowongans->tanggal_tutup)
+                        <p class="text-xs text-gray-500 mb-2">Batas Akhir: {{ \Carbon\Carbon::parse($lowongans->tanggal_tutup)->isoFormat('D MMMM YYYY') }}</p>
+                        @endif
+
+                        <div class="mt-2 text-sm text-gray-700">
+                            <strong class="block mb-1">Deskripsi Singkat:</strong>
+                            <p class="text-gray-600 text-xs leading-relaxed line-clamp-3">{{ Str::limit(strip_tags($lowongans->deskripsi), 200) }}</p>
+                        </div>
+
+                        <div class="mt-3 text-sm text-gray-700 kualifikasi-list">
+                            <strong class="block mb-1">Kriteria/Kualifikasi yang Dicari:</strong>
+                            @if($lowongans->kualifikasi)
+                            <ul class="text-xs text-gray-600">
+                                @foreach(explode("\n", $lowongans->kualifikasi) as $kriteria)
+                                @if(trim($kriteria) !== '')
+                                <li>{{ trim(str_replace(['-', '*'], '', $kriteria)) }}</li>
+                                @endif
+                                @endforeach
+                            </ul>
+                            @else
+                            <p class="text-xs text-gray-500">Kualifikasi tidak disebutkan.</p>
+                            @endif
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @else
+                <p class="text-sm text-gray-500 mt-4">Saat ini belum ada lowongan tersedia dari perusahaan ini.</p>
+                @endif
+            </div>
         </div>
-      </a>
-    @endforeach
-  </div>
-@else
-  <p class="text-gray-600">Tidak ada data perusahaan yang ditemukan.</p>
-@endif
-  </div>
+        @endforeach
+    </div>
+
+    @elseif(isset($companies) && $companies->isEmpty())
+    <p class="text-gray-600 text-center">Tidak ada data perusahaan yang ditemukan.</p>
+    @else
+    <p class="text-gray-600 text-center">Data perusahaan tidak tersedia saat ini.</p>
+    @endif
+</div>
+
 </body>
 </html>

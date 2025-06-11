@@ -1,5 +1,5 @@
 <?php
-function renderJobCard($title, $location, $closeDate, $startDate, $qualifications = []) {
+function renderJobCard($title, $location, $closeDate, $startDate, $qualifications = [], $applyUrl = '#') {
     ?>
     <div class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm mb-4">
         <div class="flex justify-between items-center mb-2">
@@ -23,7 +23,7 @@ function renderJobCard($title, $location, $closeDate, $startDate, $qualification
         </div>
 
         <div class="flex gap-2">
-            <a href="#" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Apply on employer site</a>
+            <a href="<?= htmlspecialchars($applyUrl); ?>" target="_blank" rel="noopener noreferrer" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">Apply on employer site</a>
             <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100 text-sm">Save</button>
         </div>
     </div>

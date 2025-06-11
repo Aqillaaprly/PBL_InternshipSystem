@@ -12,7 +12,7 @@ class Pendaftar extends Model
     protected $table = 'pendaftars';
 
     protected $fillable = [
-        'mahasiswa_id', 
+        'user_id',
         'lowongan_id',
         'tanggal_daftar',
         'status_lamaran',
