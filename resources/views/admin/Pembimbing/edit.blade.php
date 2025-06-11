@@ -130,6 +130,39 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            width: 90%;
+            max-width: 48rem; /* Adjusted max width to make it wider */
+            position: relative;
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280; /* Gray-500 */
+        }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -264,10 +297,10 @@
                     <div class="form-section mb-8">
                         <div class="flex justify-between items-center mb-4">
                             <h2 class="section-title mb-0 border-none pb-0">Mahasiswa Bimbingan Saat Ini</h2>
-                            {{-- Button to add new guidance --}}
-                            <a href="{{ route('admin.bimbingan.create') }}" class="submit-button px-4 py-2">
+                            {{-- Button to open the modal for adding new guidance --}}
+                            <button type="button" onclick="openModal()" class="submit-button px-4 py-2">
                                 Tambahkan Bimbingan
-                            </a>
+                            </button>
                         </div>
                         @if($pembimbing->bimbinganMagangs->isNotEmpty())
                             <div class="table-container">
@@ -277,7 +310,9 @@
                                             <th class="table-cell">No</th>
                                             <th class="table-cell">NIM</th>
                                             <th class="table-cell">Nama Mahasiswa</th>
-                                            <th class="table-cell">Status Bimbingan</th>
+                                            <th class="table-cell">Tanggal Mulai</th>
+                                            <th class="table-cell">Tanggal Selesai</th>
+                                            <th class="table-cell">Status</th>
                                             <th class="table-cell text-center">Aksi</th>
                                         </tr>
                                     </thead>
@@ -287,6 +322,8 @@
                                                 <td class="table-cell">{{ $index + 1 }}</td>
                                                 <td class="table-cell">{{ $bimbingan->mahasiswa->detailMahasiswa->nim ?? '-' }}</td>
                                                 <td class="table-cell">{{ $bimbingan->mahasiswa->name ?? '-' }}</td>
+                                                <td class="px-4 py-2">{{ \Carbon\Carbon::parse($bimbingan->tanggal_mulai)->format('d M Y') ?? '-' }}</td> {{-- Display Tanggal Mulai --}}
+                                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($bimbingan->tanggal_selesai)->format('d M Y') ?? '-' }}</td> {{-- Display Tanggal Selesai --}}
                                                 <td class="table-cell">
                                                     <span class="badge
                                                         @if($bimbingan->status_bimbingan == 'Aktif') bg-green-100 text-green-700
@@ -295,11 +332,9 @@
                                                         {{ $bimbingan->status_bimbingan }}
                                                     </span>
                                                 </td>
+                                                
                                                 <td class="table-cell text-center">
                                                     <div class="flex items-center justify-center space-x-2">
-                                                        {{-- Tombol Edit Bimbingan (Ini akan mengarah ke form edit bimbingan spesifik) --}}
-                                                        <a href="{{ route('admin.bimbingan.edit', $bimbingan->id) }}" class="action-button-table">Edit</a>
-
                                                         {{-- Tombol Hapus Bimbingan --}}
                                                         <form action="{{ route('admin.bimbingan.destroy', $bimbingan->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus bimbingan ini?');">
                                                             @csrf
@@ -317,10 +352,6 @@
                             <p class="text-gray-500 mt-4">Pembimbing ini belum memiliki mahasiswa bimbingan yang tercatat.</p>
                         @endif
                     </div>
-
-                    {{-- The "Tetapkan Bimbingan Magang Baru" form is removed from this page --}}
-                    {{-- as requested, and replaced by the "Tambahkan Bimbingan" button --}}
-
                 </div> {{-- End of right column --}}
             </div> {{-- End of flex container --}}
         @else
@@ -330,6 +361,121 @@
             </div>
         @endif
     </main>
+
+    {{-- Modal for "Tetapkan Bimbingan Magang Baru" --}}
+    <div id="bimbinganModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button type="button" class="modal-close-button" onclick="closeModal()">
+                &times;
+            </button>
+            <h2 class="section-title text-center">Tetapkan Bimbingan Magang Baru</h2>
+            <form action="{{ route('admin.bimbingan.store') }}" method="POST" class="space-y-6">
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4"> {{-- Added grid for 2-column layout in modal --}}
+                    <div>
+                        <label for="modal_mahasiswa_user_id" class="block text-sm font-medium text-gray-700">Mahasiswa:</label>
+                        <select name="mahasiswa_user_id" id="modal_mahasiswa_user_id" class="input-field" required>
+                            <option value="">Pilih Mahasiswa</option>
+                            {{-- Check if $mahasiswaUsers is not null and is iterable --}}
+                            @if(isset($mahasiswaUsers) && $mahasiswaUsers->isNotEmpty())
+                                @foreach($mahasiswaUsers as $mahasiswa)
+                                    <option value="{{ $mahasiswa->id }}" {{ old('mahasiswa_user_id') == $mahasiswa->id ? 'selected' : '' }}>
+                                        {{ $mahasiswa->name }} (NIM: {{ $mahasiswa->detailMahasiswa->nim ?? '-' }})
+                                    </option>
+                                @endforeach
+                            @else
+                                <option value="" disabled>Tidak ada mahasiswa tersedia</option>
+                            @endif
+                        </select>
+                        @error('mahasiswa_user_id') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="modal_pembimbing_id" class="block text-sm font-medium text-gray-700">Pembimbing:</label>
+                        {{-- The pembimbing_id is pre-filled and hidden as we are assigning for THIS pembimbing --}}
+                        <input type="text" id="modal_pembimbing_display_name" value="{{ $pembimbing->nama_lengkap ?? 'Loading...' }} (Kuota Aktif: {{ $pembimbing->kuota_aktif ?? 0 }} / {{ $pembimbing->maks_kuota_bimbingan ?? 0 }})" class="input-field bg-gray-100 cursor-not-allowed" readonly>
+                        <input type="hidden" name="pembimbing_id" value="{{ $pembimbing->id }}">
+                        @error('pembimbing_id') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- NEW FIELDS FOR BIMBINGAN (arranged in two columns) --}}
+                    <div>
+                        <label for="modal_periode_magang" class="block text-sm font-medium text-gray-700">Periode Magang:</label>
+                        <input type="text" name="periode_magang" id="modal_periode_magang" value="{{ old('periode_magang') }}" class="input-field" required>
+                        @error('periode_magang') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="modal_jenis_bimbingan" class="block text-sm font-medium text-gray-700">Jenis Bimbingan:</label>
+                        <input type="text" name="jenis_bimbingan" id="modal_jenis_bimbingan" value="{{ old('jenis_bimbingan') }}" class="input-field" required>
+                        @error('jenis_bimbingan') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="modal_tanggal_mulai" class="block text-sm font-medium text-gray-700">Tanggal Mulai:</label>
+                        <input type="date" name="tanggal_mulai" id="modal_tanggal_mulai" value="{{ old('tanggal_mulai') }}" class="input-field" required>
+                        @error('tanggal_mulai') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="modal_tanggal_selesai" class="block text-sm font-medium text-gray-700">Tanggal Selesai (Opsional):</label>
+                        <input type="date" name="tanggal_selesai" id="modal_tanggal_selesai" value="{{ old('tanggal_selesai') }}" class="input-field">
+                        @error('tanggal_selesai') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="col-span-2"> {{-- This div spans both columns --}}
+                        <label for="modal_status_bimbingan" class="block text-sm font-medium text-gray-700">Status Bimbingan:</label>
+                        <select name="status_bimbingan" id="modal_status_bimbingan" class="input-field" required>
+                            <option value="Aktif" {{ old('status_bimbingan', 'Aktif') == 'Aktif' ? 'selected' : '' }}>Aktif</option>
+                            <option value="Selesai" {{ old('status_bimbingan') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
+                            <option value="Dibatalkan" {{ old('status_bimbingan') == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                        </select>
+                        @error('status_bimbingan') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div class="col-span-2"> {{-- This div spans both columns --}}
+                        <label for="modal_catatan_koordinator" class="block text-sm font-medium text-gray-700">Catatan Koordinator (Opsional):</label>
+                        <textarea name="catatan_koordinator" id="modal_catatan_koordinator" rows="3" class="input-field">{{ old('catatan_koordinator') }}</textarea>
+                        @error('catatan_koordinator') <p class="error-message">{{ $message }}</p> @enderror
+                    </div>
+                </div> {{-- End of grid container --}}
+
+                <div class="flex items-center justify-end mt-6">
+                    <button type="submit" class="submit-button">
+                        Tetapkan Bimbingan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {{-- JavaScript for Modal functionality --}}
+    <script>
+        function openModal() {
+            document.getElementById('bimbinganModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('bimbinganModal').classList.add('hidden');
+        }
+
+        // Optional: Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('bimbinganModal');
+            if (event.target == modal) {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // To handle initial display of validation errors in modal if redirect happens
+        document.addEventListener('DOMContentLoaded', function() {
+            const shouldOpenModal = {{ ($errors->has('mahasiswa_user_id') || $errors->has('pembimbing_id') || $errors->has('periode_magang') || $errors->has('jenis_bimbingan') || $errors->has('tanggal_mulai') || $errors->has('tanggal_selesai') || $errors->has('status_bimbingan') || $errors->has('catatan_koordinator') || session('error')) ? 'true' : 'false' }};
+            if (shouldOpenModal) {
+                openModal();
+            }
+        });
+    </script>
 
     {{-- Include the admin footer --}}
     @include('admin.template.footer')

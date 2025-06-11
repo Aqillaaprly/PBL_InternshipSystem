@@ -9,54 +9,49 @@ class BimbinganMagang extends Model
 {
     use HasFactory;
 
-    protected $table = 'bimbingan_magangs'; // Pastikan nama tabel benar
-
     protected $fillable = [
         'mahasiswa_user_id',
         'pembimbing_id',
         'company_id',
         'lowongan_id',
-        'periode_magang',
-        'tanggal_mulai',
-        'tanggal_selesai',
-        'status_bimbingan',
-        'catatan_koordinator',
+        'periode_magang',        // Added to fillable
+        'jenis_bimbingan',       // Added to fillable
+        'tanggal_mulai',         // Added to fillable
+        'tanggal_selesai',       // Added to fillable
+        'status_bimbingan',      // Added to fillable
+        'catatan_koordinator',   // Added to fillable
     ];
 
-    protected $casts = [
-        'tanggal_mulai' => 'date',
-        'tanggal_selesai' => 'date',
-    ];
-
+    /**
+     * Get the mahasiswa (user) that owns the bimbingan magang.
+     */
     public function mahasiswa()
     {
-        // Relasi ke User model yang berperan sebagai mahasiswa
         return $this->belongsTo(User::class, 'mahasiswa_user_id');
     }
 
+    /**
+     * Get the pembimbing (dosen) that owns the bimbingan magang.
+     */
     public function pembimbing()
     {
-        // Relasi ke Pembimbing model
         return $this->belongsTo(Pembimbing::class, 'pembimbing_id');
     }
 
+    /**
+     * Get the company associated with the bimbingan magang.
+     */
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');
     }
 
+    /**
+     * Get the lowongan associated with the bimbingan magang.
+     */
     public function lowongan()
     {
         return $this->belongsTo(Lowongan::class, 'lowongan_id');
     }
-
-    public function logBimbinganMagangs()
-    {
-        return $this->hasMany(LogBimbinganMagang::class);
-    }
-
-    public function absensiMagangs()
-    {
-        return $this->hasMany(AbsensiMagang::class);
-    }
 }
+

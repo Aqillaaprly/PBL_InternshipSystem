@@ -30,6 +30,12 @@ class BimbinganController extends Controller
         $validator = Validator::make($request->all(), [
             'mahasiswa_user_id' => 'required|exists:users,id',
             'pembimbing_id' => 'required|exists:pembimbings,id',
+            'periode_magang' => 'required|string|max:255',
+            'jenis_bimbingan' => 'required|string|max:255',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'status_bimbingan' => 'required|in:Aktif,Selesai,Dibatalkan',
+            'catatan_koordinator' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -55,28 +61,27 @@ class BimbinganController extends Controller
                 return redirect()->back()->with('error', 'Pembimbing tidak ditemukan.')->withInput();
             }
 
-            if ($pembimbing->kuota_aktif >= $pembimbing->maks_kuota_bimbingan) {
+            // Corrected: Use 'kuota_bimbingan_aktif' as per your database schema
+            if ($pembimbing->kuota_bimbingan_aktif >= $pembimbing->maks_kuota_bimbingan) {
                 DB::rollBack();
                 return redirect()->back()->with('error', 'Kuota bimbingan pembimbing ini sudah penuh.')->withInput();
             }
 
             // Find the associated Pendaftar entry for the student
-            // Assuming 'Diterima' status indicates an accepted internship for which bimbingan will be assigned.
-            // You might need to adjust the criteria (e.g., 'sedang_berjalan' or 'active' status)
-            $pendaftar = Pendaftar::where('mahasiswa_user_id', $request->mahasiswa_user_id)
-                                ->where('status', 'Diterima') // Adjust this status as per your application logic
-                                ->with('lowongan.company') // Eager load lowongan and its company
-                                ->latest() // Get the latest accepted application if multiple exist
+            // Removed the specific status requirement, now any pendaftar entry for the user_id will be considered.
+            $pendaftar = Pendaftar::where('user_id', $request->mahasiswa_user_id)
+                                ->with('lowongan.company')
+                                ->latest() // Still gets the latest application if multiple exist
                                 ->first();
 
             if (!$pendaftar) {
                 DB::rollBack();
-                return redirect()->back()->with('error', 'Mahasiswa belum memiliki pendaftaran magang berstatus Diterima.')->withInput();
+                return redirect()->back()->with('error', 'Mahasiswa belum memiliki pendaftaran magang terkait. Pastikan mahasiswa telah mendaftar lowongan terlebih dahulu.')->withInput();
             }
 
             // Extract lowongan_id and company_id from the Pendaftar entry
             $lowonganId = $pendaftar->lowongan_id;
-            $companyId = $pendaftar->lowongan->company_id ?? null; // Ensure company_id is available from lowongan
+            $companyId = $pendaftar->lowongan->company_id ?? null;
 
             if (is_null($lowonganId)) {
                 DB::rollBack();
@@ -86,15 +91,18 @@ class BimbinganController extends Controller
             BimbinganMagang::create([
                 'mahasiswa_user_id' => $request->mahasiswa_user_id,
                 'pembimbing_id' => $request->pembimbing_id,
-                'lowongan_id' => $lowonganId, // Provide lowongan_id
-                'company_id' => $companyId,   // Provide company_id
-                'status_bimbingan' => 'Aktif',
-                'tanggal_mulai' => now(), // Or adjust as needed
-                'tanggal_selesai' => null, // Will be set when internship ends
+                'lowongan_id' => $lowonganId,
+                'company_id' => $companyId,
+                'periode_magang' => $request->periode_magang,
+                'jenis_bimbingan' => $request->jenis_bimbingan,
+                'tanggal_mulai' => $request->tanggal_mulai,
+                'tanggal_selesai' => $request->tanggal_selesai,
+                'status_bimbingan' => $request->status_bimbingan,
+                'catatan_koordinator' => $request->catatan_koordinator,
             ]);
 
-            // Increment active quota
-            $pembimbing->increment('kuota_aktif');
+            // Corrected: Increment 'kuota_bimbingan_aktif'
+            $pembimbing->increment('kuota_bimbingan_aktif');
 
             DB::commit();
             return redirect()->route('admin.pembimbings.index')->with('success', 'Bimbingan magang berhasil ditetapkan.');
@@ -129,9 +137,9 @@ class BimbinganController extends Controller
             $pembimbing = $bimbinganMagang->pembimbing; // Get the related pembimbing
             $bimbinganMagang->delete();
 
-            // Decrement active quota if the bimbingan was active
-            if ($pembimbing && $pembimbing->kuota_aktif > 0) {
-                $pembimbing->decrement('kuota_aktif');
+            // Corrected: Decrement 'kuota_bimbingan_aktif'
+            if ($pembimbing && $pembimbing->kuota_bimbingan_aktif > 0) {
+                $pembimbing->decrement('kuota_bimbingan_aktif');
             }
 
             DB::commit();

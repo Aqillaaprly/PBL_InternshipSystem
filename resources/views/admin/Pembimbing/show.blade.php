@@ -6,11 +6,14 @@
     <title>Detail Pembimbing - {{ $pembimbing->nama_lengkap ?? ($pembimbing->user->name ?? 'Informasi Pembimbing') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #f7f8fc; }
+        body {
+            font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
+            background-color: #f7f8fc;
+        }
         .profile-header {
             background: linear-gradient(to right, #687EEA, #3B5998);
             color: white;
-            padding: 1rem 1rem;
+            padding: 1.5rem 1.5rem; /* Adjusted padding for better visual */
             border-radius: 1rem 1rem 0 0;
             margin-bottom: -1rem;
             position: relative;
@@ -27,9 +30,16 @@
         }
         .info-item {
             display: flex;
+            flex-direction: column; /* Stack on small screens */
             justify-content: space-between;
             padding: 1rem 0;
             border-bottom: 1px solid #f3f4f6;
+        }
+        @media (min-width: 640px) { /* Apply row layout on screens larger than 'sm' */
+            .info-item {
+                flex-direction: row;
+                align-items: center;
+            }
         }
         .info-item:last-child {
             border-bottom: none;
@@ -39,17 +49,30 @@
             font-size: 0.875rem;
             display: flex;
             align-items: center;
+            margin-bottom: 0.25rem; /* Add some space below label on small screens */
+        }
+        @media (min-width: 640px) {
+            .info-label {
+                margin-bottom: 0;
+            }
         }
         .info-value {
             color: #111827;
             font-weight: 500;
-            text-align: right;
+            text-align: left; /* Align value to left on small screens */
+            word-break: break-word; /* Ensure long emails/text break lines */
+        }
+        @media (min-width: 640px) {
+            .info-value {
+                text-align: right; /* Align value to right on larger screens */
+            }
         }
         .badge {
             padding: 0.25rem 0.75rem;
             font-size: 0.75rem;
             font-weight: 600;
             border-radius: 9999px;
+            display: inline-block; /* Ensure badge takes its own space */
         }
         .badge-aktif {
             background-color: #d1fae5;
@@ -69,15 +92,23 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none; /* Remove underline from link */
         }
         .action-button:hover {
             background-image: linear-gradient(to right, #4338ca, #6d28d9);
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
+        .table-responsive {
+            overflow-x: auto; /* Make table responsive for small screens */
+        }
+        th, td {
+            white-space: nowrap; /* Prevent text wrapping in table headers/cells */
+        }
     </style>
 </head>
 <body class="text-gray-800">
+    {{-- Include the admin navigation bar --}}
     @include('admin.template.navbar')
 
     <main class="max-w-3xl mx-auto px-4 py-8 mt-20">
@@ -86,17 +117,20 @@
         </div>
 
         <div class="info-card">
+            {{-- Display success message if available --}}
             @if (session('success'))
                 <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-md mb-4" role="alert">
                     {{ session('success') }}
                 </div>
             @endif
+            {{-- Display error message if available --}}
             @if (session('error'))
                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md mb-4" role="alert">
                     {{ session('error') }}
                 </div>
             @endif
 
+            {{-- Check if pembimbing data exists --}}
             @if(isset($pembimbing) && $pembimbing->id)
                 <div class="space-y-4 text-sm">
                     <div class="info-item"><span class="info-label">Nama Lengkap</span><span class="info-value">{{ $pembimbing->nama_lengkap ?? '-' }}</span></div>
@@ -106,9 +140,10 @@
                     <div class="info-item"><span class="info-label">Jabatan Fungsional</span><span class="info-value">{{ $pembimbing->jabatan_fungsional ?? '-' }}</span></div>
                     <div class="info-item"><span class="info-label">Program Studi Homebase</span><span class="info-value">{{ $pembimbing->program_studi_homebase ?? '-' }}</span></div>
                     <div class="info-item"><span class="info-label">Bidang Keahlian Utama</span><span class="info-value">{{ $pembimbing->bidang_keahlian_utama ?? '-' }}</span></div>
-                    <div class="info-item"><span class="info-label">Kuota Bimbingan Aktif</span><span class="info-value">{{ $pembimbing->kuota_aktif ?? 0 }}</span></div>
+                    <div class="info-item"><span class="info-label">Kuota Bimbingan Aktif</span><span class="info-value">{{ $pembimbing->kuota_bimbingan_aktif ?? 0 }}</span></div> {{-- Changed to kuota_bimbingan_aktif --}}
                     <div class="info-item"><span class="info-label">Maksimal Kuota</span><span class="info-value">{{ $pembimbing->maks_kuota_bimbingan ?? 0 }}</span></div>
-                    <div class="info-item"><span class="info-label">Status Aktif</span>
+                    <div class="info-item">
+                        <span class="info-label">Status Aktif</span>
                         <span class="info-value">
                             <span class="badge {{ $pembimbing->status_aktif ? 'badge-aktif' : 'badge-nonaktif' }}">
                                 {{ $pembimbing->status_aktif ? 'Aktif' : 'Tidak Aktif' }}
@@ -119,9 +154,8 @@
 
                 {{-- NEW SECTION: Mahasiswa Bimbingan --}}
                 <div class="border-t border-gray-200 pt-6 mt-6 text-sm">
-                    <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-lg font-semibold text-gray-700">Mahasiswa Bimbingan</h2>
-                    
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold text-gray-700 mb-2 sm:mb-0">Mahasiswa Bimbingan</h2>
                     </div>
 
                     @if($pembimbing->bimbinganMagangs->isNotEmpty())
@@ -134,9 +168,12 @@
                                         <th class="px-4 py-2">Nama Mahasiswa</th>
                                         <th class="px-4 py-2">Program Studi</th>
                                         <th class="px-4 py-2">Perusahaan</th>
+                                        <th class="px-4 py-2">Tanggal Mulai</th> {{-- Added Tanggal Mulai Header --}}
+                                        <th class="px-4 py-2">Tanggal Selesai</th> {{-- Added Tanggal Selesai Header --}}
                                         <th class="px-4 py-2 text-center">Status Bimbingan</th>
                                     </tr>
                                 </thead>
+
                                 <tbody class="text-gray-600">
                                     @foreach($pembimbing->bimbinganMagangs as $index => $bimbingan)
                                         <tr class="border-b hover:bg-gray-50">
@@ -145,6 +182,8 @@
                                             <td class="px-4 py-2">{{ $bimbingan->mahasiswa->name ?? '-' }}</td>
                                             <td class="px-4 py-2">{{ $bimbingan->mahasiswa->detailMahasiswa->program_studi ?? '-' }}</td>
                                             <td class="px-4 py-2">{{ $bimbingan->company->nama_perusahaan ?? '-' }}</td>
+                                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($bimbingan->tanggal_mulai)->format('d M Y') ?? '-' }}</td> {{-- Display Tanggal Mulai --}}
+                                            <td class="px-4 py-2">{{ \Carbon\Carbon::parse($bimbingan->tanggal_selesai)->format('d M Y') ?? '-' }}</td> {{-- Display Tanggal Selesai --}}
                                             <td class="px-4 py-2 text-center">
                                                 <span class="badge
                                                     @if($bimbingan->status_bimbingan == 'Aktif') bg-green-100 text-green-700
@@ -177,6 +216,7 @@
         </div>
     </main>
 
+    {{-- Include the admin footer --}}
     @include('admin.template.footer')
 </body>
 </html>
