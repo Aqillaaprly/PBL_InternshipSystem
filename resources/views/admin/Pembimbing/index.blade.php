@@ -17,6 +17,14 @@
             border-radius: 9999px;
             display: inline-block;
         }
+        /* Ensure table cells do not wrap text */
+        .min-w-full th, .min-w-full td {
+            white-space: nowrap;
+        }
+        /* Add horizontal scroll if content overflows */
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -65,7 +73,7 @@
                             <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="text-gray-600 text-left">
+                    <tbody class="overflow-x: auto;text-gray-600 text-left">
                         @forelse ($pembimbings as $index => $pembimbing)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
                                 <td class="px-5 py-4 text-center">{{ $pembimbings->firstItem() + $index }}</td>
