@@ -36,7 +36,7 @@
                 <label class="block text-gray-600 mb-1">Password</label>
                 <input type="password" name="password" id="password" required
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
-                <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-xl">🙉</span>
+                <span id="togglePassword" class="absolute right-3 top-9 cursor-pointer text-xl">🙈</span>
             </div>
 
             <button type="submit"
@@ -53,7 +53,7 @@
         togglePassword.addEventListener('click', () => {
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
-            togglePassword.textContent = type === 'password' ? '🙉' : '🙈';
+            togglePassword.textContent = type === 'password' ? '🙈' : '🙉';
         });
     </script>
 
