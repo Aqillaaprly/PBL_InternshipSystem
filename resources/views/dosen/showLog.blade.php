@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Detail Log Bimbingan - {{ $mahasiswa->name ?? $mahasiswa->username }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -23,10 +23,12 @@
                 <div><strong>Status:</strong>
                     <span class="inline-block px-2 py-0.5 bg-green-100 text-green-600 rounded text-xs">Aktif</span>
                 </div>
-                <div><strong>Metode Bimbingan:</strong> WhatsApp</div>
-                <div><strong>Waktu Bimbingan:</strong> 2025-05-19 11:47:00</div>
-                <div class="md:col-span-2"><strong>Topik Bimbingan:</strong> Diskusi terkait Data Pengujian yang Didapatkan dari Mitra</div>
-                <div class="md:col-span-2"><strong>Deskripsi:</strong> Deskripsi Bimbingan</div>
+                @foreach($logs as $log)
+                <div><strong>Metode Bimbingan:</strong> {{ $log->metode_bimbingan }}</div>
+                <div><strong>Waktu Bimbingan:</strong> {{ $log->waktu_bimbingan }}</div>
+                <div class="md:col-span-2"><strong>Topik Bimbingan:</strong> {{ $log->topik_bimbingan }}</div>
+                <div class="md:col-span-2"><strong>Deskripsi:</strong> {{ $log->deskripsi }}</div>
+                @endforeach
             </div>
 
             <div class="mb-4">
@@ -51,24 +53,21 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach($logs as $index => $log)
                         <tr class="bg-white">
-                            <td class="py-2 px-4 border">1</td>
+                            <td class="py-2 px-4 border">{{ $index + 1 }}</td>
                             <td class="py-2 px-4 border">{{ $mahasiswa->username }}</td>
                             <td class="py-2 px-4 border">{{ $mahasiswa->name }}</td>
-                            <td class="py-2 px-4 border w-20">
-                                <input type="number" name="nilai" class="w-full border rounded px-2 py-1" value="80">
-                            </td>
-                            <td class="py-2 px-4 border">
-                                <input type="text" name="komentar" class="w-full border rounded px-2 py-1">
-                            </td>
+                            <td class="py-2 px-4 border w-20">{{ $log->nilai }}</td>
+                            <td class="py-2 px-4 border">{{ $log->komentar }}</td>
                         </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
 
-            <div class="flex justify-between items-center">
-                <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Simpan</button>
-                <button class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Keluar</button>
+            <div class="flex justify-end items-center">
+                <a href="{{ route('dosen.data_log') }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Keluar</a>
             </div>
 
             <div class="text-xs text-gray-500 mt-6 border-t pt-3">
