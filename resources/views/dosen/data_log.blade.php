@@ -55,17 +55,15 @@
                                 </td>
                                 <td class="px-5 py-4">{{ $bimbingan->periode_magang ?? '-' }}</td>
                                 <td class="px-5 py-4">
-                                    <div class="flex item-center justify-center space-x-1">
-                                        <a href="{{ route('dosen.data_log.show', $bimbingan->status_bimbingan) }}" class="bg-green-100 text-green-600 text-xs font-medium px-3 py-1 rounded hover:bg-green-200">
-                                            Aktif
-                                        </a>
-                                    </div>
+                                    <span class="bg-green-100 text-green-600 text-xs font-medium px-3 py-1 rounded">
+                                        {{ $bimbingan->status_bimbingan ?? 'Aktif' }}
+                                    </span>
                                 </td>
                                 <td class="px-5 py-4">{{ $bimbingan->pembimbing->nama_lengkap ?? '-' }}</td>
                                 <td class="px-5 py-4">{{ $bimbingan->company->nama_perusahaan ?? '-' }}</td>
                                 <td class="px-5 py-4">
                                     <div class="flex item-center justify-center space-x-1">
-                                        <a href="{{ route('dosen.data_log.show', $bimbingan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
+                                        <a href="{{ route('dosen.data_log.show', $bimbingan->mahasiswa_user_id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
                                             Show Log
                                         </a>
                                         <a href="{{ route('dosen.log_bimbingan.create', $bimbingan->id) }}" class="bg-blue-100 text-blue-600 text-xs font-medium px-3 py-1 rounded hover:bg-blue-200">
