@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Pembimbing; // Import model Pembimbing
 use App\Models\Role; // Import model Role
 use App\Models\User; // Import model User
+use App\Models\Mahasiswa; // Import model Mahasiswa
 use Illuminate\Http\Request; // Import kelas Request
 use Illuminate\Support\Facades\Hash; // Import facade Hash untuk hashing password
 use Illuminate\Support\Facades\Validator; // Import facade Validator untuk validasi data
@@ -36,6 +37,7 @@ class PembimbingController extends Controller
             });
         }
         $pembimbings = $query->paginate(10)->withQueryString();
+
 
         return view('admin.Pembimbing.index', compact('pembimbings'));
     }
@@ -109,6 +111,7 @@ class PembimbingController extends Controller
                 'program_studi_homebase' => $request->program_studi_homebase,
                 'bidang_keahlian_utama' => $request->bidang_keahlian_utama,
                 'maks_kuota_bimbingan' => $request->maks_kuota_bimbingan,
+                'kuota_aktif' => 0, // Initialize active quota to 0 when creating a new pembimbing
                 'status_aktif' => $request->status_aktif,
             ]);
 
@@ -132,14 +135,13 @@ class PembimbingController extends Controller
     {
         // Eager load 'user' for the pembimbing itself,
         // and 'bimbinganMagangs' with nested 'mahasiswa' (which is a User model)
-        // and 'detailMahasiswa' (the Mahasiswa profile data), and 'company'
+        // and 'detailMahasiswa' (the Mahasiswa profile data), and 'company)
         $pembimbing->load([
             'user',
             'bimbinganMagangs' => function ($query) {
                 $query->with(['mahasiswa.detailMahasiswa', 'company']);
             }
         ]);
-// dd($pembimbing->bimbinganMagangs);
         return view('admin.Pembimbing.show', compact('pembimbing'));
     }
 
@@ -147,7 +149,20 @@ class PembimbingController extends Controller
     {
         $pembimbing->load('user');
 
-        return view('admin.Pembimbing.edit', compact('pembimbing'));
+        // Fetch all students (mahasiswa users) with their detailMahasiswa to populate the dropdown
+        $mahasiswaUsers = User::whereHas('role', function ($q) {
+            $q->where('name', 'mahasiswa');
+        })->with('detailMahasiswa')->get();
+
+        // Load bimbinganMagangs for this pembimbing to display and manage them
+        $pembimbing->load([
+            'bimbinganMagangs' => function ($query) {
+                $query->with(['mahasiswa.detailMahasiswa', 'company']);
+            }
+        ]);
+
+
+        return view('admin.Pembimbing.edit', compact('pembimbing', 'mahasiswaUsers')); // Pass mahasiswaUsers to the view
     }
 
     /**
@@ -155,9 +170,9 @@ class PembimbingController extends Controller
      * Memperbarui sumber daya yang ditentukan di penyimpanan (database).
      * Parameter $pembimbing adalah instance dari User (melalui Route Model Binding).
      */
-    public function update(Request $request, User $pembimbing)
+    public function update(Request $request, Pembimbing $pembimbing) // Changed type hint from User to Pembimbing
      {
-        $user = $pembimbing->user;
+        $user = $pembimbing->user; // Access the related user model
 
         $validator = Validator::make($request->all(), [
             'username_login' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id ?? null)],

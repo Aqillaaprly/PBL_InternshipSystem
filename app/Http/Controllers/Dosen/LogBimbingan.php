@@ -60,7 +60,6 @@ class LogBimbingan extends Controller
         // Simpan log bimbingan
         LogBimbinganMagang::create([
             'bimbingan_magang_id' => $bimbingan->id,
-            'mahasiswa_id' => $bimbingan->mahasiswa_id,
             'metode_bimbingan' => $request->metode_bimbingan,
             'waktu_bimbingan' => $request->waktu_bimbingan,
             'topik_bimbingan' => $request->topik_bimbingan,

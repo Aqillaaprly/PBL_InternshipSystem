@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('log_bimbingan_magangs', function (Blueprint $table) {
         $table->id();
         $table->foreignId('bimbingan_magang_id')->constrained('bimbingan_magangs')->onDelete('cascade');
-        $table->foreignId('mahasiswa_user_id')->constrained('users');
         $table->string('metode_bimbingan');
         $table->date('waktu_bimbingan');
         $table->string('topik_bimbingan');

@@ -15,6 +15,16 @@
         .status-dokumen-valid { background-color: #d1fae5; color: #065f46; }
         .status-dokumen-pending { background-color: #fef3c7; color: #92400e; }
         .status-dokumen-tidak-lengkap { background-color: #fee2e2; color: #991b1b; }
+
+
+         /* Ensure table cells do not wrap text */
+        .min-w-full th, .min-w-full td {
+            white-space: nowrap;
+        }
+        /* Add horizontal scroll if content overflows */
+        .overflow-x-auto {
+            overflow-x: auto;
+        }
     </style>
 </head>
 

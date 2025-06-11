@@ -43,15 +43,13 @@ class MahasiswaBimbinganController extends Controller
      * @param \App\Models\User $mahasiswa The User model instance, resolved by Route Model Binding.
      * @return \Illuminate\View\View
      */
-    public function show(User $mahasiswa)
-    {
-        // The $mahasiswa object is already resolved by Route Model Binding.
-        // We only need to eager load its 'detailMahasiswa' relationship to access student-specific data
-        // associated with this user, ensuring it's available in the view.
-        $mahasiswa->load('detailMahasiswa');
+   public function show($id)
+{
+    $bimbingan = BimbinganMagang::with(['mahasiswa.detailMahasiswa'])->findOrFail($id);
 
-        // Pass the resolved and loaded $mahasiswa object to the view.
-        // Ensure the view 'dosen.showdataM' exists at resources/views/dosen/showdataM.blade.php
-        return view('dosen.showdataM', compact('mahasiswa'));
-    }
+    return view('dosen.showdataM', [
+        'mahasiswa' => $bimbingan->mahasiswa, // kirim mahasiswa saja ke view
+    ]);
+}
+
 }
