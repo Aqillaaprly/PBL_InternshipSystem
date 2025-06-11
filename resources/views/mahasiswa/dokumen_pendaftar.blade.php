@@ -1,4 +1,4 @@
-<div class="space-y-4">
+<div class="space-y-4 bg-[#F0F8FF] p-4 rounded-lg">
     @foreach($dokumen as $doc)
     <div class="border-b pb-4">
         <div class="flex justify-between items-start">

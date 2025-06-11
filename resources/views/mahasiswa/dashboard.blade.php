@@ -19,7 +19,7 @@
                  class="w-full h-48 object-cover rounded-b-lg shadow" />
         </div>
         <div class="text-center mb-10">
-            <h1 class="text-3xl font-bold text-blue-900">Selamat Datang, {{ Auth::user()->username ?? 'Admin' }}!</h1>
+            <h1 class="text-3xl font-bold text-blue-900">Selamat Datang, {{ Auth::user()->name ?? 'Admin' }}!</h1>
             <p class="text-sm text-gray-600">Dashboard Sistem Informasi Manajemen Magang Mahasiswa</p>
         </div>
 
@@ -64,6 +64,25 @@
         <!-- Job Cards Section -->
         <div>
             @include('mahasiswa.job')
+        </div>
+
+        <!-- Add this right after the Job Cards Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mt-10">
+            <h2 class="text-xl font-bold text-blue-800 mb-6">Dokumen Tambahan</h2>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                    <span class="font-medium">Template Pakta Integritas Magang Pusat 2023</span>
+                    <a href="https://drive.google.com/uc?export=download&id=1L5dW2IC8nY5lRI4Qiz7pZapQE5EoXnsS" class="text-blue-600 hover:text-blue-800 font-medium px-4 py-2 bg-white rounded-md shadow-sm transition">Download</a>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                    <span class="font-medium">Format Daftar Riwayat Hidup 2023</span>
+                    <a href="https://drive.google.com/uc?export=download&id=1b5mgDlF_YbR9btr-eyLKPfWaY7tsXo4i" class="text-blue-600 hover:text-blue-800 font-medium px-4 py-2 bg-white rounded-md shadow-sm transition">Download</a>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                    <span class="font-medium">Template Izin Ortu 2023</span>
+                    <a href="https://drive.google.com/uc?export=download&id=1gNeyZ2J1-xV_RFeCbB8bqnW3nf8-VNQf" class="text-blue-600 hover:text-blue-800 font-medium px-4 py-2 bg-white rounded-md shadow-sm transition">Download</a>
+                </div>
+            </div>
         </div>
     </main>
 </div>

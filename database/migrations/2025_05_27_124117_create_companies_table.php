@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('telepon', 20)->nullable()->unique();
             $table->string('email_perusahaan')->nullable()->unique();
             $table->string('website');
+            $table->string('about')->nullable()->unique();
             $table->text('deskripsi')->nullable();
             $table->string('logo_path');
             $table->enum('status_kerjasama', ['Aktif', 'Non-Aktif', 'Review'])->default('Review');

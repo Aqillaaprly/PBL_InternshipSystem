@@ -16,14 +16,17 @@
             border-bottom: 1px solid #e5e7eb;
         }
         .document-table th {
-            background-color: #f3f4f6;
+            background-color: #F0F8FF;
             color: #374151;
+        }
+        body {
+            background-color: #F0F8FF;
         }
     </style>
 </head>
 @include('mahasiswa.template.navbar')
 
-<body class="bg-gray-50 text-gray-800 pt-20">
+<body class="pt-20">
 <div class="max-w-5xl mx-auto p-4 space-y-6">
     <!-- Status Table -->
     <div class="bg-white rounded-xl shadow-md p-6">

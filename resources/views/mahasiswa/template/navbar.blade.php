@@ -18,7 +18,7 @@
                 </button>
 
                 <a href="{{ route('mahasiswa.dashboard') }}" class="text-blue-700 font-extrabold text-xl tracking-tight hover:text-blue-800">
-                    STRIDEUP
+                    STRIDE UP
                 </a>
             </div>
             <!-- Center: Navigation Menu -->
@@ -160,5 +160,12 @@
             }
         });
     }
+
+    // Add this to the existing script section
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        // You'll need to implement the sidebar functionality
+        console.log('Sidebar toggle clicked - implement sidebar functionality here');
+        // This is just a placeholder - you'll need to create and toggle a sidebar element
+    });
 </script>
 <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>

@@ -112,6 +112,25 @@
                         </div>
                     </div>
 
+                    <!-- About Card -->
+                    @if($company->about)
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
+                        <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                            <i class="fas fa-quote-left text-blue-500 mr-3"></i>
+                            Tentang Perusahaan
+                        </h2>
+                        <p class="text-gray-700 leading-relaxed">
+                            @if(filter_var($company->about, FILTER_VALIDATE_URL))
+                            <a href="{{ $company->about }}" target="_blank" class="text-blue-600 hover:underline break-all">
+                                {{ $company->about }}
+                            </a>
+                            @else
+                            {{ $company->about }}
+                            @endif
+                        </p>
+                    </div>
+                    @endif
+
                     <!-- Description Card -->
                     <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
