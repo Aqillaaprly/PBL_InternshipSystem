@@ -23,8 +23,8 @@
 
 <div class="container mx-auto p-4 md:p-8 max-w-5xl">
     <header class="text-center mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Kalkulator Fuzzy TOPSIS</h1>
-        <p class="text-md text-gray-600 mt-2">Berikan penilaian kualitatif untuk setiap alternatif pada setiap kriteria.</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Survey Rekomendasi Magang</h1>
+        <p class="text-md text-gray-600 mt-2">Pilihlah Keahlian Yang Mahir Dilakukan dan Survey Ini Akan Menentukan Rekomendasi Maggangmu!.</p>
     </header>
 
     <main class="bg-white p-6 rounded-xl shadow-lg">
@@ -65,7 +65,7 @@
 
 <script>
     // --- KONFIGURASI DAN DATA YANG DITENTUKAN ---
-    const ALTERNATIVE_NAMES = ['Fullstack Developer', 'Web Developer', 'UIUX Designer', 'Data Analyst', 'Data Scientist'];
+    const ALTERNATIVE_NAMES = ['Fullstack Developer', 'Backend Developer', 'UI/UX Designer', 'Data Analyst', 'Data Scientist'];
     const CRITERIA_NAMES = ['Skill', 'Minat', 'Pengalaman', 'Language/Tool Proficiency'];
 
     // Jenis kriteria sudah ditentukan: 'cost' untuk Harga, sisanya 'benefit'

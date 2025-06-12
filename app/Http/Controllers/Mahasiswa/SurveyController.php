@@ -63,8 +63,8 @@ class SurveyController extends Controller
         // Get the recommended job title from ALTERNATIVE_NAMES
         $jobTitles = [
             'Fullstack Developer',
-            'Web Developer',
-            'UIUX Designer',
+            'Backend Developer',
+            'UI/UX Designer',
             'Data Analyst',
             'Data Scientist'
         ];
