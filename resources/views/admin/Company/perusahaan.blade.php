@@ -54,17 +54,6 @@
                 </div>
             </form>
 
-            @if (session('success'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded-md relative mb-4" role="alert">
-                    <span class="block sm:inline">{{ session('success') }}</span>
-                </div>
-            @endif
-            @if (session('error'))
-                 <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md relative mb-4" role="alert">
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                </div>
-            @endif
-
             <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="min-w-full text-sm text-left">
                     <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
@@ -142,5 +131,80 @@
 
     @include('admin.template.footer')
 
+    <script>
+        // Display success message
+        @if (session('success'))
+            Toastify({
+                text: "{{ session('success') }}",
+                duration: 3000, // 3 seconds
+                newWindow: true,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing on hover
+                style: {
+                    background: "linear-gradient(to right, #4CAF50, #66BB6A)", // Green gradient
+                    borderRadius: "0.6rem", // Tailored to your form-card rounded-lg
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)", // A subtle shadow
+                    padding: "1rem 1.5rem" // Good padding
+                },
+                offset: { // Offset from the corner
+                    x: 20, // horizontal axis - can be a number or a string indicating unity. eg: "2em"
+                    y: 20 // vertical axis - can be a number or a string indicating unity. eg: "2em"
+                },
+                onClick: function(){} // Callback after click
+            }).showToast();
+        @endif
+
+        // Display error message (e.g., from controller catches)
+        @if (session('error'))
+            Toastify({
+                text: "{{ session('error') }}",
+                duration: 5000, // Longer duration for errors
+                newWindow: true,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                style: {
+                    background: "linear-gradient(to right, #EF4444, #DC2626)", // Red gradient
+                    borderRadius: "0.6rem",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    padding: "1rem 1.5rem"
+                },
+                offset: {
+                    x: 20,
+                    y: 20
+                },
+                onClick: function(){}
+            }).showToast();
+        @endif
+
+        // Display validation errors (iterates through $errors->all())
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                Toastify({
+                    text: "{{ $error }}",
+                    duration: 5000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #F59E0B, #D97706)", // Orange/Amber gradient for warnings/validation
+                        borderRadius: "0.6rem",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        padding: "1rem 1.5rem"
+                    },
+                    offset: {
+                        x: 20,
+                        y: 20 + {{ $loop->index * 70 }} // Stagger multiple toasts if many errors
+                    },
+                    onClick: function(){}
+                }).showToast();
+            @endforeach
+        @endif
+    </script>
 </body>
 </html>
