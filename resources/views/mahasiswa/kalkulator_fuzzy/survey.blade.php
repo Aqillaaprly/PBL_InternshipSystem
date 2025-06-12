@@ -5,27 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalkulator Fuzzy TOPSIS (Linguistik & Detail)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Softer blue-gray background */
+            color: #334155; /* Default text color */
         }
-        .prose table { @apply min-w-full border-collapse border border-gray-300; }
-        .prose th, .prose td { @apply border border-gray-300 p-2 text-sm; }
-        .prose thead { @apply bg-gray-100; }
-        .prose h4 { @apply mt-6 mb-2 text-lg font-semibold; }
+        /* Custom styles for tables within prose-like content */
+        .prose table {
+            @apply min-w-full border-collapse border border-gray-200 rounded-xl shadow-sm overflow-hidden; /* Larger border-radius, subtle shadow */
+        }
+        .prose th, .prose td {
+            @apply border border-gray-200 p-3.5 text-sm; /* Increased padding, lighter border */
+        }
+        .prose thead {
+            @apply bg-blue-50 text-blue-800 font-semibold uppercase tracking-wider; /* Blue header, uppercase, tracking */
+        }
+        .prose tbody tr:nth-child(odd) {
+            @apply bg-white;
+        }
+        .prose tbody tr:nth-child(even) {
+            @apply bg-gray-50;
+        }
+        .prose tbody tr:hover {
+            @apply bg-blue-50 transition-colors duration-150 ease-in-out; /* Hover effect */
+        }
+        .prose h4 {
+            @apply mt-10 mb-4 text-xl font-extrabold text-gray-800 border-b pb-2 border-indigo-200; /* Larger, bolder, subtle border */
+        }
+        /* Specific styling for the recommendation box */
+        .recommendation-box {
+            @apply bg-gradient-to-br from-blue-600 to-indigo-700 p-8 rounded-2xl border-4 border-blue-400 shadow-xl text-white; /* Stronger gradient, border, shadow, white text */
+        }
+        .recommendation-box h4 {
+            @apply text-2xl font-extrabold text-white mb-3 !mt-0; /* White heading, larger */
+        }
+        .recommendation-box p {
+            @apply text-white text-3xl font-bold; /* Larger text for recommendation */
+        }
+        /* Styling for select dropdowns */
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='currentColor'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em;
+            padding-right: 2.5rem;
+        }
     </style>
 </head>
 
-{{-- Navbar --}}
-@include('mahasiswa.template.navbar')
-<body class="bg-blue-50 text-gray-800 pt-20">
+<body>
+    @include('mahasiswa.template.navbar')
 
-<div class="container mx-auto p-4 md:p-8 max-w-5xl">
-    <header class="text-center mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Survey Rekomendasi Magang</h1>
-        <p class="text-md text-gray-600 mt-2">Pilihlah Keahlian Yang Mahir Dilakukan dan Survey Ini Akan Menentukan Rekomendasi Maggangmu!.</p>
-    </header>
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl mt-20"> <!-- Increased max-width for more space -->
+        <header class="text-center mb-12"> <!-- Increased margin-bottom -->
+            <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight tracking-tight">Survey Rekomendasi Magang</h1>
+            <p class="text-xl text-gray-600 mt-4">Pilihlah Keahlian yang Mahir Dilakukan dan Survey Ini Akan Menentukan Rekomendasi Magangmu!</p>
+        </header>
 
     <main class="bg-white p-6 rounded-xl shadow-lg">
         <div id="input-section">
@@ -216,94 +256,114 @@
                 </table>
 
                 <h4>2. Solusi Ideal Positif (FPIS, A*) & Negatif (FNIS, A-)</h4>
-                 <table>
-                    <thead><tr><th></th>${CRITERIA_NAMES.map(name => `<th>${name}</th>`).join('')}</tr></thead>
-                    <tbody>
-                        <tr><td><b>FPIS (A*)</b></td>${results.fpis.map(cell => `<td>${formatTFN(cell)}</td>`).join('')}</tr>
-                        <tr><td><b>FNIS (A-)</b></td>${results.fnis.map(cell => `<td>${formatTFN(cell)}</td>`).join('')}</tr>
-                    </tbody>
-                </table>
+                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md mb-6"> <!-- Added rounded corners and subtle shadow -->
+                    <table class="min-w-full">
+                        <thead class="bg-blue-50">
+                            <tr>
+                                <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider"></th>
+                                ${CRITERIA_NAMES.map(name => `<th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">${name}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr class="bg-white hover:bg-blue-50 transition-colors duration-150 ease-in-out">
+                                <td class="border border-gray-200 p-3.5 font-medium text-gray-800"><b>FPIS (A*)</b></td>${results.fpis.map(cell => `<td class="border border-gray-200 p-3.5">${formatTFN(cell)}</td>`).join('')}</tr>
+                            <tr class="bg-gray-50 hover:bg-blue-50 transition-colors duration-150 ease-in-out">
+                                <td class="border border-gray-200 p-3.5 font-medium text-gray-800"><b>FNIS (A-)</b></td>${results.fnis.map(cell => `<td class="border border-gray-200 p-3.5">${formatTFN(cell)}</td>`).join('')}</tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <h4>3. Jarak dan Koefisien Kedekatan (CC)</h4>
-                <table>
-                    <thead><tr><th>Alternatif</th><th>Jarak ke FPIS (d+)</th><th>Jarak ke FNIS (d-)</th><th>Koefisien Kedekatan (CCi)</th></tr></thead>
-                    <tbody>
-                        ${ALTERNATIVE_NAMES.map((name, i) => `
+                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md mb-6"> <!-- Added rounded corners and subtle shadow -->
+                    <table class="min-w-full">
+                        <thead class="bg-blue-50">
                             <tr>
-                                <td><b>${name}</b></td>
-                                <td>${results.dPositive[i].toFixed(5)}</td>
-                                <td>${results.dNegative[i].toFixed(5)}</td>
-                                <td>${results.cc[i].toFixed(5)}</td>
+                                <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">Alternatif</th>
+                                <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">Jarak ke FPIS (d+)</th>
+                                <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">Jarak ke FNIS (d-)</th>
+                                <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">Koefisien Kedekatan (CCi)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            ${ALTERNATIVE_NAMES.map((name, i) => `
+                                <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150 ease-in-out">
+                                    <td class="border border-gray-200 p-3.5 font-medium text-gray-800"><b>${name}</b></td>
+                                    <td class="border border-gray-200 p-3.5">${results.dPositive[i].toFixed(5)}</td>
+                                    <td class="border border-gray-200 p-3.5">${results.dNegative[i].toFixed(5)}</td>
+                                    <td class="border border-gray-200 p-3.5">${results.cc[i].toFixed(5)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            // HTML for final ranking (this will be immediately visible)
+            let rankingHtml = `
+            <h3 class="text-2xl font-bold text-gray-800 mb-5">Hasil Akhir Peringkat</h3>
+            <div class="overflow-x-auto">
+                <table class="data-table ranking-table">
+                    <thead><tr><th>Peringkat</th><th>Alternatif Magang</th><th>Nilai CC</th></tr></thead>
+                    <tbody>
+                        ${results.ranked.map((item, index) => `
+                            <tr class="${index === 0 ? 'bg-green-100 font-bold text-green-800' : ''}">
+                                <td class="text-center text-lg">${index + 1}</td>
+                                <td>${ALTERNATIVE_NAMES[item.alternative]}</td>
+                                <td>${item.value.toFixed(5)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
+            </div>
+            <div class="recommendation-box mt-10">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6"> <!-- Increased gap -->
+                    <div class="text-center md:text-left">
+                        <h4>Rekomendasi Magang Terbaik Untukmu:</h4>
+                        <p class="mt-2">${ALTERNATIVE_NAMES[results.ranked[0].alternative]}</p>
+                    </div>
+                    <form id="recommendation-form" action="/mahasiswa/survey/accept" method="POST"> <!-- Placeholder action -->
+                        <!-- @csrf (Blade directive placeholder) -->
+                        <input type="hidden" name="recommended_job_id" value="${results.ranked[0].alternative + 1}">
+                        <button type="submit" class="px-8 py-4 bg-white text-indigo-700 font-bold rounded-xl shadow-lg hover:bg-indigo-100 transition duration-200 ease-in-out transform hover:scale-105 text-lg">
+                            Ajukan Sekarang!
+                        </button>
+                    </form>
+                </div>
+            </div>
             `;
 
-        // HTML untuk peringkat akhir (ini yang akan terlihat langsung)
-        let rankingHtml = `
-        <h3 class="mt-8">Hasil Akhir Peringkat</h3>
-        <table>
-            <thead class="bg-gray-200"><tr><th>Peringkat</th><th>Alternatif</th><th>Nilai CC</th></tr></thead>
-            <tbody>
-                ${results.ranked.map((item, index) => `
-                    <tr class="font-medium ${index === 0 ? 'bg-green-100' : ''}">
-                        <td class="text-center text-lg">${index + 1}</td>
-                        <td>${ALTERNATIVE_NAMES[item.alternative]}</td>
-                        <td>${item.value.toFixed(5)}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h4 class="font-semibold text-blue-800">Rekomendasi Magang:</h4>
-                    <p class="text-blue-900">${ALTERNATIVE_NAMES[results.ranked[0].alternative]}</p>
-                </div>
-                <form id="recommendation-form" action="{{ route('mahasiswa.survey.accept') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="recommended_job_id" value="${results.ranked[0].alternative + 1}">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
-                        Apply
-                    </button>
-                </form>
-            </div>
+            resultsOutput.innerHTML = detailsHtml;
+            finalRankingOutput.innerHTML = rankingHtml;
+            window.scrollTo({ top: resultsSection.offsetTop - 40, behavior: 'smooth' }); // Adjusted scroll offset
+        }
+
+        calculateBtn.addEventListener('click', () => {
+            const inputs = gatherInputs();
+            if (inputs) {
+                const results = fuzzyTopsis(inputs.decisionMatrix, inputs.criteriaTypes);
+                displayResults(results);
+            }
+        });
+
+        toggleDetailsBtn.addEventListener('click', () => {
+            if (calculationDetails.classList.contains('hidden')) {
+                calculationDetails.classList.remove('hidden');
+                toggleDetailsBtn.textContent = 'Sembunyikan Detail';
+            } else {
+                calculationDetails.classList.add('hidden');
+                toggleDetailsBtn.textContent = 'Tampilkan Detail';
+            }
+            window.scrollTo({ top: resultsSection.offsetTop - 40, behavior: 'smooth' }); // Adjusted scroll offset
+        });
+
+        window.onload = generateInputsUI;
+    </script>
+
+    <!-- Footer Placeholder (Original was @include('mahasiswa.template.footer')) -->
+    <footer class="bg-gray-800 text-white p-6 mt-20">
+        <div class="container mx-auto text-center text-sm">
+            &copy; 2024 Aplikasi Magang. All rights reserved.
         </div>
-    `;
-
-        resultsOutput.innerHTML = detailsHtml; // Isi detail perhitungan
-        finalRankingOutput.innerHTML = rankingHtml; // Isi peringkat akhir
-        window.scrollTo({ top: resultsSection.offsetTop - 20, behavior: 'smooth' });
-
-
-    }
-
-    calculateBtn.addEventListener('click', () => {
-        const inputs = gatherInputs();
-        if (inputs) {
-            const results = fuzzyTopsis(inputs.decisionMatrix, inputs.criteriaTypes);
-            displayResults(results);
-        }
-    });
-
-    // Event listener untuk tombol "Tampilkan Detail"
-    toggleDetailsBtn.addEventListener('click', () => {
-        if (calculationDetails.classList.contains('hidden')) {
-            calculationDetails.classList.remove('hidden');
-            toggleDetailsBtn.textContent = 'Sembunyikan Detail';
-        } else {
-            calculationDetails.classList.add('hidden');
-            toggleDetailsBtn.textContent = 'Tampilkan Detail';
-        }
-        window.scrollTo({ top: resultsSection.offsetTop - 20, behavior: 'smooth' }); // Opsional: scroll kembali
-    });
-
-
-    window.onload = generateInputsUI;
-</script>
-
-{{-- Footer --}}
-@include('mahasiswa.template.footer')
+    </footer>
 </body>
 </html>

@@ -9,13 +9,6 @@
     <title>Manajemen Pendaftar - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .status-badge-sm { padding: 0.125rem 0.5rem; font-size: 0.7rem; line-height: 1; border-radius: 9999px; font-weight: 600; white-space: nowrap;}
-        .status-dokumen-overall-validate { background-color: #d1fae5; color: #065f46; } /* bg-green-100 text-green-700 */
-        .status-dokumen-overall-invalidate { background-color: #fee2e2; color: #991b1b; } /* bg-red-100 text-red-700 */
-        .status-dokumen-valid { background-color: #d1fae5; color: #065f46; }
-        .status-dokumen-pending { background-color: #fef3c7; color: #92400e; }
-        .status-dokumen-tidak-lengkap { background-color: #fee2e2; color: #991b1b; }
-
 
          /* Ensure table cells do not wrap text */
         .min-w-full th, .min-w-full td {
@@ -122,4 +115,5 @@
     @include('admin.template.footer')
 
 </body>
+
 </html>

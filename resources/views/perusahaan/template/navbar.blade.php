@@ -35,11 +35,14 @@
                 
                <div class="relative">
                     <button id="profileBtn" class="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full" aria-haspopup="true" aria-expanded="false">
-                        @if (Auth::user()->profile_picture && Storage::disk('public')->exists(Auth::user()->profile_picture))
-                            <img src="{{ asset('storage/' . Auth::user()->profile_picture) }}" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
-                        @else
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->name ?? Auth::user()->username) }}&background=random&color=fff&size=40" alt="User avatar" class="w-10 h-10 rounded-full border border-gray-300 object-cover" />
-                        @endif
+                       @if (Auth::user()->company && Auth::user()->company->logo_path && Storage::disk('public')->exists(Auth::user()->company->logo_path))
+                    <img src="{{ asset('storage/' . Auth::user()->company->logo_path) }}" alt="Logo Perusahaan {{ Auth::user()->company->nama_perusahaan }}"class="w-10 h-10 rounded-full border border-gray-300 object-cover"
+                         class="profile-picture">
+                @else
+                    <img src="https://placehold.co/160x160/f0f0f0/333333?text=Logo+Perusahaan"
+                         alt="Logo Perusahaan Placeholder"
+                         class="profile-picture">
+                @endif
                         <span class="hidden sm:block font-medium text-gray-700">{{ Auth::user()->username ?? 'Perusahaan' }}</span>
                     </button>
                     <div id="profileDropdown" class="origin-top-right absolute right-0 mt-2 w-44 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">

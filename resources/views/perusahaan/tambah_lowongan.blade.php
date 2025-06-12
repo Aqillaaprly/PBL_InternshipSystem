@@ -123,13 +123,17 @@
                         <label for="judul" class="input-label">Judul Lowongan <span class="text-red-500">*</span></label>
                         <select name="judul" id="judul" required class="form-select @error('judul') border-red-500 @enderror">
                             <option value="">Pilih Judul Lowongan</option>
-                            <option value="Digital Marketing Specialist" {{ old('judul') == 'Digital Marketing Specialist' ? 'selected' : '' }}>Digital Marketing Specialist</option>
-                            <option value="Software Engineer" {{ old('judul') == 'Software Engineer' ? 'selected' : '' }}>Software Engineer</option>
-                            <option value="Content Writer" {{ old('judul') == 'Content Writer' ? 'selected' : '' }}>Content Writer</option>
-                            <option value="Human Resources Staff" {{ old('judul') == 'Human Resources Staff' ? 'selected' : '' }}>Human Resources Staff</option>
-                            <option value="Customer Service Representative" {{ old('judul') == 'Customer Service Representative' ? 'selected' : '' }}>Customer Service Representative</option>
-                            <option value="Financial Analyst" {{ old('judul') == 'Financial Analyst' ? 'selected' : '' }}>Financial Analyst</option>
-                            <option value="Desainer Grafis" {{ old('judul') == 'Desainer Grafis' ? 'selected' : '' }}>Desainer Grafis</option>
+                           <option value="Fullstack Developer" {{ old('judul') == 'Fullstack Developer' ? 'selected' : '' }}>Fullstack Developer</option>
+                            <option value="Web Developer" {{ old('judul') == 'Web Developer' ? 'selected' : '' }}>Web Developer</option>
+                            <option value="Machine Learning Engineer" {{ old('judul') == 'Machine Learning Engineer' ? 'selected' : '' }}>Machine Learning Engineer</option>
+                            <option value="Cyber Security" {{ old('judul') == 'Cyber Security' ? 'selected' : '' }}>Cyber Security</option>
+                            <option value="Computer Network" {{ old('judul') == 'Computer Network' ? 'selected' : '' }}>Computer Network</option>
+                            <option value="Quality Assurance" {{ old('judul') == 'Quality Assurance' ? 'selected' : '' }}>Quality Assurance</option>
+                            <option value="System Analyst" {{ old('judul') == 'System Analyst' ? 'selected' : '' }}>System Analyst</option>
+                            <option value="Backend Developer" {{ old('judul') == 'Backend Developer' ? 'selected' : '' }}>Backend Developer</option>
+                            <option value="UI/UX Designer" {{ old('judul') == 'UI/UX Designer' ? 'selected' : '' }}>UI/UX Designer</option>
+                            <option value="Data Analyst" {{ old('judul') == 'Data Analyst' ? 'selected' : '' }}>Data Analyst</option>
+                            <option value="Data Scientist" {{ old('judul') == 'Data Scientist' ? 'selected' : '' }}>Data Scientist</option>
                         </select>
                         @error('judul') <p class="error-message">{{ $message }}</p> @enderror
                     </div>

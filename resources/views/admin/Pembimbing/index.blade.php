@@ -5,10 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manajemen Pembimbing - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    {{-- Font Awesome for icons, if needed --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" xintegrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    {{-- Toastify-JS CDN links for notifications --}}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <style>
         body {
-            font-family: 'Inter', sans-serif; /* Using Inter font as per instructions */
+            font-family: 'Inter', sans-serif;
+            /* Using Inter font as per instructions */
         }
+
         /* Custom styles for badges, alerts, and buttons if needed, consistent with previous immersives */
         .badge {
             padding: 0.25rem 0.75rem;
@@ -17,10 +27,13 @@
             border-radius: 9999px;
             display: inline-block;
         }
+
         /* Ensure table cells do not wrap text */
-        .min-w-full th, .min-w-full td {
+        .min-w-full th,
+        .min-w-full td {
             white-space: nowrap;
         }
+
         /* Add horizontal scroll if content overflows */
         .overflow-x-auto {
             overflow-x: auto;
@@ -44,20 +57,7 @@
                 </div>
             </div>
 
-            {{-- Display success message if available --}}
-            @if (session('success'))
-                <div class="bg-green-100 border-l-4 border-green-500 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <strong class="font-bold">Berhasil!</strong>
-                    <span class="block sm:inline">{{ session('success') }}</span>
-                </div>
-            @endif
-            {{-- Display error message if available --}}
-            @if (session('error'))
-                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
-                    <strong class="font-bold">Gagal!</strong>
-                    <span class="block sm:inline">{{ session('error') }}</span>
-                </div>
-            @endif
+            {{-- Removed the old success/error message divs as they will be handled by Toastify --}}
 
             <div class="overflow-x-auto rounded-lg border border-gray-200">
                 <table class="min-w-full text-sm">
@@ -73,7 +73,7 @@
                             <th class="px-5 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="overflow-x: auto;text-gray-600 text-left">
+                    <tbody class="text-gray-600 text-left">
                         @forelse ($pembimbings as $index => $pembimbing)
                             <tr class="border-b border-gray-200 hover:bg-gray-50">
                                 <td class="px-5 py-4 text-center">{{ $pembimbings->firstItem() + $index }}</td>
@@ -91,7 +91,7 @@
                                 </td>
                                 <td class="px-5 py-4 text-center">
                                     <div class="flex item-center justify-center space-x-1">
-                                        {{-- PASTIKAN BAGIAN INI MENGGUNAKAN NAMA RUTE YANG BENAR --}}
+                                        {{-- Ensure this section uses the correct route names --}}
                                         <a href="{{ route('admin.pembimbings.show', $pembimbing->id) }}" class="bg-sky-100 text-sky-600 text-xs font-medium px-3 py-1 rounded hover:bg-sky-200">Detail</a>
                                         <a href="{{ route('admin.pembimbings.edit', $pembimbing->id) }}" class="bg-yellow-100 text-yellow-600 text-xs font-medium px-3 py-1 rounded hover:bg-yellow-200">Edit</a>
                                         <form action="{{ route('admin.pembimbings.destroy', $pembimbing->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin menghapus pembimbing ini beserta akun login terkait?');">
@@ -129,5 +129,82 @@
 
     {{-- Include the admin footer --}}
     @include('admin.template.footer')
+
+    {{-- Toastify-JS Integration --}}
+    <script>
+        // Display success message
+        @if (session('success'))
+            Toastify({
+                text: "{{ session('success') }}",
+                duration: 3000, // 3 seconds
+                newWindow: true,
+                close: true,
+                gravity: "top", // `top` or `bottom`
+                position: "right", // `left`, `center` or `right`
+                stopOnFocus: true, // Prevents dismissing on hover
+                style: {
+                    background: "linear-gradient(to right, #4CAF50, #66BB6A)", // Green gradient
+                    borderRadius: "0.6rem", // Tailored to your form-card rounded-lg
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)", // A subtle shadow
+                    padding: "1rem 1.5rem" // Good padding
+                },
+                offset: { // Offset from the corner
+                    x: 20, // horizontal axis - can be a number or a string indicating unity. eg: "2em"
+                    y: 20 // vertical axis - can be a number or a string indicating unity. eg: "2em"
+                },
+                onClick: function(){} // Callback after click
+            }).showToast();
+        @endif
+
+        // Display error message (e.g., from controller catches)
+        @if (session('error'))
+            Toastify({
+                text: "{{ session('error') }}",
+                duration: 5000, // Longer duration for errors
+                newWindow: true,
+                close: true,
+                gravity: "top",
+                position: "right",
+                stopOnFocus: true,
+                style: {
+                    background: "linear-gradient(to right, #EF4444, #DC2626)", // Red gradient
+                    borderRadius: "0.6rem",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                    padding: "1rem 1.5rem"
+                },
+                offset: {
+                    x: 20,
+                    y: 20
+                },
+                onClick: function(){}
+            }).showToast();
+        @endif
+
+        // Display validation errors (iterates through $errors->all())
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                Toastify({
+                    text: "{{ $error }}",
+                    duration: 5000,
+                    newWindow: true,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    stopOnFocus: true,
+                    style: {
+                        background: "linear-gradient(to right, #F59E0B, #D97706)", // Orange/Amber gradient for warnings/validation
+                        borderRadius: "0.6rem",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        padding: "1rem 1.5rem"
+                    },
+                    offset: {
+                        x: 20,
+                        y: 20 + {{ '$loop->index * 70' }} // Stagger multiple toasts if many errors
+                    },
+                    onClick: function(){}
+                }).showToast();
+            @endforeach
+        @endif
+    </script>
 </body>
 </html>
