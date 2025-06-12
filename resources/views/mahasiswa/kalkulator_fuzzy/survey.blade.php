@@ -10,10 +10,47 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .prose table { @apply min-w-full border-collapse border border-gray-300; }
-        .prose th, .prose td { @apply border border-gray-300 p-2 text-sm; }
-        .prose thead { @apply bg-gray-100; }
-        .prose h4 { @apply mt-6 mb-2 text-lg font-semibold; }
+        /* Custom styles for tables within prose-like content */
+        .prose table {
+            @apply min-w-full border-collapse border border-gray-300 rounded-lg overflow-hidden; /* Added rounded-lg and overflow-hidden for better appearance */
+        }
+        .prose th, .prose td {
+            @apply border border-gray-300 p-3 text-sm; /* Increased padding */
+        }
+        .prose thead {
+            @apply bg-gray-100 text-gray-700 font-semibold; /* Stronger header styling */
+        }
+        .prose h4 {
+            @apply mt-8 mb-3 text-xl font-bold text-gray-800; /* Larger and bolder headings */
+        }
+        /* Specific styling for the recommendation box */
+        .recommendation-box {
+            @apply bg-gradient-to-r from-blue-100 to-indigo-100 p-6 rounded-xl border border-blue-200 shadow-md; /* Gradient background with shadow */
+        }
+        .recommendation-box h4 {
+            @apply text-xl font-bold text-blue-800 mb-2 !mt-0; /* Specific heading style, override mt-8 */
+        }
+        .recommendation-box p {
+            @apply text-blue-900 text-lg font-semibold; /* Larger text for recommendation */
+        }
+        .ranking-table th, .ranking-table td {
+            @apply px-4 py-2; /* Adjust padding for ranking table */
+        }
+        .ranking-table thead {
+            @apply bg-gray-200 text-gray-700;
+        }
+        .ranking-table tbody tr:nth-child(odd) {
+            @apply bg-white;
+        }
+        .ranking-table tbody tr:nth-child(even) {
+            @apply bg-gray-50;
+        }
+        .ranking-table tbody tr:hover {
+            @apply bg-gray-100;
+        }
+        .ranking-table tbody tr.bg-green-100:hover {
+            @apply bg-green-200; /* Keep hover distinct for the top rank */
+        }
     </style>
 </head>
 
@@ -22,21 +59,21 @@
 <body class="bg-blue-50 text-gray-800 pt-20">
 
 <div class="container mx-auto p-4 md:p-8 max-w-5xl">
-    <header class="text-center mb-8">
-        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">Survey Rekomendasi Magang</h1>
-        <p class="text-md text-gray-600 mt-2">Pilihlah Keahlian Yang Mahir Dilakukan dan Survey Ini Akan Menentukan Rekomendasi Maggangmu!.</p>
+    <header class="text-center mb-10">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">Survey Rekomendasi Magang</h1>
+        <p class="text-lg text-gray-600 mt-3">Pilihlah Keahlian Yang Mahir Dilakukan dan Survey Ini Akan Menentukan Rekomendasi Magangmu!</p>
     </header>
 
-    <main class="bg-white p-6 rounded-xl shadow-lg">
+    <main class="bg-white p-8 rounded-xl shadow-2xl"> {{-- Increased padding and shadow --}}
         <div id="input-section">
-            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">1. Berikan Penilaian</h2>
+            <h2 class="text-2xl font-bold mb-6 pb-3 border-b-2 border-indigo-500 text-gray-800">1. Berikan Penilaian Keahlian</h2> {{-- Bolder and colored border --}}
 
-            <div id="decision-matrix-container" class="mb-6">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full border-collapse border border-gray-300">
+            <div id="decision-matrix-container" class="mb-8"> {{-- Increased margin-bottom --}}
+                <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm"> {{-- Added rounded corners and subtle shadow --}}
+                    <table class="min-w-full border-collapse"> {{-- Removed direct border-gray-300 here, let prose handle --}}
                         <thead class="bg-gray-100">
                         <tr>
-                            <th class="border border-gray-300 p-2">Alternatif</th>
+                            <th class="border border-gray-300 p-3 text-left font-semibold text-gray-700">Alternatif Magang</th> {{-- Aligned left and slightly bolder --}}
                         </tr>
                         </thead>
                         <tbody id="decision-matrix-body">
@@ -46,19 +83,21 @@
             </div>
         </div>
 
-        <button id="calculate-btn" class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-lg font-semibold transition duration-150 ease-in-out">Hitung Peringkat</button>
+        <button id="calculate-btn" class="w-full bg-indigo-600 text-white py-3.5 px-4 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-xl font-bold transition duration-200 ease-in-out transform hover:scale-105"> {{-- Changed to indigo, larger padding, bolder, transform effect --}}
+            Hitung Rekomendasi Magang
+        </button>
 
-        <div id="results-section" class="mt-8 hidden">
-            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">
+        <div id="results-section" class="mt-10 hidden"> {{-- Increased margin-top --}}
+            <h2 class="text-2xl font-bold mb-6 pb-3 border-b-2 border-indigo-500 text-gray-800">
                 2. Hasil Perhitungan
-                <button id="toggle-details-btn" class="ml-4 px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400">
+                <button id="toggle-details-btn" class="ml-4 px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition duration-150 ease-in-out">
                     Tampilkan Detail
                 </button>
             </h2>
             <div id="calculation-details" class="hidden">
-                <div id="results-output" class="prose max-w-none"></div>
+                <div id="results-output" class="prose max-w-none text-gray-700"></div> {{-- Added text color for prose content --}}
             </div>
-            <div id="final-ranking-output" class="prose max-w-none mt-4"></div>
+            <div id="final-ranking-output" class="prose max-w-none mt-8"></div> {{-- Increased margin-top for final ranking --}}
         </div>
     </main>
 </div>
@@ -154,26 +193,26 @@
     const decisionMatrixBody = document.getElementById('decision-matrix-body');
     const resultsSection = document.getElementById('results-section');
     const resultsOutput = document.getElementById('results-output');
-    const toggleDetailsBtn = document.getElementById('toggle-details-btn'); // New element
-    const calculationDetails = document.getElementById('calculation-details'); // New element
-    const finalRankingOutput = document.getElementById('final-ranking-output'); // New element
+    const toggleDetailsBtn = document.getElementById('toggle-details-btn');
+    const calculationDetails = document.getElementById('calculation-details');
+    const finalRankingOutput = document.getElementById('final-ranking-output');
 
     function generateInputsUI() {
         const headerRow = document.querySelector('#decision-matrix-container thead tr');
         CRITERIA_NAMES.forEach(name => {
-            headerRow.innerHTML += `<th class="border border-gray-300 p-2 text-sm">${name}</th>`;
+            headerRow.innerHTML += `<th class="border border-gray-300 p-3 text-left font-semibold text-gray-700">${name}</th>`; // Consistent header styling
         });
 
         ALTERNATIVE_NAMES.forEach((altName, i) => {
             const row = document.createElement('tr');
-            let rowHtml = `<td class="border border-gray-300 p-2 font-medium">${altName}</td>`;
+            let rowHtml = `<td class="border border-gray-300 p-3 font-medium text-gray-800">${altName}</td>`; // Consistent cell styling
             CRITERIA_NAMES.forEach((critName, j) => {
-                let selectHtml = `<select id="d-cell-${i}-${j}" class="w-full p-2 border-gray-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500">`;
+                let selectHtml = `<select id="d-cell-${i}-${j}" class="w-full p-2 border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-gray-700 bg-white shadow-sm transition duration-150 ease-in-out">`; // Enhanced select styling
                 for (const term in linguisticTerms) {
                     selectHtml += `<option value="${term}">${term}</option>`;
                 }
                 selectHtml += `</select>`;
-                rowHtml += `<td class="border border-gray-300 p-1">${selectHtml}</td>`;
+                rowHtml += `<td class="border border-gray-300 p-2">${selectHtml}</td>`; // Padding for cell containing select
             });
             row.innerHTML = rowHtml;
             decisionMatrixBody.appendChild(row);
@@ -189,20 +228,20 @@
                 decisionMatrix[i][j] = linguisticTerms[selectedTerm];
             });
         });
-
         return { decisionMatrix, criteriaTypes: CRITERIA_TYPES };
     }
 
     function displayResults(results) {
-        resultsSection.classList.remove('hidden'); // Tampilkan section hasil
-        calculationDetails.classList.add('hidden'); // Sembunyikan detail perhitungan default
-        toggleDetailsBtn.textContent = 'Tampilkan Detail'; // Reset teks tombol
+        resultsSection.classList.remove('hidden');
+        calculationDetails.classList.add('hidden');
+        toggleDetailsBtn.textContent = 'Tampilkan Detail';
 
         const formatTFN = (tfn) => `(${tfn.map(v => v.toFixed(3)).join(', ')})`;
 
-        // HTML untuk detail perhitungan (Matriks, FPIS, FNIS, Jarak, CC)
+        // HTML for calculation details (Matrix, FPIS, FNIS, Distance, CC)
         let detailsHtml = `
-                <h4>1. Matriks Keputusan Fuzzy Ternormalisasi</h4>
+            <h4>1. Matriks Keputusan Fuzzy Ternormalisasi</h4>
+            <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
                 <table>
                     <thead><tr><th>Alternatif</th>${CRITERIA_NAMES.map(name => `<th>${name}</th>`).join('')}</tr></thead>
                     <tbody>
@@ -214,17 +253,21 @@
                         `).join('')}
                     </tbody>
                 </table>
+            </div>
 
-                <h4>2. Solusi Ideal Positif (FPIS, A*) & Negatif (FNIS, A-)</h4>
-                 <table>
+            <h4>2. Solusi Ideal Positif (FPIS, A*) & Negatif (FNIS, A-)</h4>
+            <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+                <table>
                     <thead><tr><th></th>${CRITERIA_NAMES.map(name => `<th>${name}</th>`).join('')}</tr></thead>
                     <tbody>
                         <tr><td><b>FPIS (A*)</b></td>${results.fpis.map(cell => `<td>${formatTFN(cell)}</td>`).join('')}</tr>
                         <tr><td><b>FNIS (A-)</b></td>${results.fnis.map(cell => `<td>${formatTFN(cell)}</td>`).join('')}</tr>
                     </tbody>
                 </table>
+            </div>
 
-                <h4>3. Jarak dan Koefisien Kedekatan (CC)</h4>
+            <h4>3. Jarak dan Koefisien Kedekatan (CC)</h4>
+            <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
                 <table>
                     <thead><tr><th>Alternatif</th><th>Jarak ke FPIS (d+)</th><th>Jarak ke FNIS (d-)</th><th>Koefisien Kedekatan (CCi)</th></tr></thead>
                     <tbody>
@@ -238,45 +281,46 @@
                         `).join('')}
                     </tbody>
                 </table>
-            `;
+            </div>
+        `;
 
-        // HTML untuk peringkat akhir (ini yang akan terlihat langsung)
+        // HTML for final ranking (this will be immediately visible)
         let rankingHtml = `
-        <h3 class="mt-8">Hasil Akhir Peringkat</h3>
-        <table>
-            <thead class="bg-gray-200"><tr><th>Peringkat</th><th>Alternatif</th><th>Nilai CC</th></tr></thead>
-            <tbody>
-                ${results.ranked.map((item, index) => `
-                    <tr class="font-medium ${index === 0 ? 'bg-green-100' : ''}">
-                        <td class="text-center text-lg">${index + 1}</td>
-                        <td>${ALTERNATIVE_NAMES[item.alternative]}</td>
-                        <td>${item.value.toFixed(5)}</td>
-                    </tr>
-                `).join('')}
-            </tbody>
-        </table>
-        <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <div class="flex items-center justify-between">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Hasil Akhir Peringkat</h3>
+        <div class="overflow-x-auto rounded-lg border border-gray-200 shadow-sm mb-6">
+            <table class="data-table ranking-table"> {{-- Added ranking-table class --}}
+                <thead><tr><th>Peringkat</th><th>Alternatif Magang</th><th>Nilai CC</th></tr></thead>
+                <tbody>
+                    ${results.ranked.map((item, index) => `
+                        <tr class="${index === 0 ? 'bg-green-100 font-bold text-green-800' : ''}"> {{-- Highlight top rank --}}
+                            <td class="text-center text-lg">${index + 1}</td>
+                            <td>${ALTERNATIVE_NAMES[item.alternative]}</td>
+                            <td>${item.value.toFixed(5)}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+        <div class="recommendation-box"> {{-- Applied recommendation-box class --}}
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <div>
-                    <h4 class="font-semibold text-blue-800">Rekomendasi Magang:</h4>
-                    <p class="text-blue-900">${ALTERNATIVE_NAMES[results.ranked[0].alternative]}</p>
+                    <h4 class="font-bold text-blue-800 mb-2">Rekomendasi Magang Terbaik Untukmu:</h4>
+                    <p class="text-blue-900 text-2xl">${ALTERNATIVE_NAMES[results.ranked[0].alternative]}</p>
                 </div>
                 <form id="recommendation-form" action="{{ route('mahasiswa.survey.accept') }}" method="POST">
                     @csrf
                     <input type="hidden" name="recommended_job_id" value="${results.ranked[0].alternative + 1}">
-                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
-                        Apply
+                    <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105">
+                        Ajukan Sekarang!
                     </button>
                 </form>
             </div>
         </div>
-    `;
+        `;
 
-        resultsOutput.innerHTML = detailsHtml; // Isi detail perhitungan
-        finalRankingOutput.innerHTML = rankingHtml; // Isi peringkat akhir
+        resultsOutput.innerHTML = detailsHtml;
+        finalRankingOutput.innerHTML = rankingHtml;
         window.scrollTo({ top: resultsSection.offsetTop - 20, behavior: 'smooth' });
-
-
     }
 
     calculateBtn.addEventListener('click', () => {
@@ -287,7 +331,6 @@
         }
     });
 
-    // Event listener untuk tombol "Tampilkan Detail"
     toggleDetailsBtn.addEventListener('click', () => {
         if (calculationDetails.classList.contains('hidden')) {
             calculationDetails.classList.remove('hidden');
@@ -296,9 +339,8 @@
             calculationDetails.classList.add('hidden');
             toggleDetailsBtn.textContent = 'Tampilkan Detail';
         }
-        window.scrollTo({ top: resultsSection.offsetTop - 20, behavior: 'smooth' }); // Opsional: scroll kembali
+        window.scrollTo({ top: resultsSection.offsetTop - 20, behavior: 'smooth' });
     });
-
 
     window.onload = generateInputsUI;
 </script>
