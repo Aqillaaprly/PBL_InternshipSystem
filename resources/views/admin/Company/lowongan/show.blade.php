@@ -98,7 +98,7 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-4 border-b border-gray-100">
                 <div>
                     <h1 class="text-3xl font-extrabold text-gray-900 mb-1 leading-tight">{{ $lowongan->judul ?? 'Informasi Lowongan' }}</h1>
-                    <p class="text-lg text-gray-600">di <span class="font-semibold text-indigo-700">{{ $lowongan->company->nama_perusahaan ?? 'N/A' }}</span></p>
+                    <p class="text-lg text-gray-600"><span class="font-semibold text-indigo-700">{{ $lowongan->company->nama_perusahaan ?? 'N/A' }}</span></p>
                 </div>
                 <a href="{{ route('perusahaan.lowongan') }}" class="mt-4 sm:mt-0 text-sm text-indigo-600 hover:underline flex items-center">
                     <i class="fas fa-arrow-left mr-2"></i> Kembali ke Daftar Lowongan
