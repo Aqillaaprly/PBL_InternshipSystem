@@ -10,7 +10,7 @@
         /* Menggunakan font Inter untuk konsistensi */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #4652a3;   /* Warna biru gelap untuk container utama */
+            background-color: #414b97;   /* Warna biru gelap untuk container utama */
         }
         .login-container {
             background-color: #334dac77; /* Warna latar belakang biru muda dari gambar */
