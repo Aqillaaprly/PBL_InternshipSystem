@@ -6,9 +6,34 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
+    /**
+     * Display a listing of companies.
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function perusahaan(Request $request)
+    {
+        $query = Company::query()->withCount('lowongans');
+
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('nama_perusahaan', 'like', "%$search%")
+                    ->orWhere('email_perusahaan', 'like', "%$search%")
+                    ->orWhere('kota', 'like', "%$search%")
+                    ->orWhere('provinsi', 'like', "%$search%");
+            });
+        }
+
+        $companies = $query->paginate(10);
+
+        return view('mahasiswa.perusahaan', compact('companies'));
+    }
+
     /**
      * Display the company profile page
      *
@@ -18,38 +43,23 @@ class CompanyController extends Controller
     public function showProfile($id)
     {
         try {
-            // Find the company by ID
-            $company = Company::findOrFail($id);
-
-            // Eager load relationships with optimized queries
-            $company->load([
-                'user' => function($query) {
-                    $query->select('id', 'name', 'email');
-                },
+            $company = Company::with([
+                'user:id,name,email',
                 'lowongans' => function($query) {
                     $query->where('status', 'Aktif')
                         ->orderBy('created_at', 'desc')
-                        ->select(['id', 'company_id', 'judul', 'lokasi', 'status', 'created_at']);
+                        ->select('id', 'company_id', 'judul', 'status', 'created_at');
                 }
-            ]);
+            ])->findOrFail($id);
 
-            // Prepare the view data
-            $viewData = [
+            return view('mahasiswa.company_profile', [
                 'company' => $company,
-                'activeLowonganCount' => $company->lowongans->count(),
-            ];
-
-            // Return the company profile page
-            return view('mahasiswa.company_profile', $viewData);
-
-        } catch (\Exception $e) {
-            Log::error('Failed to load company profile', [
-                'company_id' => $id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'activeLowonganCount' => $company->lowongans->count()
             ]);
 
-            return back()->with('error', 'Gagal memuat profil perusahaan. Silakan coba lagi.');
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('Company not found', ['company_id' => $id, 'error' => $e->getMessage()]);
+            return back()->with('error', 'Perusahaan tidak ditemukan.');
         }
     }
 
@@ -69,18 +79,5 @@ class CompanyController extends Controller
             default:
                 return 'bg-yellow-100 text-yellow-700';
         }
-    }
-
-    /**
-     * Helper method to get lowongan status badge class
-     *
-     * @param string $status
-     * @return string
-     */
-    protected function getLowonganStatusBadgeClass($status)
-    {
-        return $status == 'Aktif'
-            ? 'bg-green-100 text-green-700'
-            : 'bg-gray-100 text-gray-700';
     }
 }

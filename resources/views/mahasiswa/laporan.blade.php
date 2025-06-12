@@ -44,6 +44,7 @@
                 <tr>
                     <th class="px-4 py-3">No</th>
                     <th class="px-4 py-3">Tanggal</th>
+                    <th class="px-4 py-3">Jam Kerja</th>
                     <th class="px-4 py-3">Deskripsi Kegiatan</th>
                     <th class="px-4 py-3">Bukti Kegiatan</th>
                     <th class="px-4 py-3">Aksi</th>
@@ -52,14 +53,16 @@
                 <tbody>
                 @foreach($aktivitas as $index => $item)
                 <tr class="border-b">
-                    <td class="px-4 py-3">{{ $index + 1 }}</td>
+                    <td class="px-4 py-3">{{ $index + $aktivitas->firstItem() }}</td>
                     <td class="px-4 py-3">{{ \Carbon\Carbon::parse($item->tanggal)->format('d/m/Y') }}</td>
+                    <td class="px-4 py-3">{{ $item->jam_kerja ? \Carbon\Carbon::parse($item->jam_kerja)->format('H:i') : '-' }}</td>
                     <td class="px-4 py-3">{{ $item->deskripsi_kegiatan }}</td>
                     <td class="px-4 py-3">
                         @if($item->bukti_kegiatan)
                         <img src="{{ asset('storage/' . $item->bukti_kegiatan) }}"
-                             class="w-16 h-16 mx-auto rounded object-cover"
-                             alt="Bukti Kegiatan">
+                             class="w-16 h-16 mx-auto rounded object-cover cursor-pointer"
+                             alt="Bukti Kegiatan"
+                             onclick="window.open('{{ asset('storage/' . $item->bukti_kegiatan) }}', '_blank')">
                         @else
                         <span class="text-gray-400 italic">Tidak ada bukti</span>
                         @endif
@@ -71,7 +74,7 @@
                             @csrf
                             @method('DELETE')
                             <button type="submit"
-                                    class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs">
+                                    class="bg-red-100 text-red-600 px-3 py-1 rounded text-xs hover:bg-red-200 transition">
                                 Hapus
                             </button>
                         </form>
@@ -97,27 +100,35 @@
             <form action="{{ route('mahasiswa.laporan.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
                 <div>
-                    <label class="block text-sm font-medium">Tanggal</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
                     <input type="date" name="tanggal" required
-                           class="w-full border px-4 py-2 rounded">
+                           class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                           value="{{ old('tanggal', now()->format('Y-m-d')) }}">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Deskripsi Kegiatan</label>
-                    <textarea name="deskripsi_kegiatan" required
-                              class="w-full border px-4 py-2 rounded"></textarea>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Jam Kerja</label>
+                    <input type="time" name="jam_kerja" required
+                           class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-blue-500 focus:border-blue-500"
+                           value="{{ old('jam_kerja', now()->format('H:i')) }}">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Bukti Kegiatan (Foto)</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Kegiatan</label>
+                    <textarea name="deskripsi_kegiatan" required rows="3"
+                              class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-blue-500 focus:border-blue-500">{{ old('deskripsi_kegiatan') }}</textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Bukti Kegiatan (Foto)</label>
                     <input type="file" name="bukti_kegiatan" accept="image/*"
-                           class="w-full border px-4 py-2 rounded">
+                           class="w-full border border-gray-300 px-4 py-2 rounded focus:ring-blue-500 focus:border-blue-500">
+                    <p class="mt-1 text-xs text-gray-500">Format: JPG, PNG (Max: 2MB)</p>
                 </div>
-                <div class="flex justify-end space-x-2">
+                <div class="flex justify-end space-x-2 pt-2">
                     <button type="submit"
-                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
                         Simpan
                     </button>
                     <button type="button" id="cancelBtn"
-                            class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
+                            class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition">
                         Batal
                     </button>
                 </div>

@@ -38,7 +38,7 @@
                         <option value="Penuh Waktu" @if(request('tipe') == 'Penuh Waktu') selected @endif>Penuh Waktu</option>
                         <option value="Paruh Waktu" @if(request('tipe') == 'Paruh Waktu') selected @endif>Paruh Waktu</option>
                         <option value="Kontrak" @if(request('tipe') == 'Kontrak') selected @endif>Kontrak</option>
-                        <option value="Internship" @if(request('tipe') == 'Internship') selected @endif>Internship</option>
+                        <option value="Magang" @if(request('tipe') == 'Magang') selected @endif>Magang</option>
                     </select>
                     <select name="status" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" onchange="this.form.submit()">
                         <option value="">Semua Status</option>

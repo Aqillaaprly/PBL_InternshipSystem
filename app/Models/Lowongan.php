@@ -8,30 +8,33 @@ use Illuminate\Database\Eloquent\Model;
 class Lowongan extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'company_id',
         'judul',
         'deskripsi',
         'kualifikasi',
+        'tanggung_jawab',
         'tipe',
-        'provinsi', // Add this
-        'kota',     // Add this
-        'alamat',   // Add this
-        'kode_pos', // Add this
-        'lokasi',   // Keep if used for a combined string, otherwise consider removing if it conflicts with separate address fields
+        'provinsi',
+        'kota',
+        'alamat',
+        'kode_pos',
         'gaji_min',
         'gaji_max',
         'tanggal_buka',
         'tanggal_tutup',
-        'status',
+        'status'
     ];
-
+    // Add this if you want to enforce enum values
+    protected $casts = [
+        'tipe' => 'string',
+        'status' => 'string'
+    ];
     public function company()
     {
+
         return $this->belongsTo(Company::class);
     }
-
     public function pendaftars()
     {
         return $this->hasMany(Pendaftar::class);
