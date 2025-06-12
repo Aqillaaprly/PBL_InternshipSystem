@@ -54,35 +54,57 @@ class SurveyController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     // In SurveyController.php, update the accept method:
+    // public function accept(Request $request)
+    // {
+    //     $request->validate([
+    //         'recommended_job_id' => 'required|integer'
+    //     ]);
+
+    //     // Get the recommended job title from ALTERNATIVE_NAMES
+    //     $jobTitles = [
+    //         'Fullstack Developer',
+    //         'Web Developer',
+    //         'Machine Learning Engineer', 
+    //         'Cyber Security', 
+    //         'Computer Network',
+    //         'Quality Assurance',
+    //         'System Analyst', 
+    //         'Backend Developer', 
+    //         'UI/UX Designer', 
+    //         'Data Analyst', 
+    //         'Data Scientist'
+    //     ];
+
+    //     $recommendedIndex = $request->recommended_job_id - 1;
+    //     $recommendedJobTitle = $jobTitles[$recommendedIndex] ?? 'Rekomendasi Sistem';
+
+    //     // Store the recommendation in session
+    //     session([
+    //         'recommended_job' => $recommendedJobTitle,
+    //         'recommended_job_id' => $request->recommended_job_id
+    //     ]);
+
+    //     return redirect()->route('mahasiswa.lowongan.index')->with([
+    //         'success' => 'Rekomendasi lowongan telah diterima',
+    //         'recommended_job' => $recommendedJobTitle
+    //     ]);
+    //     }
     public function accept(Request $request)
-    {
-        $request->validate([
-            'recommended_job_id' => 'required|integer'
-        ]);
+{
+    $request->validate([
+        'recommended_job_title' => 'required|string|max:255' // Validate for the job title string
+    ]);
 
-        // Get the recommended job title from ALTERNATIVE_NAMES
-        $jobTitles = [
-            'Fullstack Developer',
-            'Backend Developer',
-            'UI/UX Designer',
-            'Data Analyst',
-            'Data Scientist'
-        ];
+    $recommendedJobTitle = $request->input('recommended_job_title');
 
-        $recommendedIndex = $request->recommended_job_id - 1;
-        $recommendedJobTitle = $jobTitles[$recommendedIndex] ?? 'Rekomendasi Sistem';
+    // Store the recommendation in session
+    // We only need the title for filtering, no specific ID from the survey's internal list
+    session()->flash('recommended_job_title', $recommendedJobTitle);
 
-        // Store the recommendation in session
-        session([
-            'recommended_job' => $recommendedJobTitle,
-            'recommended_job_id' => $request->recommended_job_id
-        ]);
-
-        return redirect()->route('mahasiswa.lowongan.index')->with([
-            'success' => 'Rekomendasi lowongan telah diterima',
-            'recommended_job' => $recommendedJobTitle
-        ]);
-    }
+    return redirect()->route('mahasiswa.lowongan.index')->with([
+        'success' => 'Rekomendasi lowongan telah diterima. Menampilkan lowongan terkait ' . $recommendedJobTitle . '.',
+    ]);
+}
 
     /**
      * Cancel the current job recommendation

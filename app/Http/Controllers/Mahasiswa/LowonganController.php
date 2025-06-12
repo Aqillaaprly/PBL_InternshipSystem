@@ -43,9 +43,12 @@ class LowonganController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Filter by recommendation if exists
-        if (session('recommended_job')) {
-            $query->where('judul', 'like', '%' . session('recommended_job') . '%');
+       // Filter by recommendation if exists
+        if (session()->has('recommended_job_title')) {
+            $recommendedJobTitle = session('recommended_job_title');
+            // Convert both the database column and the search term to lowercase for case-insensitive matching
+            // Also, ensure the search term is trimmed of any extra spaces
+            $query->whereRaw('LOWER(judul) LIKE ?', ['%' . strtolower(trim($recommendedJobTitle)) . '%']);
         }
 
         $lowongans = $query->orderBy('created_at', 'desc')->paginate(10);
@@ -150,5 +153,12 @@ class LowonganController extends Controller
     {
         $lowongan->delete();
         return redirect()->route('mahasiswa.lowongan.index')->with('success', 'Lowongan berhasil dihapus.');
+    }
+
+    public function clearRecommendation()
+    {
+        session()->forget('recommended_job_title'); // Ensure it's explicitly forgotten if a user navigates directly.
+
+        return redirect()->route('mahasiswa.lowongan.index')->with('info', 'Filter rekomendasi telah dihapus.');
     }
 }

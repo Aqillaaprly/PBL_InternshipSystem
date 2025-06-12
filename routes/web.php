@@ -144,6 +144,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/lowongan/{lowongan}/edit', [MahasiswaLowonganController::class, 'edit'])->name('lowongan.edit');
     Route::put('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'update'])->name('lowongan.update');
     Route::delete('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'destroy'])->name('lowongan.destroy');
+    Route::get('/lowongan/clear-recommendation', [MahasiswaLowonganController::class, 'clearRecommendation'])->name('lowongan.clear_recommendation');
 
     // Pendaftar Routes
     Route::get('/pendaftar', [MahasiswaPendaftarController::class, 'showPendaftaranTable'])->name('pendaftar');
@@ -160,6 +161,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::post('/survey/process', [SurveyController::class, 'process'])->name('survey.process');
     Route::post('/survey/accept', [SurveyController::class, 'accept'])->name('survey.accept');
     Route::post('/survey/cancel', [SurveyController::class, 'cancelRecommendation'])->name('survey.cancel');
+
 });
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)

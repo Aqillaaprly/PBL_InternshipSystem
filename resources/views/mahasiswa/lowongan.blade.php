@@ -59,6 +59,23 @@
             {{ session('error') }}
         </div>
         @endif
+        @if (session('info'))
+        <div class="mb-4 p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700 rounded">
+            {{ session('info') }}
+        </div>
+        @endif
+
+        @if (session()->has('recommended_job_title') && request()->routeIs('mahasiswa.lowongan.index'))
+        <div class="mb-6 p-5 bg-indigo-50 border-l-4 border-indigo-400 text-indigo-800 rounded-lg shadow-sm flex items-center justify-between">
+            <div>
+                <p class="font-semibold text-lg mb-1">Rekomendasi Magang Untukmu!</p>
+                <p>Anda sedang melihat lowongan yang direkomendasikan: <span class="font-bold">{{ session('recommended_job_title') }}</span></p>
+            </div>
+            <a href="{{ route('mahasiswa.lowongan.index') }}" class="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition duration-200 ease-in-out">
+                Lihat Semua Lowongan
+            </a>
+        </div>
+        @endif
 
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm text-left">

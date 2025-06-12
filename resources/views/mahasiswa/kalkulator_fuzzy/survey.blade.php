@@ -329,9 +329,8 @@
                         <h4>Rekomendasi Magang Terbaik Untukmu:</h4>
                         <p class="mt-2">${ALTERNATIVE_NAMES[results.ranked[0].alternative]}</p>
                     </div>
-                    <form id="recommendation-form" action="/mahasiswa/survey/accept" method="POST"> <!-- Placeholder action -->
-                        <!-- @csrf (Blade directive placeholder) -->
-                        <input type="hidden" name="recommended_job_id" value="${results.ranked[0].alternative + 1}">
+                    <form id="recommendation-form" action="{{ route('mahasiswa.survey.accept') }}" method="POST">
+                        @csrf <input type="hidden" name="recommended_job_title" value="${ALTERNATIVE_NAMES[results.ranked[0].alternative]}">
                         <button type="submit" class="px-8 py-4 bg-white text-indigo-700 font-bold rounded-xl shadow-lg hover:bg-indigo-100 transition duration-200 ease-in-out transform hover:scale-105 text-lg">
                             Ajukan Sekarang!
                         </button>
