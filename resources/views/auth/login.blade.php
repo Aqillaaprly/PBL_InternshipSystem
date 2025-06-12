@@ -65,7 +65,7 @@
             @csrf
             <div>
                 <label class="sr-only"></label>
-                <input type="text" name="username" id="username" value="{{ old('username') }}" placeholder="2341720207" required
+                <input type="text" name="username" id="username" value="{{ old('username') }}" placeholder="Username" required
                        class="input-field w-full px-4 py-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             </div>
 
