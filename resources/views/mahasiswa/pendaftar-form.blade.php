@@ -85,10 +85,22 @@
                                     <p class="mt-1 text-xs text-gray-500">Format: PDF/DOC/DOCX (Max: 5MB)</p>
                                 </div>
 
+                                     <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            CV <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="file" name="cv" required
+                                               accept=".pdf,.doc,.docx"
+                                               class="w-full px-3 py-2 border rounded-md file:mr-4 file:py-2 file:px-4
+                                               file:rounded-md file:border-0 file:text-sm file:font-semibold
+                                               file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                                        <p class="mt-1 text-xs text-gray-500">Format: PDF/DOC/DOCX (Max: 5MB)</p>
+                                    </div>
+
                                 <!-- CV -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                                        Daftar Riwayat Hidup (CV) <span class="text-red-500">*</span>
+                                        Daftar Riwayat Hidup <span class="text-red-500">*</span>
                                     </label>
                                     <input type="file" name="cv" required
                                            accept=".pdf,.doc,.docx"

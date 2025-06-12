@@ -42,7 +42,7 @@ class LaporanController extends Controller
         $data['mahasiswa_id'] = auth()->id();
 
         // Combine the date from tanggal with time from jam_kerja to create a proper datetime
-        $data['jam_kerja'] = Carbon::parse($request->tanggal . ' ' . $request->jam_kerja);
+        $data['jam_kerja'] = $request->jam_kerja;
 
         if ($request->hasFile('bukti_kegiatan')) {
             $path = $request->file('bukti_kegiatan')->store('aktifitas_magang', 'public');

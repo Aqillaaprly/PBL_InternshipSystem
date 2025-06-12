@@ -18,7 +18,7 @@ class CreateAktivitasMagangsTable extends Migration
             $table->foreignId('mahasiswa_id')->constrained('mahasiswas'); 
             $table->date('tanggal');
             $table->text('deskripsi_kegiatan');
-            $table->integer('jam_kerja')->nullable(); 
+            $table->time('jam_kerja')->nullable(); 
             $table->string('status_verifikasi')->default('pending'); 
             $table->unsignedBigInteger('dosen_pembimbing_id')->nullable(); 
             $table->unsignedBigInteger('perusahaan_pic_id')->nullable(); 
