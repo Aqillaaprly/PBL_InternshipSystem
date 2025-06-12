@@ -159,7 +159,7 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
     Route::get('/survey', [SurveyController::class, 'index'])->name('survey');
     Route::post('/survey/process', [SurveyController::class, 'process'])->name('survey.process');
     Route::post('/survey/accept', [SurveyController::class, 'accept'])->name('survey.accept');
-    Route::post('/survey/cancel', [SurveyController::class, 'cancel'])->name('survey.cancel');
+    Route::post('/survey/cancel', [SurveyController::class, 'cancelRecommendation'])->name('survey.cancel');
 });
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)

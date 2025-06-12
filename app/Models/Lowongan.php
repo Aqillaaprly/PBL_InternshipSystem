@@ -13,13 +13,22 @@ class Lowongan extends Model
         'judul',
         'deskripsi',
         'kualifikasi',
+        'tanggung_jawab',
         'tipe',
-        'lokasi',
+        'provinsi',
+        'kota',
+        'alamat',
+        'kode_pos',
         'gaji_min',
         'gaji_max',
         'tanggal_buka',
         'tanggal_tutup',
         'status'
+    ];
+    // Add this if you want to enforce enum values
+    protected $casts = [
+        'tipe' => 'string',
+        'status' => 'string'
     ];
     public function company()
     {

@@ -53,25 +53,34 @@ class SurveyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
+    // In SurveyController.php, update the accept method:
     public function accept(Request $request)
     {
         $request->validate([
             'recommended_job_id' => 'required|integer'
         ]);
 
-        // Map the recommendation ID to actual lowongan ID
-        // This assumes your ALTERNATIVE_NAMES in survey.blade.php matches lowongan IDs
-        $lowonganId = $request->recommended_job_id;
+        // Get the recommended job title from ALTERNATIVE_NAMES
+        $jobTitles = [
+            'Fullstack Developer',
+            'Web Developer',
+            'UIUX Designer',
+            'Data Analyst',
+            'Data Scientist'
+        ];
+
+        $recommendedIndex = $request->recommended_job_id - 1;
+        $recommendedJobTitle = $jobTitles[$recommendedIndex] ?? 'Rekomendasi Sistem';
 
         // Store the recommendation in session
         session([
-            'recommended_lowongan_id' => $lowonganId,
-            'recommended_lowongan_title' => Lowongan::find($lowonganId)->judul ?? 'Rekomendasi Sistem'
+            'recommended_job' => $recommendedJobTitle,
+            'recommended_job_id' => $request->recommended_job_id
         ]);
 
-        return redirect()->route('mahasiswa.dashboard')->with([
+        return redirect()->route('mahasiswa.lowongan.index')->with([
             'success' => 'Rekomendasi lowongan telah diterima',
-            'recommended_lowongan' => Lowongan::find($lowonganId)
+            'recommended_job' => $recommendedJobTitle
         ]);
     }
 
@@ -84,5 +93,12 @@ class SurveyController extends Controller
     {
         session()->forget(['recommended_lowongan_id', 'recommended_lowongan_title']);
         return redirect()->route('mahasiswa.dashboard')->with('success', 'Rekomendasi telah dibatalkan');
+    }
+    // In SurveyController.php, add this method:
+    public function cancelRecommendation()
+    {
+        session()->forget(['recommended_job', 'recommended_job_id']);
+        return redirect()->route('mahasiswa.lowongan.index')
+            ->with('success', 'Rekomendasi telah dibatalkan');
     }
 }

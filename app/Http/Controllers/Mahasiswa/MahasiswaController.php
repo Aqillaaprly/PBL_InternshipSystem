@@ -100,21 +100,20 @@ class MahasiswaController extends Controller
 
     public function job()
     {
-        // Get lowongans based on recommendation if exists
-        if (session('recommended_lowongan_id')) {
-            $lowongans = Lowongan::with('company')
-                ->where('id', session('recommended_lowongan_id'))
-                ->where('status', 'Aktif')
+        // Get companies with their active job listings
+        $companies = Company::with(['lowongans' => function($query) {
+            $query->where('status', 'Aktif')
                 ->whereDate('tanggal_tutup', '>=', now())
-                ->paginate(5);
-        } else {
-            $lowongans = Lowongan::with('company')
-                ->where('status', 'Aktif')
-                ->whereDate('tanggal_tutup', '>=', now())
-                ->orderBy('tanggal_tutup', 'asc')
-                ->paginate(10);
-        }
+                ->orderBy('tanggal_tutup', 'asc');
+        }])
+            ->whereHas('lowongans', function($q) {
+                $q->where('status', 'Aktif')
+                    ->whereDate('tanggal_tutup', '>=', now());
+            })
+            ->where('status_kerjasama', 'Aktif')
+            ->orderBy('nama_perusahaan')
+            ->paginate(10);
 
-        return view('mahasiswa.job', compact('lowongans'));
+        return view('mahasiswa.job', compact('companies'));
     }
 }

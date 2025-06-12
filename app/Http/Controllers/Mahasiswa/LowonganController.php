@@ -22,11 +22,13 @@ class LowonganController extends Controller
         // Search functionality
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('judul', 'like', "%$search%")
-                    ->orWhere('lokasi', 'like', "%$search%")
-                    ->orWhereHas('company', function($q) use ($search) {
-                        $q->where('nama_perusahaan', 'like', "%$search%");
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', '%' . $search . '%')
+                    ->orWhere('provinsi', 'like', '%' . $search . '%')
+                    ->orWhere('kota', 'like', '%' . $search . '%')
+                    ->orWhere('alamat', 'like', '%' . $search . '%')
+                    ->orWhereHas('company', function ($q2) use ($search) {
+                        $q2->where('nama_perusahaan', 'like', '%' . $search . '%');
                     });
             });
         }

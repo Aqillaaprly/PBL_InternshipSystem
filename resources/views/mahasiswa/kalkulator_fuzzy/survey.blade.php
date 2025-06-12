@@ -242,24 +242,41 @@
 
         // HTML untuk peringkat akhir (ini yang akan terlihat langsung)
         let rankingHtml = `
-                <h3 class="mt-8">Hasil Akhir Peringkat</h3>
-                <table>
-                    <thead class="bg-gray-200"><tr><th>Peringkat</th><th>Alternatif</th><th>Nilai CC</th></tr></thead>
-                    <tbody>
-                        ${results.ranked.map((item, index) => `
-                            <tr class="font-medium ${index === 0 ? 'bg-green-100' : ''}">
-                                <td class="text-center text-lg">${index + 1}</td>
-                                <td>${ALTERNATIVE_NAMES[item.alternative]}</td>
-                                <td>${item.value.toFixed(5)}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+        <h3 class="mt-8">Hasil Akhir Peringkat</h3>
+        <table>
+            <thead class="bg-gray-200"><tr><th>Peringkat</th><th>Alternatif</th><th>Nilai CC</th></tr></thead>
+            <tbody>
+                ${results.ranked.map((item, index) => `
+                    <tr class="font-medium ${index === 0 ? 'bg-green-100' : ''}">
+                        <td class="text-center text-lg">${index + 1}</td>
+                        <td>${ALTERNATIVE_NAMES[item.alternative]}</td>
+                        <td>${item.value.toFixed(5)}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h4 class="font-semibold text-blue-800">Rekomendasi Magang:</h4>
+                    <p class="text-blue-900">${ALTERNATIVE_NAMES[results.ranked[0].alternative]}</p>
+                </div>
+                <form id="recommendation-form" action="{{ route('mahasiswa.survey.accept') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="recommended_job_id" value="${results.ranked[0].alternative + 1}">
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                        Apply
+                    </button>
+                </form>
+            </div>
+        </div>
+    `;
 
         resultsOutput.innerHTML = detailsHtml; // Isi detail perhitungan
         finalRankingOutput.innerHTML = rankingHtml; // Isi peringkat akhir
         window.scrollTo({ top: resultsSection.offsetTop - 20, behavior: 'smooth' });
+
+
     }
 
     calculateBtn.addEventListener('click', () => {

@@ -35,6 +35,23 @@ class PendaftarController extends Controller
 
     public function showPendaftaranForm(Request $request)
     {
+        $userId = Auth::id();
+
+        // Check if user already has a pending application for recommended job
+        if (session('recommended_job_id')) {
+            $existing = Pendaftar::where('user_id', $userId)
+                ->whereHas('lowongan', function($q) {
+                    $q->where('judul', 'like', '%' . session('recommended_job') . '%');
+                })
+                ->where('status_lamaran', 'Pending')
+                ->exists();
+
+            if ($existing) {
+                return redirect()->route('mahasiswa.pendaftar')
+                    ->with('error', 'Anda sudah memiliki pendaftaran aktif untuk rekomendasi ini');
+            }
+        }
+
         $lowongans = Lowongan::with('company')
             ->where('status', 'Aktif')
             ->where('tanggal_tutup', '>=', Carbon::now())
