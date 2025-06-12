@@ -65,7 +65,7 @@
 
 <script>
     // --- KONFIGURASI DAN DATA YANG DITENTUKAN ---
-    const ALTERNATIVE_NAMES = ['Fullstack Developer', 'Backend Developer', 'UI/UX Designer', 'Data Analyst', 'Data Scientist'];
+    const ALTERNATIVE_NAMES = ['Fullstack Developer', 'Backend Developer', 'UI/UX Designer', 'Data Analyst', 'Financial Analyst'];
     const CRITERIA_NAMES = ['Skill', 'Minat', 'Pengalaman', 'Language/Tool Proficiency'];
 
     // Jenis kriteria sudah ditentukan: 'cost' untuk Harga, sisanya 'benefit'
