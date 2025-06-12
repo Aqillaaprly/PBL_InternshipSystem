@@ -15,10 +15,10 @@ class LowonganController extends Controller
      */
     public function index(Request $request)
     {
-        // ... (logika query Anda) ...
-        $lowongans = Lowongan::with('company')->latest()->paginate(10); // Contoh sederhana
+        // Fetch lowongans with their associated company, ordered by the latest created, and paginate the results.
+        $lowongans = Lowongan::with('company')->latest()->paginate(10);
 
-        // Jika file index ada di admin/Company/lowongan/index.blade.php
+        // Return the view for displaying lowongan listings, passing the lowongans data.
         return view('admin.Company.lowongan.index', compact('lowongans'));
     }
 
@@ -27,9 +27,10 @@ class LowonganController extends Controller
      */
     public function create()
     {
+        // Fetch all companies, ordered by their name, to be used in the lowongan creation form.
         $companies = Company::orderBy('nama_perusahaan')->get();
 
-        // Jika file create ada di admin/Company/lowongan/create.blade.php
+        // Return the view for creating a new lowongan, passing the companies data.
         return view('admin.Company.lowongan.create', compact('companies'));
     }
 
@@ -38,18 +39,34 @@ class LowonganController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the incoming request data.
+        // The 'status' field must be 'Aktif' or 'Non-Aktif'.
+        // The 'tipe' field must be one of the specified enum values, now including 'Internship'.
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:Aktif,Non-Aktif', // Validasi status
+            'judul' => 'required|string|max:255',
+            'company_id' => 'required|exists:companies,id',
+            'deskripsi' => 'required|string',
+            'kualifikasi' => 'required|string',
+            'tipe' => 'required|in:Full-time,Part-time,Magang,Kontrak,Internship', // Corrected: Added 'Internship'
+            'lokasi' => 'required|string|max:255',
+            'gaji_min' => 'nullable|numeric|min:0',
+            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
+            'tanggal_buka' => 'required|date',
+            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka',
+            'status' => 'required|in:Aktif,Non-Aktif', // Existing validation
         ]);
 
+        // If validation fails, redirect back with errors and input.
         if ($validator->fails()) {
             return redirect()->route('admin.lowongan.create')
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        Lowongan::create($request->all()); // $request->all() akan mencakup 'status'
+        // Create a new Lowongan record using all validated request data.
+        Lowongan::create($request->all());
 
+        // Redirect to the lowongan index page with a success message.
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil ditambahkan.');
     }
 
@@ -58,9 +75,10 @@ class LowonganController extends Controller
      */
     public function show(Lowongan $lowongan)
     {
+        // Load the associated company for the given lowongan.
         $lowongan->load('company');
 
-        // Path view disesuaikan dengan struktur folder Anda
+        // Return the view for displaying lowongan details, passing the lowongan data.
         return view('admin.Company.lowongan.show', compact('lowongan'));
     }
 
@@ -69,9 +87,10 @@ class LowonganController extends Controller
      */
     public function edit(Lowongan $lowongan)
     {
+        // Fetch all companies, ordered by their name, to be used in the lowongan edit form.
         $companies = Company::orderBy('nama_perusahaan')->get();
 
-        // Path view disesuaikan dengan struktur folder Anda
+        // Return the view for editing a lowongan, passing both lowongan and companies data.
         return view('admin.Company.lowongan.edit', compact('lowongan', 'companies'));
     }
 
@@ -80,18 +99,34 @@ class LowonganController extends Controller
      */
     public function update(Request $request, Lowongan $lowongan)
     {
+        // Validate the incoming request data for updating a lowongan.
+        // The 'status' field must be 'Aktif' or 'Non-Aktif'.
+        // The 'tipe' field must be one of the specified enum values, now including 'Internship'.
         $validator = Validator::make($request->all(), [
-            'status' => 'required|in:Aktif,Non-Aktif', // Ubah di sini untuk menyertakan 'Non-Aktif'
+            'judul' => 'required|string|max:255',
+            'company_id' => 'required|exists:companies,id',
+            'deskripsi' => 'required|string',
+            'kualifikasi' => 'required|string',
+            'tipe' => 'required|in:Full-time,Part-time,Magang,Kontrak,Internship', // Corrected: Added 'Internship'
+            'lokasi' => 'required|string|max:255',
+            'gaji_min' => 'nullable|numeric|min:0',
+            'gaji_max' => 'nullable|numeric|min:0|gte:gaji_min',
+            'tanggal_buka' => 'required|date',
+            'tanggal_tutup' => 'required|date|after_or_equal:tanggal_buka',
+            'status' => 'required|in:Aktif,Non-Aktif', // Existing validation
         ]);
 
+        // If validation fails, redirect back to the edit form with errors and input.
         if ($validator->fails()) {
             return redirect()->route('admin.lowongan.edit', $lowongan->id)
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        $lowongan->update($request->all()); // $request->all() akan mencakup 'status'
+        // Update the Lowongan record with all validated request data.
+        $lowongan->update($request->all());
 
+        // Redirect to the lowongan index page with a success message.
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil diperbarui.');
     }
 
@@ -100,6 +135,11 @@ class LowonganController extends Controller
      */
     public function destroy(Lowongan $lowongan)
     {
+        // Delete the specified lowongan record.
+        $lowongan->delete();
+
+        // Redirect to the lowongan index page with a success message.
         return redirect()->route('admin.lowongan.index')->with('success', 'Lowongan berhasil dihapus.');
     }
 }
+
