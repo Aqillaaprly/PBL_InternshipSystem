@@ -14,20 +14,53 @@
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .document-table th {
             background-color: #F0F8FF;
             color: #374151;
+            font-weight: 600;
         }
+        .document-table td {
+            max-width: 0;
+        }
+        /* Specific column widths */
+        .col-job { width: 20%; }
+        .col-company { width: 18%; }
+        .col-date { width: 12%; }
+        .col-status { width: 12%; }
+        .col-docs { width: 12%; }
+        .col-notes { width: 15%; }
+        .col-actions { width: 11%; }
+
         body {
             background-color: #F0F8FF;
+        }
+
+        /* Tooltip for truncated text */
+        .truncate-text {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: help;
+        }
+
+        .truncate-notes {
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: help;
         }
     </style>
 </head>
 @include('mahasiswa.template.navbar')
 
 <body class="pt-20">
-<div class="max-w-5xl mx-auto p-4 space-y-6">
+<div class="max-w-7xl mx-auto p-4 space-y-6">
     <!-- Status Table -->
     <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex justify-between items-center mb-6">
@@ -63,56 +96,81 @@
             <table class="w-full document-table">
                 <thead>
                 <tr>
-                    <th>Judul Lowongan</th>
-                    <th>Perusahaan</th>
-                    <th>Tanggal Daftar</th>
-                    <th>Status Lamaran</th>
-                    <th>Status Dokumen</th>
-                    <th>Catatan Admin</th>
-                    <th>Aksi</th>
+                    <th class="col-job">Lowongan</th>
+                    <th class="col-company">Perusahaan</th>
+                    <th class="col-date">Tgl Daftar</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-docs">Dokumen</th>
+                    <th class="col-notes">Catatan</th>
+                    <th class="col-actions">Aksi</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($pendaftarans as $pendaftar)
                 <tr>
-                    <td>{{ $pendaftar->lowongan->judul ?? '-' }}</td>
-                    <td>{{ $pendaftar->lowongan->company->nama_perusahaan ?? '-' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($pendaftar->tanggal_daftar)->format('d-m-Y') }}</td>
-                    <td>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <td class="col-job">
+                        <div class="truncate-text" title="{{ $pendaftar->lowongan->judul ?? '-' }}">
+                            {{ $pendaftar->lowongan->judul ?? '-' }}
+                        </div>
+                    </td>
+                    <td class="col-company">
+                        <div class="truncate-text" title="{{ $pendaftar->lowongan->company->nama_perusahaan ?? '-' }}">
+                            {{ $pendaftar->lowongan->company->nama_perusahaan ?? '-' }}
+                        </div>
+                    </td>
+                    <td class="col-date">
+                        {{ \Carbon\Carbon::parse($pendaftar->tanggal_daftar)->format('d/m/Y') }}
+                    </td>
+                    <td class="col-status">
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
                             @if($pendaftar->status_lamaran == 'Diterima') bg-green-100 text-green-800
                             @elseif($pendaftar->status_lamaran == 'Ditolak') bg-red-100 text-red-800
                             @else bg-yellow-100 text-yellow-800 @endif">
                             {{ $pendaftar->status_lamaran }}
                         </span>
                     </td>
-                    <td>
+                    <td class="col-docs">
                         @if($pendaftar->dokumenPendaftars->count() > 0)
                         @php
                         $validCount = $pendaftar->dokumenPendaftars->where('status_validasi', 'Valid')->count();
                         $totalCount = $pendaftar->dokumenPendaftars->count();
                         @endphp
-                        <span class="text-sm">{{ $validCount }}/{{ $totalCount }} dokumen valid</span>
+                        <span class="text-sm font-medium
+                            @if($validCount == $totalCount) text-green-600
+                            @elseif($validCount > 0) text-yellow-600
+                            @else text-red-600 @endif">
+                            {{ $validCount }}/{{ $totalCount }}
+                        </span>
                         @else
-                        <span class="text-sm text-gray-500">Belum ada dokumen</span>
+                        <span class="text-sm text-gray-500">-</span>
                         @endif
                     </td>
-                    <td>{{ $pendaftar->catatan_admin ?? '-' }}</td>
-                    <td class="flex gap-2">
-                        <a href="{{ route('mahasiswa.pendaftar.dokumen', $pendaftar->id) }}"
-                           class="text-blue-600 hover:text-blue-800 font-medium">
-                            Lihat Dokumen
-                        </a>
-                        @if($pendaftar->status_lamaran == 'Pending')
-                        <form action="{{ route('mahasiswa.pendaftar.cancel', $pendaftar->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-800 font-medium"
-                                    onclick="return confirm('Apakah Anda yakin ingin membatalkan pendaftaran ini?')">
-                                Batalkan
-                            </button>
-                        </form>
+                    <td class="col-notes">
+                        @if($pendaftar->catatan_admin)
+                        <div class="truncate-notes" title="{{ $pendaftar->catatan_admin }}">
+                            {{ $pendaftar->catatan_admin }}
+                        </div>
+                        @else
+                        <span class="text-gray-400">-</span>
                         @endif
+                    </td>
+                    <td class="col-actions">
+                        <div class="flex flex-col gap-1">
+                            <a href="{{ route('mahasiswa.pendaftar.dokumen', $pendaftar->id) }}"
+                               class="text-blue-600 hover:text-blue-800 text-xs font-medium">
+                                Lihat Dokumen
+                            </a>
+                            @if($pendaftar->status_lamaran == 'Pending')
+                            <form action="{{ route('mahasiswa.pendaftar.cancel', $pendaftar->id) }}" method="POST" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-600 hover:text-red-800 text-xs font-medium"
+                                        onclick="return confirm('Yakin batalkan?')">
+                                    Batalkan
+                                </button>
+                            </form>
+                            @endif
+                        </div>
                     </td>
                 </tr>
                 @endforeach

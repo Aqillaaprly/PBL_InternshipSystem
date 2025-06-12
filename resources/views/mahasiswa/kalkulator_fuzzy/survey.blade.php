@@ -67,201 +67,193 @@
             <p class="text-xl text-gray-600 mt-4">Pilihlah Keahlian yang Mahir Dilakukan dan Survey Ini Akan Menentukan Rekomendasi Magangmu!</p>
         </header>
 
-        <main class="bg-white p-8 md:p-10 rounded-3xl shadow-2xl border border-gray-100"> <!-- Enhanced padding, rounded corners, shadow, border -->
-            <div id="input-section">
-                <h2 class="text-3xl font-bold mb-7 pb-4 border-b-4 border-indigo-600 text-gray-800">1. Berikan Penilaian Keahlian</h2> <!-- Bolder, thicker border -->
+    <main class="bg-white p-6 rounded-xl shadow-lg">
+        <div id="input-section">
+            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">1. Berikan Penilaian</h2>
 
-                <div id="decision-matrix-container" class="mb-10"> <!-- Increased margin-bottom -->
-                    <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md"> <!-- Added rounded corners and subtle shadow -->
-                        <table class="min-w-full">
-                            <thead class="bg-blue-50"> <!-- Consistent blue header -->
-                                <tr>
-                                    <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">Alternatif Magang</th>
-                                </tr>
-                            </thead>
-                            <tbody id="decision-matrix-body" class="divide-y divide-gray-100"> <!-- Added divider -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <button id="calculate-btn" class="w-full bg-indigo-600 text-white py-4 px-6 rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-offset-2 focus:ring-indigo-500 text-2xl font-bold transition duration-300 ease-in-out transform hover:scale-105 shadow-lg"> <!-- Larger padding, bolder, stronger hover/focus, shadow -->
-                Hitung Rekomendasi Magang
-            </button>
-
-            <div id="results-section" class="mt-14 hidden"> <!-- Increased margin-top -->
-                <h2 class="text-3xl font-bold mb-7 pb-4 border-b-4 border-indigo-600 text-gray-800">
-                    2. Hasil Perhitungan
-                    <button id="toggle-details-btn" class="ml-6 px-5 py-2.5 bg-blue-500 text-white text-base rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition duration-200 ease-in-out shadow-sm">
-                        Tampilkan Detail
-                    </button>
-                </h2>
-                <div id="calculation-details" class="hidden">
-                    <div id="results-output" class="prose max-w-none text-gray-700"></div>
-                </div>
-                <div id="final-ranking-output" class="prose max-w-none mt-10"></div> <!-- Increased margin-top for final ranking -->
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // --- KONFIGURASI DAN DATA YANG DITENTUKAN ---
-        const ALTERNATIVE_NAMES = ['Fullstack Developer','Web Developer','Machine Learning Engineer', 'Cyber Security', 'Computer Network','Quality Assurance','System Analyst', 'Backend Developer', 'UI/UX Designer', 'Data Analyst', 'Data Scientist'];
-        const CRITERIA_NAMES = ['Skill', 'Minat', 'Pengalaman', 'Language/Tool Proficiency'];
-
-        // Jenis kriteria sudah ditentukan: 'cost' untuk Harga, sisanya 'benefit'
-        const CRITERIA_TYPES = ['benefit', 'benefit', 'benefit', 'benefit'];
-
-        const linguisticTerms = {
-            "Sangat Rendah": [1, 2, 3],
-            "Rendah": [2, 3, 4],
-            "Cukup": [4, 5, 6],
-            "Tinggi": [6, 7, 8],
-            "Sangat Tinggi": [7, 8, 9]
-        };
-
-        // --- Core Fuzzy TOPSIS Logic (Tidak Berubah) ---
-        const ftn = {
-            divide: (a, scalar) => [a[0] / scalar, a[1] / scalar, a[2] / scalar]
-        };
-
-        function fuzzyTopsis(decisionMatrix, criteriaTypes) {
-            const numAlternatives = decisionMatrix.length;
-            const numCriteria = decisionMatrix[0].length;
-
-            const normalizedMatrix = [];
-            for (let j = 0; j < numCriteria; j++) {
-                let cMax = -Infinity;
-                let aMin = Infinity;
-                if (criteriaTypes[j] === 'benefit') {
-                    for (let i = 0; i < numAlternatives; i++) {
-                        if (decisionMatrix[i][j][2] > cMax) cMax = decisionMatrix[i][j][2];
-                    }
-                } else { // cost
-                    for (let i = 0; i < numAlternatives; i++) {
-                        if (decisionMatrix[i][j][0] < aMin) aMin = decisionMatrix[i][j][0];
-                    }
-                }
-                for (let i = 0; i < numAlternatives; i++) {
-                    if (!normalizedMatrix[i]) normalizedMatrix[i] = [];
-                    if (criteriaTypes[j] === 'benefit') {
-                        normalizedMatrix[i][j] = ftn.divide(decisionMatrix[i][j], cMax);
-                    } else { // cost
-                        normalizedMatrix[i][j] = [aMin / decisionMatrix[i][j][2], aMin / decisionMatrix[i][j][1], aMin / decisionMatrix[i][j][0]];
-                    }
-                }
-            }
-
-            const fpis = [];
-            const fnis = [];
-            for (let j = 0; j < numCriteria; j++) {
-                let maxVal = [-Infinity, -Infinity, -Infinity];
-                let minVal = [Infinity, Infinity, Infinity];
-                for (let i = 0; i < numAlternatives; i++) {
-                    if (normalizedMatrix[i][j][2] > maxVal[2]) maxVal = normalizedMatrix[i][j];
-                    if (normalizedMatrix[i][j][0] < minVal[0]) minVal = normalizedMatrix[i][j];
-                }
-                fpis.push(maxVal);
-                fnis.push(minVal);
-            }
-
-            const dPositive = [];
-            const dNegative = [];
-            const distance = (a, b) => Math.sqrt((1 / 3) * (Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)));
-            for (let i = 0; i < numAlternatives; i++) {
-                let dPosSum = 0;
-                let dNegSum = 0;
-                for (let j = 0; j < numCriteria; j++) {
-                    dPosSum += distance(normalizedMatrix[i][j], fpis[j]);
-                    dNegSum += distance(normalizedMatrix[i][j], fnis[j]);
-                }
-                dPositive.push(dPosSum);
-                dNegative.push(dNegSum);
-            }
-
-            const cc = [];
-            for (let i = 0; i < numAlternatives; i++) {
-                cc.push(dNegative[i] / (dPositive[i] + dNegative[i]));
-            }
-
-            const ranked = cc.map((value, index) => ({ alternative: index, value }))
-                .sort((a, b) => b.value - a.value);
-
-            return { normalizedMatrix, fpis, fnis, dPositive, dNegative, cc, ranked };
-        }
-
-        // --- UI Logic (Telah Diperbarui) ---
-        const calculateBtn = document.getElementById('calculate-btn');
-        const decisionMatrixBody = document.getElementById('decision-matrix-body');
-        const resultsSection = document.getElementById('results-section');
-        const resultsOutput = document.getElementById('results-output');
-        const toggleDetailsBtn = document.getElementById('toggle-details-btn');
-        const calculationDetails = document.getElementById('calculation-details');
-        const finalRankingOutput = document.getElementById('final-ranking-output');
-
-        function generateInputsUI() {
-            const headerRow = document.querySelector('#decision-matrix-container thead tr');
-            CRITERIA_NAMES.forEach(name => {
-                headerRow.innerHTML += `<th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">${name}</th>`; // Consistent header styling
-            });
-
-            ALTERNATIVE_NAMES.forEach((altName, i) => {
-                const row = document.createElement('tr');
-                let rowHtml = `<td class="border border-gray-200 p-3.5 font-medium text-gray-800">${altName}</td>`; // Consistent cell styling
-                CRITERIA_NAMES.forEach((critName, j) => {
-                    let selectHtml = `<select id="d-cell-${i}-${j}" class="w-full p-2.5 pr-8 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 text-gray-700 bg-white shadow-sm transition duration-150 ease-in-out cursor-pointer hover:border-indigo-400">`; // Enhanced select styling
-                    for (const term in linguisticTerms) {
-                        selectHtml += `<option value="${term}">${term}</option>`;
-                    }
-                    selectHtml += `</select>`;
-                    rowHtml += `<td class="border border-gray-200 p-2.5">${selectHtml}</td>`; // Padding for cell containing select
-                });
-                row.innerHTML = rowHtml;
-                decisionMatrixBody.appendChild(row);
-            });
-        }
-
-        function gatherInputs() {
-            const decisionMatrix = [];
-            ALTERNATIVE_NAMES.forEach((alt, i) => {
-                decisionMatrix[i] = [];
-                CRITERIA_NAMES.forEach((crit, j) => {
-                    const selectedTerm = document.getElementById(`d-cell-${i}-${j}`).value;
-                    decisionMatrix[i][j] = linguisticTerms[selectedTerm];
-                });
-            });
-            return { decisionMatrix, criteriaTypes: CRITERIA_TYPES };
-        }
-
-        function displayResults(results) {
-            resultsSection.classList.remove('hidden');
-            calculationDetails.classList.add('hidden');
-            toggleDetailsBtn.textContent = 'Tampilkan Detail';
-
-            const formatTFN = (tfn) => `(${tfn.map(v => v.toFixed(3)).join(', ')})`;
-
-            // HTML for calculation details (Matrix, FPIS, FNIS, Distance, CC)
-            let detailsHtml = `
-                <h4>1. Matriks Keputusan Fuzzy Ternormalisasi</h4>
-                <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md mb-6"> <!-- Added rounded corners and subtle shadow -->
-                    <table class="min-w-full">
-                        <thead class="bg-blue-50">
-                            <tr>
-                                <th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">Alternatif</th>
-                                ${CRITERIA_NAMES.map(name => `<th class="border border-gray-200 p-4 text-left font-semibold text-blue-800 uppercase tracking-wider">${name}</th>`).join('')}
-                            </tr>
+            <div id="decision-matrix-container" class="mb-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border border-gray-300 p-2">Alternatif</th>
+                        </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            ${results.normalizedMatrix.map((row, i) => `
-                                <tr class="${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition-colors duration-150 ease-in-out">
-                                    <td class="border border-gray-200 p-3.5 font-medium text-gray-800"><b>${ALTERNATIVE_NAMES[i]}</b></td>
-                                    ${row.map(cell => `<td class="border border-gray-200 p-3.5">${formatTFN(cell)}</td>`).join('')}
-                                </tr>
-                            `).join('')}
+                        <tbody id="decision-matrix-body">
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <button id="calculate-btn" class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 text-lg font-semibold transition duration-150 ease-in-out">Hitung Peringkat</button>
+
+        <div id="results-section" class="mt-8 hidden">
+            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">
+                2. Hasil Perhitungan
+                <button id="toggle-details-btn" class="ml-4 px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400">
+                    Tampilkan Detail
+                </button>
+            </h2>
+            <div id="calculation-details" class="hidden">
+                <div id="results-output" class="prose max-w-none"></div>
+            </div>
+            <div id="final-ranking-output" class="prose max-w-none mt-4"></div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // --- KONFIGURASI DAN DATA YANG DITENTUKAN ---
+    const ALTERNATIVE_NAMES = ['Fullstack Developer', 'Backend Developer', 'UI/UX Designer', 'Data Analyst', 'Financial Analyst'];
+    const CRITERIA_NAMES = ['Skill', 'Minat', 'Pengalaman', 'Language/Tool Proficiency'];
+
+    // Jenis kriteria sudah ditentukan: 'cost' untuk Harga, sisanya 'benefit'
+    const CRITERIA_TYPES = ['benefit', 'benefit', 'benefit', 'benefit'];
+
+    const linguisticTerms = {
+        "Sangat Rendah": [1, 2, 3],
+        "Rendah": [2, 3, 4],
+        "Cukup": [4, 5, 6],
+        "Tinggi": [6, 7, 8],
+        "Sangat Tinggi": [7, 8, 9]
+    };
+
+    // --- Core Fuzzy TOPSIS Logic (Tidak Berubah) ---
+    const ftn = {
+        divide: (a, scalar) => [a[0] / scalar, a[1] / scalar, a[2] / scalar]
+    };
+
+    function fuzzyTopsis(decisionMatrix, criteriaTypes) {
+        const numAlternatives = decisionMatrix.length;
+        const numCriteria = decisionMatrix[0].length;
+
+        const normalizedMatrix = [];
+        for (let j = 0; j < numCriteria; j++) {
+            let cMax = -Infinity;
+            let aMin = Infinity;
+            if (criteriaTypes[j] === 'benefit') {
+                for (let i = 0; i < numAlternatives; i++) {
+                    if (decisionMatrix[i][j][2] > cMax) cMax = decisionMatrix[i][j][2];
+                }
+            } else { // cost
+                for (let i = 0; i < numAlternatives; i++) {
+                    if (decisionMatrix[i][j][0] < aMin) aMin = decisionMatrix[i][j][0];
+                }
+            }
+            for (let i = 0; i < numAlternatives; i++) {
+                if (!normalizedMatrix[i]) normalizedMatrix[i] = [];
+                if (criteriaTypes[j] === 'benefit') {
+                    normalizedMatrix[i][j] = ftn.divide(decisionMatrix[i][j], cMax);
+                } else { // cost
+                    normalizedMatrix[i][j] = [aMin / decisionMatrix[i][j][2], aMin / decisionMatrix[i][j][1], aMin / decisionMatrix[i][j][0]];
+                }
+            }
+        }
+
+        const fpis = [];
+        const fnis = [];
+        for (let j = 0; j < numCriteria; j++) {
+            let maxVal = [-Infinity, -Infinity, -Infinity];
+            let minVal = [Infinity, Infinity, Infinity];
+            for (let i = 0; i < numAlternatives; i++) {
+                if (normalizedMatrix[i][j][2] > maxVal[2]) maxVal = normalizedMatrix[i][j];
+                if (normalizedMatrix[i][j][0] < minVal[0]) minVal = normalizedMatrix[i][j];
+            }
+            fpis.push(maxVal);
+            fnis.push(minVal);
+        }
+
+        const dPositive = [];
+        const dNegative = [];
+        const distance = (a, b) => Math.sqrt((1 / 3) * (Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)));
+        for (let i = 0; i < numAlternatives; i++) {
+            let dPosSum = 0;
+            let dNegSum = 0;
+            for (let j = 0; j < numCriteria; j++) {
+                dPosSum += distance(normalizedMatrix[i][j], fpis[j]);
+                dNegSum += distance(normalizedMatrix[i][j], fnis[j]);
+            }
+            dPositive.push(dPosSum);
+            dNegative.push(dNegSum);
+        }
+
+        const cc = [];
+        for (let i = 0; i < numAlternatives; i++) {
+            cc.push(dNegative[i] / (dPositive[i] + dNegative[i]));
+        }
+
+        const ranked = cc.map((value, index) => ({ alternative: index, value }))
+            .sort((a, b) => b.value - a.value);
+
+        return { normalizedMatrix, fpis, fnis, dPositive, dNegative, cc, ranked };
+    }
+
+    // --- UI Logic (Telah Diperbarui) ---
+    const calculateBtn = document.getElementById('calculate-btn');
+    const decisionMatrixBody = document.getElementById('decision-matrix-body');
+    const resultsSection = document.getElementById('results-section');
+    const resultsOutput = document.getElementById('results-output');
+    const toggleDetailsBtn = document.getElementById('toggle-details-btn'); // New element
+    const calculationDetails = document.getElementById('calculation-details'); // New element
+    const finalRankingOutput = document.getElementById('final-ranking-output'); // New element
+
+    function generateInputsUI() {
+        const headerRow = document.querySelector('#decision-matrix-container thead tr');
+        CRITERIA_NAMES.forEach(name => {
+            headerRow.innerHTML += `<th class="border border-gray-300 p-2 text-sm">${name}</th>`;
+        });
+
+        ALTERNATIVE_NAMES.forEach((altName, i) => {
+            const row = document.createElement('tr');
+            let rowHtml = `<td class="border border-gray-300 p-2 font-medium">${altName}</td>`;
+            CRITERIA_NAMES.forEach((critName, j) => {
+                let selectHtml = `<select id="d-cell-${i}-${j}" class="w-full p-2 border-gray-200 rounded-md focus:ring-indigo-500 focus:border-indigo-500">`;
+                for (const term in linguisticTerms) {
+                    selectHtml += `<option value="${term}">${term}</option>`;
+                }
+                selectHtml += `</select>`;
+                rowHtml += `<td class="border border-gray-300 p-1">${selectHtml}</td>`;
+            });
+            row.innerHTML = rowHtml;
+            decisionMatrixBody.appendChild(row);
+        });
+    }
+
+    function gatherInputs() {
+        const decisionMatrix = [];
+        ALTERNATIVE_NAMES.forEach((alt, i) => {
+            decisionMatrix[i] = [];
+            CRITERIA_NAMES.forEach((crit, j) => {
+                const selectedTerm = document.getElementById(`d-cell-${i}-${j}`).value;
+                decisionMatrix[i][j] = linguisticTerms[selectedTerm];
+            });
+        });
+
+        return { decisionMatrix, criteriaTypes: CRITERIA_TYPES };
+    }
+
+    function displayResults(results) {
+        resultsSection.classList.remove('hidden'); // Tampilkan section hasil
+        calculationDetails.classList.add('hidden'); // Sembunyikan detail perhitungan default
+        toggleDetailsBtn.textContent = 'Tampilkan Detail'; // Reset teks tombol
+
+        const formatTFN = (tfn) => `(${tfn.map(v => v.toFixed(3)).join(', ')})`;
+
+        // HTML untuk detail perhitungan (Matriks, FPIS, FNIS, Jarak, CC)
+        let detailsHtml = `
+                <h4>1. Matriks Keputusan Fuzzy Ternormalisasi</h4>
+                <table>
+                    <thead><tr><th>Alternatif</th>${CRITERIA_NAMES.map(name => `<th>${name}</th>`).join('')}</tr></thead>
+                    <tbody>
+                        ${results.normalizedMatrix.map((row, i) => `
+                            <tr>
+                                <td><b>${ALTERNATIVE_NAMES[i]}</b></td>
+                                ${row.map(cell => `<td>${formatTFN(cell)}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
 
                 <h4>2. Solusi Ideal Positif (FPIS, A*) & Negatif (FNIS, A-)</h4>
                 <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-md mb-6"> <!-- Added rounded corners and subtle shadow -->

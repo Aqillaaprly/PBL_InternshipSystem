@@ -71,6 +71,7 @@ class PendaftarController extends Controller
         $validatedData = $request->validate([
             'lowongan_id' => 'required|exists:lowongans,id',
             'surat_lamaran' => 'required|file|mimes:pdf,doc,docx|max:5120',
+            'daftar_riwayat_hidup' => 'required|file|mimes:pdf,doc,docx|max:5120',
             'cv' => 'required|file|mimes:pdf,doc,docx|max:5120',
             'portofolio' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'khs_transkrip' => 'required|file|mimes:pdf,doc,docx|max:5120',
@@ -123,8 +124,13 @@ class PendaftarController extends Controller
                     'required' => true,
                     'type' => 'document'
                 ],
+                'daftar_riwayat_hidup' => [
+                    'name' => 'Daftar Riwayat Hidup',
+                    'required' => true,
+                    'type' => 'document'
+                ],
                 'cv' => [
-                    'name' => 'Daftar Riwayat Hidup (CV)',
+                    'name' => 'CV',
                     'required' => true,
                     'type' => 'document'
                 ],
@@ -279,9 +285,13 @@ class PendaftarController extends Controller
             ->where('user_id', $userId)
             ->findOrFail($pendaftarId);
 
+        // Add this to check if application is still editable
+        $isEditable = $pendaftar->status_lamaran === 'Pending';
+
         return view('mahasiswa.dokumen_pendaftar', [
             'dokumen' => $pendaftar->dokumenPendaftars,
-            'pendaftar' => $pendaftar
+            'pendaftar' => $pendaftar,
+            'isEditable' => $isEditable // Pass this to view
         ]);
     }
 
@@ -327,6 +337,70 @@ class PendaftarController extends Controller
             case 'Belum Diverifikasi':
             default:
                 return 'bg-yellow-100 text-yellow-700';
+        }
+    }
+
+    public function replaceDocument(Request $request, $pendaftarId, $documentId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $userId = Auth::id();
+            $pendaftar = Pendaftar::where('user_id', $userId)->findOrFail($pendaftarId);
+
+            // Check if application is still editable
+            if ($pendaftar->status_lamaran !== 'Pending') {
+                throw new \Exception('Dokumen hanya dapat diganti saat status lamaran Pending');
+            }
+
+            $document = DokumenPendaftar::where('pendaftar_id', $pendaftarId)
+                ->findOrFail($documentId);
+
+            $request->validate([
+                'replacement_file' => 'required|file|max:5120'
+            ]);
+
+            // Validate file type based on original document type
+            $allowedExtensions = Str::contains($document->nama_dokumen, ['KTP', 'KTM'])
+                ? ['jpg', 'jpeg', 'png']
+                : ['pdf', 'doc', 'docx'];
+
+            $file = $request->file('replacement_file');
+            $extension = strtolower($file->getClientOriginalExtension());
+
+            if (!in_array($extension, $allowedExtensions)) {
+                throw new \Exception("Format file tidak valid untuk {$document->nama_dokumen}");
+            }
+
+            // Delete old file
+            if (Storage::disk('public')->exists($document->file_path)) {
+                Storage::disk('public')->delete($document->file_path);
+            }
+
+            // Store new file
+            $fileName = Str::slug($document->nama_dokumen).'_'.time().'_'.Str::random(6).'.'.$extension;
+            $path = $file->storeAs("dokumen_pendaftar/{$pendaftarId}", $fileName, 'public');
+
+            // Update document record
+            $document->update([
+                'file_path' => $path,
+                'tipe_file' => $extension,
+                'status_validasi' => 'Belum Diverifikasi'
+            ]);
+
+            DB::commit();
+
+            return redirect()
+                ->back()
+                ->with('success', 'Dokumen berhasil diganti');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Document Replacement Error: ' . $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal mengganti dokumen: ' . $e->getMessage());
         }
     }
 }
