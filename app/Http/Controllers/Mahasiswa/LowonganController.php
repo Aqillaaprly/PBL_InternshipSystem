@@ -41,6 +41,11 @@ class LowonganController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by recommendation if exists
+        if (session('recommended_job')) {
+            $query->where('judul', 'like', '%' . session('recommended_job') . '%');
+        }
+
         $lowongans = $query->orderBy('created_at', 'desc')->paginate(10);
         $jumlahLowongan = Lowongan::count();
 

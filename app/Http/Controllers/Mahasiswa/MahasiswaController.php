@@ -18,12 +18,24 @@ class MahasiswaController extends Controller
         $jumlahLowongan = Lowongan::where('status', 'Aktif')->count();
         $jumlahPendaftar = Pendaftar::where('user_id', Auth::id())->count();
 
+        // Get recommended lowongan if exists
+        $recommendedLowongan = null;
+        if (session('recommended_lowongan_id')) {
+            $recommendedLowongan = Lowongan::with('company')
+                ->where('id', session('recommended_lowongan_id'))
+                ->where('status', 'Aktif')
+                ->whereDate('tanggal_tutup', '>=', now())
+                ->first();
+        }
+
         return view('mahasiswa.dashboard', compact(
             'jumlahPerusahaan',
             'jumlahLowongan',
-            'jumlahPendaftar'
+            'jumlahPendaftar',
+            'recommendedLowongan'
         ));
     }
+
 
     public function lihatPembimbing()
     {
@@ -60,9 +72,10 @@ class MahasiswaController extends Controller
         return view('mahasiswa.laporan', compact('bimbingans'));
     }
 
+    // Update perusahaan method to filter by recommendation:
     public function perusahaan(Request $request)
     {
-        $query = Company::with('lowongans'); // Fixed: should be 'lowongans' not 'lowongan'
+        $query = Company::with('lowongans');
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -73,8 +86,35 @@ class MahasiswaController extends Controller
             });
         }
 
+        // Filter by recommendation if exists
+        if (session('recommended_job')) {
+            $query->whereHas('lowongans', function($q) {
+                $q->where('judul', 'like', '%' . session('recommended_job') . '%');
+            });
+        }
+
         $companies = $query->orderBy('nama_perusahaan')->paginate(10);
 
         return view('mahasiswa.perusahaan', compact('companies'));
+    }
+
+    public function job()
+    {
+        // Get lowongans based on recommendation if exists
+        if (session('recommended_lowongan_id')) {
+            $lowongans = Lowongan::with('company')
+                ->where('id', session('recommended_lowongan_id'))
+                ->where('status', 'Aktif')
+                ->whereDate('tanggal_tutup', '>=', now())
+                ->paginate(5);
+        } else {
+            $lowongans = Lowongan::with('company')
+                ->where('status', 'Aktif')
+                ->whereDate('tanggal_tutup', '>=', now())
+                ->orderBy('tanggal_tutup', 'asc')
+                ->paginate(10);
+        }
+
+        return view('mahasiswa.job', compact('lowongans'));
     }
 }

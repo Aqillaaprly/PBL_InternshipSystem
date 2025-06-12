@@ -25,6 +25,16 @@ use App\Http\Controllers\Dosen\MahasiswaBimbinganController;
 use App\Http\Controllers\Dosen\AbsensiMahasiswaBimbingan;
 use App\Http\Controllers\Dosen\ProfileController;
 use App\Http\Controllers\Dosen\LogBimbingan;
+//Mahasiswa
+use App\Http\Controllers\Mahasiswa\MahasiswaController;
+use App\Http\Controllers\Mahasiswa\ProfileController as MahasiswaProfileController;
+use App\Http\Controllers\Mahasiswa\LowonganController as MahasiswaLowonganController;
+use App\Http\Controllers\Mahasiswa\PendaftarController as MahasiswaPendaftarController;
+use App\Http\Controllers\Mahasiswa\LaporanController as MahasiswaLaporanController;
+use App\Http\Controllers\Mahasiswa\CompanyController as MahasiswaCompanyController;
+use App\Http\Controllers\Mahasiswa\SurveyController;
+use App\Models\Company;
+use App\Models\AktivitasAbsensi;
 
 // Mengarahkan halaman utama ('/') ke halaman login
 Route::get('/', [AuthenticatedSessionController::class, 'create'])->name('home');
@@ -91,60 +101,66 @@ Route::middleware(['auth', 'authorize:dosen'])->prefix('dosen')->name('dosen.')-
     Route::post('/log-bimbingan/store/{id}', [LogBimbingan::class, 'store'])->name('log_bimbingan.store');
     Route::get('/absensi', [AbsensiMahasiswaBimbingan::class, 'index'])->name('absensi.index');
     Route::get('/absensi/{id}', [AbsensiMahasiswaBimbingan::class, 'show'])->name('absensi.show');
-    // Profile Management Routes 
+    // Profile Management Routes
     Route::get('/profil', [ProfileController::class, 'show'])->name('profile.dosenProfile2'); // Changed name to match your controller's comment and redirect
     Route::get('/profil/edit', [ProfileController::class, 'edit'])->name('profile.edit3');
     Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update3');
 });
 
-// MAHASISWA GROUP
-// Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-//     // Dashboard
-//     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
+// MAHASISWA GROUP - Updated Routes Section
+Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
+    // Dashboard
+    Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
 
-//     // Pembimbing
-//     Route::get('/pembimbing', [MahasiswaController::class, 'lihatPembimbing'])->name('pembimbing');
+    // Pembimbing
+    Route::get('/pembimbing', [MahasiswaController::class, 'lihatPembimbing'])->name('pembimbing');
 
-//     // Absensi
-//     Route::get('/absensi', fn() => view('mahasiswa.absensi'))->name('absensi');
+    // Absensi
+    Route::get('/absensi', fn() => view('mahasiswa.absensi'))->name('absensi');
 
-//     // Job
-//     Route::get('/job', fn() => view('mahasiswa.job'))->name('job');
+    // Job - Updated to use controller method
+    Route::get('/job', [MahasiswaController::class, 'job'])->name('job');
 
-//     // Profile Routes
-//     Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
-//     Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
-//     Route::put('/profile', [MahasiswaProfileController::class, 'update'])->name('profile.update');
+    // Profile Routes
+    Route::get('/profile', [MahasiswaProfileController::class, 'show'])->name('profile');
+    Route::get('/profile/edit', [MahasiswaProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [MahasiswaProfileController::class, 'update'])->name('profile.update');
 
-//     // Perusahaan Routes - UPDATED
-//     Route::get('/perusahaan', [MahasiswaController::class, 'perusahaan'])->name('perusahaan');
-//     Route::get('/perusahaan/{id}/profile', [MahasiswaCompanyController::class, 'showProfile'])
-//         ->name('perusahaan.profile');
+    // Perusahaan Routes - UPDATED
+    Route::get('/perusahaan', [MahasiswaCompanyController::class, 'perusahaan'])->name('perusahaan.index');
+    Route::get('/perusahaan/{company}', [MahasiswaCompanyController::class, 'showProfile'])
+        ->name('perusahaan.show');
 
-//     // Laporan Routes with Search
-//     Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
-//     Route::post('/laporan', [MahasiswaLaporanController::class, 'store'])->name('laporan.store');
-//     Route::delete('/laporan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('laporan.destroy');
+    // Laporan Routes with Search
+    Route::get('/laporan', [MahasiswaLaporanController::class, 'index'])->name('laporan');
+    Route::post('/laporan', [MahasiswaLaporanController::class, 'store'])->name('laporan.store');
+    Route::delete('/laporan/{id}', [MahasiswaLaporanController::class, 'destroy'])->name('laporan.destroy');
 
-//     // Lowongan Routes with Search/Filter
-//     Route::get('/lowongan', [MahasiswaLowonganController::class, 'index'])->name('lowongan.index');
-//     Route::get('/lowongan/create', [MahasiswaLowonganController::class, 'create'])->name('lowongan.create');
-//     Route::post('/lowongan', [MahasiswaLowonganController::class, 'store'])->name('lowongan.store');
-//     Route::get('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'show'])->name('lowongan.show');
-//     Route::get('/lowongan/{lowongan}/edit', [MahasiswaLowonganController::class, 'edit'])->name('lowongan.edit');
-//     Route::put('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'update'])->name('lowongan.update');
-//     Route::delete('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'destroy'])->name('lowongan.destroy');
+    // Lowongan Routes with Search/Filter
+    Route::get('/lowongan', [MahasiswaLowonganController::class, 'index'])->name('lowongan.index');
+    Route::get('/lowongan/create', [MahasiswaLowonganController::class, 'create'])->name('lowongan.create');
+    Route::post('/lowongan', [MahasiswaLowonganController::class, 'store'])->name('lowongan.store');
+    Route::get('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'show'])->name('lowongan.show');
+    Route::get('/lowongan/{lowongan}/edit', [MahasiswaLowonganController::class, 'edit'])->name('lowongan.edit');
+    Route::put('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'update'])->name('lowongan.update');
+    Route::delete('/lowongan/{lowongan}', [MahasiswaLowonganController::class, 'destroy'])->name('lowongan.destroy');
 
-//     // Pendaftar Routes
-//     Route::get('/pendaftar', [PendaftarController::class, 'showPendaftaranTable'])->name('pendaftar');
-//     Route::get('/pendaftar/form', [PendaftarController::class, 'showPendaftaranForm'])->name('pendaftar.form');
-//     Route::post('/pendaftar/submit', [PendaftarController::class, 'submitPendaftaran'])->name('pendaftar.submit');
-//     Route::delete('/pendaftar/{pendaftar}', [PendaftarController::class, 'cancelPendaftaran'])->name('pendaftar.cancel');
-//     Route::get('/apply-from-lowongan/{lowonganId}', [PendaftarController::class, 'applyFromLowongan'])
-//         ->name('apply.from.lowongan');
-//     Route::get('/pendaftar/dokumen/{pendaftarId}', [PendaftarController::class, 'showDocuments'])
-//         ->name('pendaftar.dokumen');
-// });
+    // Pendaftar Routes
+    Route::get('/pendaftar', [MahasiswaPendaftarController::class, 'showPendaftaranTable'])->name('pendaftar');
+    Route::get('/pendaftar/form', [MahasiswaPendaftarController::class, 'showPendaftaranForm'])->name('pendaftar.form');
+    Route::post('/pendaftar/submit', [MahasiswaPendaftarController::class, 'submitPendaftaran'])->name('pendaftar.submit');
+    Route::delete('/pendaftar/{pendaftar}', [MahasiswaPendaftarController::class, 'cancelPendaftaran'])->name('pendaftar.cancel');
+    Route::get('/apply-from-lowongan/{lowonganId}', [MahasiswaPendaftarController::class, 'applyFromLowongan'])
+        ->name('apply.from.lowongan');
+    Route::get('/pendaftar/dokumen/{pendaftarId}', [MahasiswaPendaftarController::class, 'showDocuments'])
+        ->name('pendaftar.dokumen');
+
+    // Survey Routes - Updated and consolidated
+    Route::get('/survey', [SurveyController::class, 'index'])->name('survey');
+    Route::post('/survey/process', [SurveyController::class, 'process'])->name('survey.process');
+    Route::post('/survey/accept', [SurveyController::class, 'accept'])->name('survey.accept');
+    Route::post('/survey/cancel', [SurveyController::class, 'cancel'])->name('survey.cancel');
+});
 
 // PERUSAHAAN GROUP (Ini untuk DASHBOARD ROLE PERUSAHAAN, bukan manajemen oleh ADMIN)
 Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name('perusahaan.')->group(function () {
@@ -156,7 +172,7 @@ Route::middleware(['auth', 'authorize:perusahaan'])->prefix('perusahaan')->name(
     Route::get('/profil/edit', [CompanyController::class, 'edit'])->name('profile.edit1');
     Route::put('/profil', [CompanyController::class, 'update'])->name('profile.update1');
 
-    // Profile Management Routes 
+    // Profile Management Routes
     Route::get('/profil', [ProfilePerusahaanController::class, 'show'])->name('profile.perusahaanProfile2'); // Changed name to match your controller's comment and redirect
     Route::get('/profil/edit', [ProfilePerusahaanController::class, 'edit'])->name('profile.edit2');
     Route::put('/profil', [ProfilePerusahaanController::class, 'update'])->name('profile.update2');

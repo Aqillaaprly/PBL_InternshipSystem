@@ -7,6 +7,7 @@ use App\Models\AktivitasAbsensi;
 use App\Models\AktivitasFoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
@@ -33,11 +34,15 @@ class LaporanController extends Controller
         $request->validate([
             'tanggal' => 'required|date',
             'deskripsi_kegiatan' => 'required|string',
+            'jam_kerja' => 'required|date_format:H:i',
             'bukti_kegiatan' => 'nullable|image|max:2048'
         ]);
 
         $data = $request->only(['tanggal', 'deskripsi_kegiatan']);
         $data['mahasiswa_id'] = auth()->id();
+
+        // Combine the date from tanggal with time from jam_kerja to create a proper datetime
+        $data['jam_kerja'] = Carbon::parse($request->tanggal . ' ' . $request->jam_kerja);
 
         if ($request->hasFile('bukti_kegiatan')) {
             $path = $request->file('bukti_kegiatan')->store('aktifitas_magang', 'public');

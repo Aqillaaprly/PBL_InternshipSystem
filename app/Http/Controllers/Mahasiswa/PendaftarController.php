@@ -157,7 +157,8 @@ class PendaftarController extends Controller
             foreach ($documentConfig as $field => $config) {
                 if ($request->hasFile($field)) {
                     $file = $request->file($field);
-                    $extension = strtolower($file->getClientOriginalExtension());
+                    $originalExtension = $file->getClientOriginalExtension();
+                    $extension = strtolower($originalExtension);
 
                     // Validate file type
                     $allowedExtensions = $config['type'] === 'image'
@@ -169,24 +170,18 @@ class PendaftarController extends Controller
                     }
 
                     // Generate unique filename
-                    $fileName = Str::slug($config['name']).'_'.time().'.'.$extension;
+                    $fileName = Str::slug($config['name']).'_'.time().'_'.Str::random(6).'.'.$extension;
                     $path = $file->storeAs("dokumen_pendaftar/{$pendaftar->id}", $fileName, 'public');
 
-                    // Create document record
-                    $document = DokumenPendaftar::create([
+                    // Create document record - aligned with database structure
+                    DokumenPendaftar::create([
                         'pendaftar_id' => $pendaftar->id,
                         'nama_dokumen' => $config['name'],
                         'file_path' => $path,
-                        'tipe_file' => $extension,
-                        'status_validasi' => 'Belum Diverifikasi'
+                        'tipe_file' => $extension, // Store the file extension
+                        'status_validasi' => 'Belum Diverifikasi' // Default value as per database
                     ]);
 
-                    // Update main document paths if needed
-                    if (in_array($field, ['surat_lamaran', 'cv', 'portofolio'])) {
-                        $pendaftar->update([
-                            "{$field}_path" => $document->file_path
-                        ]);
-                    }
                 } elseif ($config['required']) {
                     throw new \Exception("Dokumen {$config['name']} wajib diunggah");
                 }
@@ -216,7 +211,7 @@ class PendaftarController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        // Rest of the existing cancel logic...
+        // Only allow cancellation of pending applications
         if ($pendaftar->status_lamaran !== 'Pending') {
             return redirect()
                 ->back()
@@ -226,9 +221,13 @@ class PendaftarController extends Controller
         DB::beginTransaction();
 
         try {
-            // Delete associated documents
+            // Delete associated documents and files
             foreach ($pendaftar->dokumenPendaftars as $document) {
-                Storage::disk('public')->delete($document->file_path);
+                // Delete file from storage
+                if (Storage::disk('public')->exists($document->file_path)) {
+                    Storage::disk('public')->delete($document->file_path);
+                }
+                // Delete database record
                 $document->delete();
             }
 
@@ -258,7 +257,7 @@ class PendaftarController extends Controller
         $pendaftar = Pendaftar::with(['dokumenPendaftars' => function($query) use ($userId) {
             $query->whereHas('pendaftar', function($q) use ($userId) {
                 $q->where('user_id', $userId);
-            });
+            })->orderBy('created_at');
         }])
             ->where('user_id', $userId)
             ->findOrFail($pendaftarId);
@@ -279,6 +278,7 @@ class PendaftarController extends Controller
                 ->with('error', 'Silakan login terlebih dahulu');
         }
 
+        // Check if user already applied for this job
         $existing = Pendaftar::where('user_id', $userId)
             ->where('lowongan_id', $lowonganId)
             ->exists();
@@ -289,7 +289,27 @@ class PendaftarController extends Controller
                 ->with('error', 'Anda sudah mendaftar untuk lowongan ini');
         }
 
+        // Redirect to application form with pre-selected job
         return redirect()
             ->route('mahasiswa.pendaftar.form', ['lowongan_id' => $lowonganId]);
+    }
+
+    /**
+     * Get document validation status badge class
+     *
+     * @param string $status
+     * @return string
+     */
+    protected function getValidationStatusBadge($status)
+    {
+        switch ($status) {
+            case 'Valid':
+                return 'bg-green-100 text-green-700';
+            case 'Tidak Valid':
+                return 'bg-red-100 text-red-700';
+            case 'Belum Diverifikasi':
+            default:
+                return 'bg-yellow-100 text-yellow-700';
+        }
     }
 }

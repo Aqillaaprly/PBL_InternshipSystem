@@ -41,6 +41,12 @@
             </a>
         </div>
 
+        @if(session('recommended_job'))
+        <div class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+            Anda sedang mengikuti rekomendasi sistem untuk: <strong>{{ session('recommended_job') }}</strong>
+        </div>
+        @endif
+
         @if(session('success'))
         <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded">
             {{ session('success') }}
@@ -93,10 +99,10 @@
                     </td>
                     <td>{{ $pendaftar->catatan_admin ?? '-' }}</td>
                     <td class="flex gap-2">
-                        <button onclick="showDocuments('{{ $pendaftar->id }}')"
-                                class="text-blue-600 hover:text-blue-800 font-medium">
+                        <a href="{{ route('mahasiswa.pendaftar.dokumen', $pendaftar->id) }}"
+                           class="text-blue-600 hover:text-blue-800 font-medium">
                             Lihat Dokumen
-                        </button>
+                        </a>
                         @if($pendaftar->status_lamaran == 'Pending')
                         <form action="{{ route('mahasiswa.pendaftar.cancel', $pendaftar->id) }}" method="POST">
                             @csrf
@@ -123,52 +129,60 @@
         </div>
         @endif
     </div>
-</div>
 
-<!-- Document Modal -->
-<div id="documentModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[80vh] overflow-y-auto">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-semibold">Dokumen Pendaftaran</h3>
-            <button onclick="hideModal()" class="text-gray-500 hover:text-gray-700">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+    <!-- Application Form Section (if this page includes a form) -->
+    @if(isset($showForm) && $showForm)
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">Daftar Magang</h2>
+
+        @if(session('recommended_job'))
+        <div class="mb-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 rounded">
+            Anda sedang mengikuti rekomendasi sistem untuk: <strong>{{ session('recommended_job') }}</strong>
         </div>
-        <div id="documentContent">
-            <!-- Content will be loaded here via AJAX -->
-        </div>
+        @endif
+
+        <form action="{{ route('mahasiswa.pendaftar.store') }}" method="POST">
+            @csrf
+            <div class="mb-4">
+                <label for="lowongan_id" class="block text-sm font-medium text-gray-700 mb-2">
+                    Pilih Lowongan
+                </label>
+                <select name="lowongan_id"
+                        id="lowongan_id"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @if(session('recommended_job')) bg-gray-100 cursor-not-allowed @endif"
+                        @if(session('recommended_job')) disabled @endif
+                required>
+                <option value="">-- Pilih Lowongan --</option>
+                @if(isset($lowongans))
+                @foreach($lowongans as $lowongan)
+                <option value="{{ $lowongan->id }}"
+                        @if(session('recommended_job_id') == $lowongan->id) selected @endif>
+                {{ $lowongan->judul }} - {{ $lowongan->company->nama_perusahaan ?? 'N/A' }}
+                </option>
+                @endforeach
+                @endif
+                </select>
+                @if(session('recommended_job'))
+                <input type="hidden" name="lowongan_id" value="{{ session('recommended_job_id') }}">
+                <p class="text-xs text-gray-500 mt-1">Lowongan terkunci berdasarkan rekomendasi sistem</p>
+                @endif
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button type="button"
+                        onclick="window.history.back()"
+                        class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md">
+                    Batal
+                </button>
+                <button type="submit"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                    Daftar
+                </button>
+            </div>
+        </form>
     </div>
+    @endif
 </div>
-
-<script>
-    function showDocuments(pendaftarId) {
-        fetch(`/mahasiswa/pendaftar/dokumen/${pendaftarId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Dokumen tidak ditemukan');
-                }
-                return response.text();
-            })
-            .then(html => {
-                document.getElementById('documentContent').innerHTML = html;
-                document.getElementById('documentModal').classList.remove('hidden');
-            })
-            .catch(error => {
-                document.getElementById('documentContent').innerHTML = `
-                    <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                        ${error.message}
-                    </div>
-                `;
-                document.getElementById('documentModal').classList.remove('hidden');
-            });
-    }
-
-    function hideModal() {
-        document.getElementById('documentModal').classList.add('hidden');
-    }
-</script>
 
 @include('mahasiswa.template.footer')
 </body>

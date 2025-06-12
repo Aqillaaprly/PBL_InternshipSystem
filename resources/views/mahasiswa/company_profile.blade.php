@@ -1,12 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{ $company->nama_perusahaan }} - Profil Perusahaan | SIMMAGANG</title>
+    <title>Profil Perusahaan - {{ $company->nama_perusahaan ?? 'Perusahaan' }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
 
 <body class="bg-blue-50 text-gray-800 pt-20">
@@ -18,7 +23,7 @@
     <nav class="flex mb-6" aria-label="Breadcrumb">
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-                <a href="{{ route('mahasiswa.perusahaan') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                <a href="{{ route('mahasiswa.perusahaan.index') }}" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
                     <i class="fas fa-building mr-2"></i>
                     Daftar Perusahaan
                 </a>
@@ -39,20 +44,20 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 pb-6 border-b border-gray-200">
                 <!-- Logo -->
                 <div class="flex-shrink-0">
-                    @if($company->logo_path)
+                    @if($company->logo_path && Storage::disk('public')->exists($company->logo_path))
                     <img src="{{ asset('storage/' . $company->logo_path) }}"
                          alt="Logo {{ $company->nama_perusahaan }}"
                          class="w-24 h-24 rounded-lg object-cover border border-gray-200">
                     @else
-                    <div class="w-24 h-24 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center">
-                        <i class="fas fa-building text-gray-400 text-3xl"></i>
-                    </div>
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($company->nama_perusahaan) }}&size=96&background=2563EB&color=fff"
+                         alt="Logo Default"
+                         class="w-24 h-24 rounded-lg object-cover border border-gray-200">
                     @endif
                 </div>
 
                 <!-- Basic Info -->
                 <div class="flex-1">
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $company->nama_perusahaan }}</h1>
+                    <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ $company->nama_perusahaan ?? 'Nama Perusahaan' }}</h1>
 
                     <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm">
                         @if($company->email_perusahaan)
@@ -92,6 +97,19 @@
                 </div>
             </div>
 
+            <!-- Success Message -->
+            @if (session('success'))
+            <div class="bg-green-50 border-l-4 border-green-400 text-green-700 p-4 rounded-md" role="alert">
+                <div class="flex">
+                    <div class="py-1"><i class="fas fa-check-circle fa-lg mr-3 text-green-500"></i></div>
+                    <div>
+                        <p class="font-bold">Sukses!</p>
+                        <p class="text-sm">{{ session('success') }}</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Main Content Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left Column - Company Details -->
@@ -103,7 +121,7 @@
                             Alamat Perusahaan
                         </h2>
                         <div class="text-gray-700 space-y-2">
-                            <p class="whitespace-pre-line leading-relaxed">{{ $company->alamat }}</p>
+                            <p class="whitespace-pre-line leading-relaxed">{{ $company->alamat ?? 'Alamat tidak tersedia' }}</p>
                             <p class="font-medium">
                                 {{ $company->kota }}{{ $company->kota && $company->provinsi ? ', ' : '' }}
                                 {{ $company->provinsi }}
@@ -138,7 +156,7 @@
                             Deskripsi Perusahaan
                         </h2>
                         <div class="prose max-w-none text-gray-700 leading-relaxed">
-                            {!! nl2br(e($company->deskripsi)) !!}
+                            {!! nl2br(e($company->deskripsi ?? 'Tidak ada deskripsi tersedia')) !!}
                         </div>
                     </div>
                 </div>
@@ -174,6 +192,7 @@
                     </div>
 
                     <!-- Active Job Openings -->
+                    @if(isset($company->lowongans))
                     <div class="bg-gray-50 rounded-lg border border-gray-200 p-6">
                         <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center justify-between">
                             <span class="flex items-center">
@@ -217,12 +236,13 @@
                         </div>
                         @endif
                     </div>
+                    @endif
                 </div>
             </div>
 
             <!-- Back Button -->
             <div class="pt-6 border-t border-gray-200">
-                <a href="{{ route('mahasiswa.perusahaan') }}"
+                <a href="{{ route('mahasiswa.perusahaan.index') }}"
                    class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition duration-200">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Kembali ke Daftar Perusahaan
