@@ -6,24 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manajemen Perusahaan - Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Font Awesome for icons, if needed --}}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" xintegrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    {{-- Toastify-JS CDN links for notifications --}}
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
     <style>
+        /* Custom styles for status badges */
         .status-aktif {
-            background-color: #d1fae5; /* green-100 */
-            color: #065f46; /* green-800 */
+            background-color: #d1fae5;
+            /* green-100 */
+            color: #065f46;
+            /* green-800 */
         }
+
         .status-tidak-aktif {
-            background-color: #fee2e2; /* red-100 */
-            color: #991b1b; /* red-800 */
+            background-color: #fee2e2;
+            /* red-100 */
+            color: #991b1b;
+            /* red-800 */
         }
-        .status-dalam-pembahasan { /* Mengganti 'Review' menjadi 'Dalam Pembahasan' agar sesuai data */
-            background-color: #fef3c7; /* yellow-100 */
-            color: #92400e; /* yellow-800 */
+
+        .status-dalam-pembahasan {
+            /* Renamed to match 'Dalam Pembahasan' status */
+            background-color: #fef3c7;
+            /* yellow-100 */
+            color: #92400e;
+            /* yellow-800 */
         }
-         /* Ensure table cells do not wrap text */
-        .min-w-full th, .min-w-full td {
+
+        /* Ensure table cells do not wrap text and allow horizontal scroll */
+        .min-w-full th,
+        .min-w-full td {
             white-space: nowrap;
         }
-        /* Add horizontal scroll if content overflows */
+
         .overflow-x-auto {
             overflow-x: auto;
         }
@@ -40,8 +59,8 @@
                 <h1 class="text-2xl sm:text-3xl font-bold text-blue-800 mb-4 sm:mb-0">Manajemen Data Perusahaan</h1>
                 <a href="{{ route('admin.perusahaan.create') }}" class="bg-blue-600 text-white px-5 py-2 rounded-md text-sm hover:bg-blue-700 whitespace-nowrap shadow-sm sm:ml-auto">+ Tambah Perusahaan</a>
             </div>
-            
-            {{-- Form Pencarian Tunggal --}}
+
+            {{-- Single Search Form --}}
             <form method="GET" action="{{ route('admin.perusahaan.index') }}" class="mb-6">
                 <div class="flex flex-col sm:flex-row gap-4">
                     <div class="flex-grow">
@@ -71,59 +90,59 @@
                     </thead>
                     <tbody class="overflow-x: auto; text-gray-600 divide-y divide-gray-200">
                         @forelse ($companies as $index => $company)
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-5 py-4 text-center align-middle">{{ $companies->firstItem() + $index }}</td>
-                                <td class="px-5 py-4 align-middle">
-                                    @if ($company->logo_path && Storage::disk('public')->exists($company->logo_path))
-                                        <img src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo {{ $company->nama_perusahaan }}" class="h-10 w-10 object-contain rounded-md">
-                                    @else
-                                        <div class="h-10 w-10 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-xs">No Logo</div>
-                                    @endif
-                                </td>
-                                <td class="px-5 py-4 font-medium text-gray-900 align-middle">{{ $company->nama_perusahaan }}</td>
-                                <td class="px-5 py-4 align-middle">{{ $company->email_perusahaan }}</td>
-                                <td class="px-5 py-4 align-middle">{{ $company->telepon ?? '-' }}</td>
-                                <td class="px-5 py-4 align-middle">{{ $company->kota ?? '-' }}</td>
-                                <td class="px-5 py-4 align-middle">{{ $company->provinsi ?? '-' }}</td>
-                                <td class="px-5 py-4 text-center align-middle">
-                                    <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-5 py-4 text-center align-middle">{{ $companies->firstItem() + $index }}</td>
+                            <td class="px-5 py-4 align-middle">
+                                @if ($company->logo_path && Storage::disk('public')->exists($company->logo_path))
+                                <img src="{{ asset('storage/' . $company->logo_path) }}" alt="Logo {{ $company->nama_perusahaan }}" class="h-10 w-10 object-contain rounded-md">
+                                @else
+                                <div class="h-10 w-10 bg-gray-200 rounded-md flex items-center justify-center text-gray-400 text-xs">No Logo</div>
+                                @endif
+                            </td>
+                            <td class="px-5 py-4 font-medium text-gray-900 align-middle">{{ $company->nama_perusahaan }}</td>
+                            <td class="px-5 py-4 align-middle">{{ $company->email_perusahaan }}</td>
+                            <td class="px-5 py-4 align-middle">{{ $company->telepon ?? '-' }}</td>
+                            <td class="px-5 py-4 align-middle">{{ $company->kota ?? '-' }}</td>
+                            <td class="px-5 py-4 align-middle">{{ $company->provinsi ?? '-' }}</td>
+                            <td class="px-5 py-4 text-center align-middle">
+                                <span class="px-2 py-1 font-semibold leading-tight rounded-full text-xs
                                         @if ($company->status_kerjasama == 'Aktif') status-aktif
                                         @elseif ($company->status_kerjasama == 'Non-Aktif') status-tidak-aktif
-                                        @else status-dalam-pembahasan @endif"> 
-                                        {{ $company->status_kerjasama }}
-                                    </span>
-                                </td>
-                                <td class="px-5 py-4 text-center align-middle">
-                                    <div class="flex item-center justify-center space-x-2">
-                                        <a href="{{ route('admin.perusahaan.show', $company->id) }}" class="text-xs bg-sky-100 text-sky-600 hover:bg-sky-200 px-3 py-1.5 rounded-md font-medium">Detail</a>
-                                        <a href="{{ route('admin.perusahaan.edit', $company->id) }}" class="text-xs bg-yellow-100 text-yellow-600 hover:bg-yellow-200 px-3 py-1.5 rounded-md font-medium">Ubah</a>
-                                        <form action="{{ route('admin.perusahaan.destroy', $company->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus perusahaan ini? Ini juga akan menghapus lowongan dan akun login terkait jika ada.');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-md font-medium">Hapus</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
+                                        @else status-dalam-pembahasan @endif">
+                                    {{ $company->status_kerjasama }}
+                                </span>
+                            </td>
+                            <td class="px-5 py-4 text-center align-middle">
+                                <div class="flex item-center justify-center space-x-2">
+                                    <a href="{{ route('admin.perusahaan.show', $company->id) }}" class="text-xs bg-sky-100 text-sky-600 hover:bg-sky-200 px-3 py-1.5 rounded-md font-medium">Detail</a>
+                                    <a href="{{ route('admin.perusahaan.edit', $company->id) }}" class="text-xs bg-yellow-100 text-yellow-600 hover:bg-yellow-200 px-3 py-1.5 rounded-md font-medium">Ubah</a>
+                                    <form action="{{ route('admin.perusahaan.destroy', $company->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus perusahaan ini? Ini juga akan menghapus lowongan dan akun login terkait jika ada.');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-md font-medium">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="9" class="px-5 py-4 text-center text-gray-500">
-                                    @if(request('search'))
-                                        Tidak ada perusahaan ditemukan untuk pencarian "{{ request('search') }}".
-                                    @else
-                                        Belum ada data perusahaan.
-                                    @endif
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="9" class="px-5 py-4 text-center text-gray-500">
+                                @if(request('search'))
+                                Tidak ada perusahaan ditemukan untuk pencarian "{{ request('search') }}".
+                                @else
+                                Belum ada data perusahaan.
+                                @endif
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
             </div>
 
             @if ($companies->hasPages())
-                <div class="mt-6">
-                    {{ $companies->appends(request()->query())->links() }}
-                </div>
+            <div class="mt-6">
+                {{ $companies->appends(request()->query())->links() }}
+            </div>
             @endif
 
         </div>
@@ -132,7 +151,7 @@
     @include('admin.template.footer')
 
     <script>
-        // Display success message
+        // Display success message using Toastify
         @if (session('success'))
             Toastify({
                 text: "{{ session('success') }}",
@@ -152,11 +171,11 @@
                     x: 20, // horizontal axis - can be a number or a string indicating unity. eg: "2em"
                     y: 20 // vertical axis - can be a number or a string indicating unity. eg: "2em"
                 },
-                onClick: function(){} // Callback after click
+                onClick: function() {} // Callback after click
             }).showToast();
         @endif
 
-        // Display error message (e.g., from controller catches)
+        // Display general error message using Toastify
         @if (session('error'))
             Toastify({
                 text: "{{ session('error') }}",
@@ -176,11 +195,11 @@
                     x: 20,
                     y: 20
                 },
-                onClick: function(){}
+                onClick: function() {}
             }).showToast();
         @endif
 
-        // Display validation errors (iterates through $errors->all())
+        // Display validation errors using Toastify (iterates through $errors->all())
         @if ($errors->any())
             @foreach ($errors->all() as $error)
                 Toastify({
@@ -199,12 +218,13 @@
                     },
                     offset: {
                         x: 20,
-                        y: 20 + {{ $loop->index * 70 }} // Stagger multiple toasts if many errors
+                        y: 20 + {{ '$loop->index * 70' }} // Stagger multiple toasts if many errors
                     },
-                    onClick: function(){}
+                    onClick: function() {}
                 }).showToast();
             @endforeach
         @endif
     </script>
 </body>
+
 </html>
