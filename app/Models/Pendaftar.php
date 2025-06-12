@@ -19,6 +19,7 @@ class Pendaftar extends Model
         'surat_lamaran_path',
         'cv_path',
         'portofolio_path',
+        'daftar_riwayat_hidup_path',
         'catatan_pendaftar',
         'catatan_admin',
     ];

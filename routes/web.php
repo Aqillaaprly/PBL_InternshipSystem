@@ -154,6 +154,8 @@ Route::middleware(['auth', 'authorize:mahasiswa'])->prefix('mahasiswa')->name('m
         ->name('apply.from.lowongan');
     Route::get('/pendaftar/dokumen/{pendaftarId}', [MahasiswaPendaftarController::class, 'showDocuments'])
         ->name('pendaftar.dokumen');
+    Route::post('/pendaftar/{pendaftar}/dokumen/{document}/replace', [MahasiswaPendaftarController::class, 'replaceDocument'])
+        ->name('pendaftar.dokumen.replace');
 
     // Survey Routes - Updated and consolidated
     Route::get('/survey', [SurveyController::class, 'index'])->name('survey');

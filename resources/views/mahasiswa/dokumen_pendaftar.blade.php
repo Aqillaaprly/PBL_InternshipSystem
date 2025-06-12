@@ -18,9 +18,18 @@
         .document-table th {
             background-color: #F0F8FF;
             color: #374151;
+            font-weight: 600;
         }
         body {
             background-color: #F0F8FF;
+        }
+        .replace-form {
+            display: none;
+        }
+        .replace-form.active {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
         }
     </style>
 </head>
@@ -62,6 +71,7 @@
                     <th>Nama Dokumen</th>
                     <th>Status Validasi</th>
                     <th>File</th>
+                    <th>Aksi</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -83,6 +93,41 @@
                             Lihat Dokumen
                         </a>
                     </td>
+                    <td>
+                        @if($pendaftar->status_lamaran == 'Pending')
+                        <button onclick="toggleReplaceForm('replace-form-{{ $doc->id }}')"
+                                class="text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                            Ganti File
+                        </button>
+                        <div id="replace-form-{{ $doc->id }}" class="replace-form">
+                            <form action="{{ route('mahasiswa.pendaftar.dokumen.replace', ['pendaftar' => $pendaftar->id, 'document' => $doc->id]) }}"
+                                  method="POST"
+                                  enctype="multipart/form-data"
+                                  class="items-center">
+                                @csrf
+                                <input type="file" name="replacement_file" required
+                                       class="text-sm text-gray-500 file:mr-2 file:py-1 file:px-2
+                                              file:rounded file:border-0
+                                              file:text-xs file:font-medium
+                                              file:bg-blue-50 file:text-blue-700
+                                              hover:file:bg-blue-100 w-full mb-1">
+                                <div class="flex gap-1">
+                                    <button type="submit"
+                                            class="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded">
+                                        Upload
+                                    </button>
+                                    <button type="button"
+                                            onclick="toggleReplaceForm('replace-form-{{ $doc->id }}')"
+                                            class="px-2 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs rounded">
+                                        Batal
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        @else
+                        <span class="text-gray-400 text-sm">Tidak dapat diganti</span>
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
                 </tbody>
@@ -95,6 +140,13 @@
         @endif
     </div>
 </div>
+
+<script>
+    function toggleReplaceForm(formId) {
+        const form = document.getElementById(formId);
+        form.classList.toggle('active');
+    }
+</script>
 
 @include('mahasiswa.template.footer')
 </body>
