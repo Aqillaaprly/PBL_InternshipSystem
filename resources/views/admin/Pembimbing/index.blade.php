@@ -127,8 +127,6 @@
         </div>
     </main>
 
-    {{-- Include the admin footer --}}
-    @include('admin.template.footer')
 
     {{-- Toastify-JS Integration --}}
     <script>

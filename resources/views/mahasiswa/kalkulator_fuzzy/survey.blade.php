@@ -365,12 +365,5 @@
 
         window.onload = generateInputsUI;
     </script>
-
-    <!-- Footer Placeholder (Original was @include('mahasiswa.template.footer')) -->
-    <footer class="bg-gray-800 text-white p-6 mt-20">
-        <div class="container mx-auto text-center text-sm">
-            &copy; 2024 Aplikasi Magang. All rights reserved.
-        </div>
-    </footer>
 </body>
 </html>

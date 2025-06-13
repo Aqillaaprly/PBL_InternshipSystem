@@ -109,6 +109,5 @@
             @endif
         </div>
     </main>
-@include('perusahaan.template.footer')
 </body>
 </html>

@@ -111,7 +111,6 @@
             </div>
         </div>
     </main>
-    @include('perusahaan.template.footer')
 
     <script>
         // Get the data passed from the Laravel controller

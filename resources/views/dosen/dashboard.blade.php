@@ -225,7 +225,7 @@
             </div>
         </div>
     </main>
-    @include('dosen.template.footer')
+    
     <script>
 document.addEventListener('DOMContentLoaded', function () {
     // Pastikan variabel $statsProdiDiterima ada dan dikirim dari controller

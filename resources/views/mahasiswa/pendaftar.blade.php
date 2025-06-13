@@ -184,6 +184,5 @@
     @endif
 </div>
 
-@include('mahasiswa.template.footer')
 </body>
 </html>

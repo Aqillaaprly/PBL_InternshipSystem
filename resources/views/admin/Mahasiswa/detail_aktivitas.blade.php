@@ -36,7 +36,7 @@
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800 mb-2">Detail Kegiatan Magang Mahasiswa</h1>
                     {{-- Pastikan $mahasiswa tersedia dari controller --}}
-                    <p class="text-gray-600">Mahasiswa: **{{ $mahasiswa->name ?? 'N/A' }}** (NIM: {{ $mahasiswa->username ?? 'N/A' }})</p>
+                    <p class="text-gray-600">Mahasiswa: *{{ $mahasiswa->name ?? 'N/A' }}* (NIM: {{ $mahasiswa->username ?? 'N/A' }})</p>
                     @php
                         $companyName = 'Belum Ditentukan';
                         // Menggunakan 'pendaftars' sesuai relasi di model User
@@ -130,7 +130,6 @@
             @endif
         </div>
     </main>
-    @include('admin.template.footer')
 
     {{-- JavaScript untuk Bootstrap Modal (Pastikan jQuery, Popper.js, dan Bootstrap JS terload) --}}
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

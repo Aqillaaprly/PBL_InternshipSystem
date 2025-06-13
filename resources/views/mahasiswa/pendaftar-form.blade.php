@@ -260,6 +260,5 @@
     </div>
 </div>
 
-@include('mahasiswa.template.footer')
 </body>
 </html>

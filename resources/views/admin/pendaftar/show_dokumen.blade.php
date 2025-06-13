@@ -127,7 +127,6 @@
         </div>
     </main>
 
-    @include('admin.template.footer')
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

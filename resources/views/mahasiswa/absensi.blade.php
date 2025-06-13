@@ -62,7 +62,6 @@
     </div>
 </div>
 
-@include('mahasiswa.template.footer')
 
 <!-- Script -->
 <script>

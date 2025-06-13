@@ -234,7 +234,6 @@
         </div>
     </main>
 
-    @include('perusahaan.template.footer')
 
     {{-- Toastify-JS Integration --}}
     <script>

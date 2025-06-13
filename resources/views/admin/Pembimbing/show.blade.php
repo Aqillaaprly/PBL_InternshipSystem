@@ -216,7 +216,5 @@
         </div>
     </main>
 
-    {{-- Include the admin footer --}}
-    @include('admin.template.footer')
 </body>
 </html>

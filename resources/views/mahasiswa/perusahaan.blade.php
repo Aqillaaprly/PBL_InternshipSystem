@@ -193,7 +193,5 @@
     </div>
 </main>
 
-{{-- Footer --}}
-@include('mahasiswa.template.footer')
 </body>
 </html>

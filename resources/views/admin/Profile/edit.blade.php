@@ -218,7 +218,6 @@
         </div>
     </main>
 
-    @include('admin.template.footer')
 
     <script>
         const profilePictureInput = document.getElementById('profile_picture_input');

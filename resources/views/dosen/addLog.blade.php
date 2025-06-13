@@ -160,6 +160,5 @@
         </div>
     </main>
 
-    @include('dosen.template.footer')
 </body>
 </html>

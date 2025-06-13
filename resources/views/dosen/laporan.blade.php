@@ -100,8 +100,6 @@
 
     </main>
 
-    <!-- Footer -->
-   @include('admin.template.footer')
 
     <!-- Dropdown JS -->
     <script>

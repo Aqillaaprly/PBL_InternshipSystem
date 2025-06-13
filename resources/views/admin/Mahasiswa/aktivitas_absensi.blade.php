@@ -133,8 +133,7 @@
         </div>
     </main>
 
-    {{-- INCLUDE FOOTER --}}
-    @include('admin.template.footer')
+
 
     {{-- Toastify-JS Integration --}}
     <script>
@@ -145,8 +144,8 @@
                 duration: 3000, // 3 seconds
                 newWindow: true,
                 close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "right", // `left`, `center` or `right`
+                gravity: "top", // top or bottom
+                position: "right", // left, center or right
                 stopOnFocus: true, // Prevents dismissing on hover
                 style: {
                     background: "linear-gradient(to right, #4CAF50, #66BB6A)", // Green gradient

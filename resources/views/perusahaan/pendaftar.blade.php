@@ -140,7 +140,6 @@
         </div>
     </main>
 
-    @include('perusahaan.template.footer') {{-- Footer diubah ke perusahaan --}}
 
 </body>
 </html>

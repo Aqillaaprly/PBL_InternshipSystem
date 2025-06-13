@@ -135,6 +135,5 @@
         </div>
     </main>
 
-    @include('admin.template.footer') {{-- Sesuaikan path footer admin Anda --}}
 </body>
 </html>

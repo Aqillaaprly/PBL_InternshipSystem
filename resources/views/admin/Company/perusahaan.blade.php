@@ -148,7 +148,6 @@
         </div>
     </main>
 
-    @include('admin.template.footer')
 
     <script>
         // Display success message using Toastify

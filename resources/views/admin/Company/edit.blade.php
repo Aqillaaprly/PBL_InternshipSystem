@@ -259,7 +259,5 @@
             @endif
         </div>
     </main>
-
-    @include('admin.template.footer')
 </body>
 </html>

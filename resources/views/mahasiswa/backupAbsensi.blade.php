@@ -78,7 +78,6 @@
     </div>
 </div>
 
-@include('mahasiswa.template.footer')
 
 <!-- Modal Script -->
 <script>

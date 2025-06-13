@@ -113,7 +113,6 @@
             @endif
         </div>
     </main>
-    @include('admin.template.footer')
 
     {{-- Toastify-JS Integration --}}
     <script>
