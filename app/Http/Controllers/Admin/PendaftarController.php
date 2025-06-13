@@ -210,7 +210,7 @@ class PendaftarController extends Controller
 
         foreach ($storageDokumenTypes as $key => $namaDokumenStandar) {
             $label = $namaDokumenStandar;
-            $opsionalKeywords = ['sertifikat kompetensi', 'surat balasan', 'bpjs atau asuransi lain', 'sktm atau kip kuliah', 'proposal magang'];
+            $opsionalKeywords = ['sertifikat kompetensi', 'surat balasan', 'bpjs atau asuransi lain', 'sktm atau kip kuliah'];
             $isOptional = false;
             foreach ($opsionalKeywords as $keyword) {
                 if (stripos($namaDokumenStandar, $keyword) !== false) {

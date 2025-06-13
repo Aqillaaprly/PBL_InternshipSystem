@@ -67,11 +67,12 @@ class PendaftarController extends Controller
 
     public function submitPendaftaran(Request $request)
     {
-        // Validation rules
+        // ===== LANGKAH 1.1: TAMBAHKAN VALIDASI UNTUK RIWAYAT HIDUP =====
         $validatedData = $request->validate([
             'lowongan_id' => 'required|exists:lowongans,id',
             'surat_lamaran' => 'required|file|mimes:pdf,doc,docx|max:5120',
             'cv' => 'required|file|mimes:pdf,doc,docx|max:5120',
+            'riwayat_hidup' => 'required|file|mimes:pdf,doc,docx|max:5120', // Ditambahkan
             'portofolio' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
             'khs_transkrip' => 'required|file|mimes:pdf,doc,docx|max:5120',
             'ktp' => 'required|image|mimes:jpeg,png,jpg|max:2048',
@@ -97,7 +98,6 @@ class PendaftarController extends Controller
                 throw new \Exception('Anda harus login terlebih dahulu');
             }
 
-            // Check for existing application
             $existingApplication = Pendaftar::where('user_id', $userId)
                 ->where('lowongan_id', $validatedData['lowongan_id'])
                 ->exists();
@@ -106,7 +106,6 @@ class PendaftarController extends Controller
                 throw new \Exception('Anda sudah mendaftar untuk lowongan ini');
             }
 
-            // Create pendaftar record
             $pendaftar = Pendaftar::create([
                 'user_id' => $userId,
                 'lowongan_id' => $validatedData['lowongan_id'],
@@ -116,7 +115,7 @@ class PendaftarController extends Controller
                 'catatan_admin' => null,
             ]);
 
-            // Document configuration
+            // ===== LANGKAH 1.2: PISAHKAN KONFIGURASI DOKUMEN =====
             $documentConfig = [
                 'surat_lamaran' => [
                     'name' => 'Surat Lamaran',
@@ -124,7 +123,12 @@ class PendaftarController extends Controller
                     'type' => 'document'
                 ],
                 'cv' => [
-                    'name' => 'Daftar Riwayat Hidup (CV)',
+                    'name' => 'CV',
+                    'required' => true,
+                    'type' => 'document'
+                ],
+                'riwayat_hidup' => [ // Entri terpisah untuk Riwayat Hidup
+                    'name' => 'Daftar Riwayat Hidup',
                     'required' => true,
                     'type' => 'document'
                 ],
@@ -170,14 +174,12 @@ class PendaftarController extends Controller
                 ]
             ];
 
-            // Process each document
             foreach ($documentConfig as $field => $config) {
                 if ($request->hasFile($field)) {
                     $file = $request->file($field);
                     $originalExtension = $file->getClientOriginalExtension();
                     $extension = strtolower($originalExtension);
 
-                    // Validate file type
                     $allowedExtensions = $config['type'] === 'image'
                         ? ['jpg', 'jpeg', 'png']
                         : ['pdf', 'doc', 'docx'];
@@ -186,17 +188,15 @@ class PendaftarController extends Controller
                         throw new \Exception("Format file tidak valid untuk {$config['name']}");
                     }
 
-                    // Generate unique filename
                     $fileName = Str::slug($config['name']).'_'.time().'_'.Str::random(6).'.'.$extension;
                     $path = $file->storeAs("dokumen_pendaftar/{$pendaftar->id}", $fileName, 'public');
 
-                    // Create document record - aligned with database structure
                     DokumenPendaftar::create([
                         'pendaftar_id' => $pendaftar->id,
                         'nama_dokumen' => $config['name'],
                         'file_path' => $path,
-                        'tipe_file' => $extension, // Store the file extension
-                        'status_validasi' => 'Belum Diverifikasi' // Default value as per database
+                        'tipe_file' => $extension,
+                        'status_validasi' => 'Belum Diverifikasi'
                     ]);
 
                 } elseif ($config['required']) {
@@ -223,12 +223,10 @@ class PendaftarController extends Controller
 
     public function cancelPendaftaran(Pendaftar $pendaftar)
     {
-        // Verify ownership first
         if ($pendaftar->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
-        // Only allow cancellation of pending applications
         if ($pendaftar->status_lamaran !== 'Pending') {
             return redirect()
                 ->back()
@@ -238,17 +236,13 @@ class PendaftarController extends Controller
         DB::beginTransaction();
 
         try {
-            // Delete associated documents and files
             foreach ($pendaftar->dokumenPendaftars as $document) {
-                // Delete file from storage
                 if (Storage::disk('public')->exists($document->file_path)) {
                     Storage::disk('public')->delete($document->file_path);
                 }
-                // Delete database record
                 $document->delete();
             }
 
-            // Delete the application
             $pendaftar->delete();
 
             DB::commit();
@@ -295,7 +289,6 @@ class PendaftarController extends Controller
                 ->with('error', 'Silakan login terlebih dahulu');
         }
 
-        // Check if user already applied for this job
         $existing = Pendaftar::where('user_id', $userId)
             ->where('lowongan_id', $lowonganId)
             ->exists();
@@ -306,17 +299,10 @@ class PendaftarController extends Controller
                 ->with('error', 'Anda sudah mendaftar untuk lowongan ini');
         }
 
-        // Redirect to application form with pre-selected job
         return redirect()
             ->route('mahasiswa.pendaftar.form', ['lowongan_id' => $lowonganId]);
     }
 
-    /**
-     * Get document validation status badge class
-     *
-     * @param string $status
-     * @return string
-     */
     protected function getValidationStatusBadge($status)
     {
         switch ($status) {
