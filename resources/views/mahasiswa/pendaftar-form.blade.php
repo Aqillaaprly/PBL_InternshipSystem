@@ -22,7 +22,6 @@
             <p class="text-gray-500 mt-2">Lengkapi form berikut untuk mendaftar magang. Pastikan semua dokumen yang diperlukan sudah siap.</p>
         </div>
 
-        {{-- Menampilkan Pesan Error Validasi --}}
         @if ($errors->any())
             <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
                 <p class="font-bold">Gagal Mengirim Pendaftaran:</p>
@@ -34,16 +33,15 @@
             </div>
         @endif
         
-        {{-- Menampilkan Pesan Error dari Controller --}}
         @if (session('error'))
             <div class="mb-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md" role="alert">
                 <p>{{ session('error') }}</p>
             </div>
         @endif
 
-
+        {{-- Pastikan tag form memiliki enctype="multipart/form-data" --}}
         <form action="{{ route('mahasiswa.pendaftar.submit') }}" method="POST" enctype="multipart/form-data">
-            @csrf
+        @csrf
 
             {{-- Pilih Lowongan --}}
             <div class="mb-6">
@@ -82,8 +80,13 @@
                             <div>
                                 <label for="riwayat_hidup" class="block text-sm font-medium text-gray-700">Daftar Riwayat Hidup <span class="text-red-500">*</span></label>
                                 <input type="file" name="riwayat_hidup" id="riwayat_hidup" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
-                                <p class="text-xs text-gray-500 mt-1">Dokumen ini berbeda dari CV.</p>
                             </div>
+                            
+                            <div>
+                                <label for="portofolio" class="block text-sm font-medium text-gray-700">Portofolio <span class="text-red-500">*</span></label>
+                                <input type="file" name="portofolio" id="portofolio" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
+                            </div>
+
                             <div>
                                 <label for="khs_transkrip" class="block text-sm font-medium text-gray-700">KHS / Transkrip Nilai <span class="text-red-500">*</span></label>
                                 <input type="file" name="khs_transkrip" id="khs_transkrip" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" required>
@@ -115,11 +118,6 @@
                     <div class="bg-gray-50 p-6 rounded-xl border border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Dokumen Tambahan</h3>
                         <div class="space-y-4">
-                            <div>
-                                <label for="portofolio" class="block text-sm font-medium text-gray-700">Portofolio</label>
-                                <input type="file" name="portofolio" id="portofolio" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-                            </div>
-                            
                             <div>
                                 <label for="sertifikat_kompetensi" class="block text-sm font-medium text-gray-700">Sertifikat Kompetensi</label>
                                 <input type="file" name="sertifikat_kompetensi" id="sertifikat_kompetensi" class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
