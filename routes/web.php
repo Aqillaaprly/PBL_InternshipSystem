@@ -79,7 +79,6 @@ Route::middleware(['auth', 'authorize:admin'])->prefix('admin')->name('admin.')-
     // Aktivitas & Absensi Mahasiswa (Admin View Only)
     Route::get('/aktivitas-mahasiswa', [AktivitasController::class, 'index'])->name('aktivitas-mahasiswa.index'); // Tabel utama mahasiswa
     Route::get('/aktivitas-mahasiswa/{mahasiswa_id}', [AktivitasController::class, 'show'])->name('aktivitas-mahasiswa.show'); // Halaman detail kegiatan
-    Route::post('/aktivitas-mahasiswa/{id}/verify', [AktivitasController::class, 'verify'])->name('aktivitas-mahasiswa.verify'); // Untuk verifikasi aktivitas
 
     Route::post('/bimbingan', [BimbinganController::class, 'store'])->name('bimbingan.store');
     Route::get('/bimbingan/create', [BimbinganController::class, 'create'])->name('bimbingan.create');

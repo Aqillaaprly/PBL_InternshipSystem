@@ -68,6 +68,7 @@ class AktivitasController extends Controller
         $aktivitas = AktivitasMagang::where('mahasiswa_id', $mahasiswa->id)
                                     ->orderBy('tanggal', 'desc')
                                     ->get();
+                                    
 
         // Teruskan variabel $bimbingan, $aktivitas, dan $mahasiswa ke view
         return view('admin.Mahasiswa.detail_aktivitas', compact('bimbingan', 'aktivitas', 'mahasiswa'));
